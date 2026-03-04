@@ -256,6 +256,173 @@
             margin-bottom: 10px;
         }
 
+        /* QuantManus Skills 生态 */
+        .skills-ecosystem {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            color: #e0e0e0;
+        }
+
+        .skills-ecosystem-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d2ff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skills-ecosystem-subtitle {
+            font-size: 13px;
+            color: #8892b0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .skills-arch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .skills-arch {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .arch-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .arch-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0,210,255,0.4);
+        }
+
+        .arch-card h5 {
+            color: #64ffda;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .arch-card p {
+            font-size: 12px;
+            color: #a0a8c0;
+            line-height: 1.6;
+        }
+
+        .skills-grid-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .skill-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-3px);
+            border-color: #64ffda;
+            background: rgba(100,255,218,0.08);
+        }
+
+        .skill-card .skill-icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .skill-card .skill-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ccd6f6;
+            margin-bottom: 4px;
+        }
+
+        .skill-card .skill-desc {
+            font-size: 11px;
+            color: #8892b0;
+        }
+
+        .skill-card.active {
+            border-color: #64ffda;
+            background: rgba(100,255,218,0.1);
+        }
+
+        .skill-card.active .skill-name::after {
+            content: " ✓";
+            color: #64ffda;
+            font-size: 11px;
+        }
+
+        .skill-card.planned {
+            border-style: dashed;
+            opacity: 0.7;
+        }
+
+        .skill-card.planned .skill-name::after {
+            content: " (规划中)";
+            color: #8892b0;
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+        .skills-repo-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,210,255,0.15);
+            border: 1px solid rgba(0,210,255,0.3);
+            color: #00d2ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-decoration: none;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .skills-repo-link:hover {
+            background: rgba(0,210,255,0.25);
+        }
+
+        .ecosystem-flow {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            color: #8892b0;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .ecosystem-flow .flow-highlight {
+            color: #64ffda;
+        }
+
+        .ecosystem-flow .flow-accent {
+            color: #00d2ff;
+        }
+
         .hobby-list {
             display: flex;
             flex-wrap: wrap;
@@ -383,7 +550,7 @@
                         <li>⭐ <strong>开源与社区贡献</strong>：维护2个开源项目，累计获得253 stars和27 forks；运营公众号「策略算法杂谈」5000+粉丝，在量化社区具有影响力</li>
                         <li>自主开发并运行实盘交易系统，实现A股+ETF混合策略自动化交易</li>
                         <li>二次开发Alphalens因子分析工具（170⭐ 18🍴），适配国内市场，成为热门因子分析工具</li>
-                        <li>开发Quantmanus量化智能体（84⭐ 9🍴），基于Claude Code架构的量化领域AI助手</li>
+                        <li>开发Quantmanus量化智能体（84⭐ 9🍴），基于Claude Code架构的量化领域AI助手，并构建独立的可插拔 Skills 技能生态系统</li>
                         <li>构建Barra多因子风险模型，进行因子收益归因与风险分解</li>
                     </ul>
                 </div>
@@ -532,6 +699,84 @@
                         <span class="tech-badge">83⭐ 9🍴</span>
                         <span class="tech-badge">Python</span>
                     </div>
+
+                    <!-- QuantManus Skills 生态系统 -->
+                    <div class="skills-ecosystem">
+                        <div class="skills-ecosystem-title">
+                            ⚡ Awsome-QuantManus-SKILLS — Agent 技能生态
+                        </div>
+                        <div class="skills-ecosystem-subtitle">
+                            为 QuantManus 构建的可插拔技能扩展体系。每个 Skill 是一份结构化 SKILL.md 文档，Agent 在规划和执行任务时按需加载，形成完整的量化 AI Agent 生态。
+                            独立仓库维护，社区可贡献。
+                        </div>
+
+                        <!-- 架构设计 -->
+                        <div class="skills-arch">
+                            <div class="arch-card">
+                                <h5>🏗️ Skills 架构机制</h5>
+                                <p>全局安装于 ~/.quantmanus/skills/，每个 Skill 为独立子目录，包含 SKILL.md（Frontmatter 元数据 + Markdown 正文）。支持 Always-on（注入 System Prompt）与按需加载两种模式。</p>
+                            </div>
+                            <div class="arch-card">
+                                <h5>🔌 依赖与发现</h5>
+                                <p>Skill 通过 requires 字段声明 CLI 工具和环境变量依赖，Agent 启动时 SkillsLoader 自动扫描、检查依赖、构建技能列表，以 XML 摘要注入 System Prompt 供 Planner 决策。</p>
+                            </div>
+                            <div class="arch-card">
+                                <h5>🧩 模块化分层</h5>
+                                <p>Skills（全局技能）与 Bootstrap（项目级自定义）、Memory（项目级记忆）三层分离。技能安装一次即可跨项目复用，项目配置与记忆跟随工作目录。</p>
+                            </div>
+                            <div class="arch-card">
+                                <h5>📦 社区可扩展</h5>
+                                <p>独立 GitHub 仓库（<a href="https://github.com/GenjiYin/Awsome-QuantManus-SKILLS" target="_blank" style="color: #00d2ff; text-decoration: none;">Awsome-QuantManus-SKILLS</a>）维护技能组，任何人可贡献新 Skill，只需创建目录并编写 SKILL.md。</p>
+                            </div>
+                        </div>
+
+                        <!-- 加载流程 -->
+                        <div class="ecosystem-flow">
+                            <span class="flow-accent">Agent 启动</span> → <span class="flow-highlight">SkillsLoader</span> 扫描 skills/ → 解析 Frontmatter → 检查 requires 依赖<br>
+                            &nbsp;&nbsp;├─ <span class="flow-highlight">Always-on</span> 技能 → 全文注入 <span class="flow-accent"># Active Skills</span><br>
+                            &nbsp;&nbsp;├─ 所有技能 → XML 摘要注入 <span class="flow-accent"># Skills</span>（name / description / available）<br>
+                            &nbsp;&nbsp;└─ 运行时 → Planner 参考摘要规划 → 按需 <span class="flow-highlight">read_file</span> 加载完整 SKILL.md
+                        </div>
+
+                        <!-- 技能卡片展示 -->
+                        <div style="font-size: 14px; color: #ccd6f6; font-weight: bold; margin-bottom: 10px;">已收录 / 规划中的 Skills</div>
+                        <div class="skills-grid-showcase">
+                            <div class="skill-card active">
+                                <div class="skill-icon">📄</div>
+                                <div class="skill-name">pdf</div>
+                                <div class="skill-desc">PyMuPDF PDF 文档处理</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">📊</div>
+                                <div class="skill-name">data-analysis</div>
+                                <div class="skill-desc">数据分析与可视化</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">🌐</div>
+                                <div class="skill-name">web-scraping</div>
+                                <div class="skill-desc">网页数据抓取</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">📈</div>
+                                <div class="skill-name">factor-analysis</div>
+                                <div class="skill-desc">因子分析与 IC 检验</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">🔄</div>
+                                <div class="skill-name">backtest</div>
+                                <div class="skill-desc">策略回测框架集成</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">⚠️</div>
+                                <div class="skill-name">risk-model</div>
+                                <div class="skill-desc">Barra 风险建模</div>
+                            </div>
+                        </div>
+
+                        <a href="https://github.com/GenjiYin/Awsome-QuantManus-SKILLS" target="_blank" class="skills-repo-link">
+                            📂 Awsome-QuantManus-SKILLS 仓库 — 查看完整技能组与贡献指南 →
+                        </a>
+                    </div>
                 </div>
                 <div class="project">
                     <div class="project-header">
@@ -575,7 +820,7 @@
                         <ul style="padding-left: 20px;">
                             <li style="margin: 10px 0;">• <strong>实盘经验</strong>：个人量化策略迄今为止年化收益26.02%、最大回撤5.93%、夏普比率1.5+，深刻理解实盘与回测的差异，策略经历完整市场周期验证</li>
                             <li style="margin: 10px 0;">• <strong>开源与社区影响力</strong>：维护2个开源项目（Alphalens改进版170⭐、Quantmanus 83⭐），累计253 stars；运营公众号「策略算法杂谈」5000+粉丝，在量化社区具有较高认可度</li>
-                            <li style="margin: 10px 0;">• <strong>全栈开发能力</strong>：掌握从因子研究、策略开发、回测验证到实盘部署的完整量化交易流程，并自主开发AI智能体工具</li>
+                            <li style="margin: 10px 0;">• <strong>全栈开发能力</strong>：掌握从因子研究、策略开发、回测验证到实盘部署的完整量化交易流程，并自主开发AI智能体工具及可插拔 Skills 技能扩展生态</li>
                             <li style="margin: 10px 0;">• <strong>风险管理</strong>：熟悉Barra风险模型、风险平价等风险管理方法，注重策略的风险收益比优化</li>
                             <li style="margin: 10px 0;">• <strong>技术深度</strong>：精通多种回测框架（Backtrader、VNPy），能够根据需求二次开发与优化，擅长解决滑点、冲击成本、订单管理等实际问题</li>
                         </ul>
