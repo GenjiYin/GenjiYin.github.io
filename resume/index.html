@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XiaoYinXu 的个人信息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header-right {
+            margin-left: 30px;
+        }
+
+        .photo {
+            width: 140px;
+            height: 180px;
+            border-radius: 8px;
+            border: 4px solid white;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .name {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .title {
+            font-size: 22px;
+            color: #ecf0f1;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .contact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            color: #bdc3c7;
+        }
+
+        .contact-item::before {
+            content: "▪";
+            margin-right: 8px;
+            color: #3498db;
+            font-size: 18px;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #2c3e50;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .skill-category {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+
+        .skill-category h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .skill-category ul {
+            list-style: none;
+        }
+
+        .skill-category li {
+            padding: 4px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .skill-category li::before {
+            content: "✓";
+            color: #3498db;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .project {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .project:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .project-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .project-tag {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .project-tag.live {
+            background: #e74c3c;
+        }
+
+        .project-tag.research {
+            background: #9b59b6;
+        }
+
+        .project-tag.tool {
+            background: #16a085;
+        }
+
+        .project-desc {
+            color: #555;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tech-badge {
+            background: white;
+            color: #3498db;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #3498db;
+        }
+
+        .highlights {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .highlights h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .highlights ul {
+            list-style: none;
+        }
+
+        .highlights li {
+            padding: 5px 0;
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .highlights li::before {
+            content: "★";
+            color: #ffc107;
+            margin-right: 8px;
+        }
+
+        .hobby-section {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .hobby-section h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        /* QuantManus Skills 生态 */
+        .skills-ecosystem {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            color: #e0e0e0;
+        }
+
+        .skills-ecosystem-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d2ff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .skills-ecosystem-subtitle {
+            font-size: 13px;
+            color: #8892b0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .skills-arch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .skills-arch {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .arch-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .arch-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0,210,255,0.4);
+        }
+
+        .arch-card h5 {
+            color: #64ffda;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .arch-card p {
+            font-size: 12px;
+            color: #a0a8c0;
+            line-height: 1.6;
+        }
+
+        .skills-grid-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .skill-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-3px);
+            border-color: #64ffda;
+            background: rgba(100,255,218,0.08);
+        }
+
+        .skill-card .skill-icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .skill-card .skill-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #ccd6f6;
+            margin-bottom: 4px;
+        }
+
+        .skill-card .skill-desc {
+            font-size: 11px;
+            color: #8892b0;
+        }
+
+        .skill-card.active {
+            border-color: #64ffda;
+            background: rgba(100,255,218,0.1);
+        }
+
+        .skill-card.active .skill-name::after {
+            content: " ✓";
+            color: #64ffda;
+            font-size: 11px;
+        }
+
+        .skill-card.planned {
+            border-style: dashed;
+            opacity: 0.7;
+        }
+
+        .skill-card.planned .skill-name::after {
+            content: " (规划中)";
+            color: #8892b0;
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+        .skills-repo-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,210,255,0.15);
+            border: 1px solid rgba(0,210,255,0.3);
+            color: #00d2ff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-decoration: none;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        .skills-repo-link:hover {
+            background: rgba(0,210,255,0.25);
+        }
+
+        .ecosystem-flow {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            color: #8892b0;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .ecosystem-flow .flow-highlight {
+            color: #64ffda;
+        }
+
+        .ecosystem-flow .flow-accent {
+            color: #00d2ff;
+        }
+
+        .hobby-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hobby-item {
+            background: white;
+            color: #2e7d32;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 2px solid #4caf50;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .project:hover {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-right {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+
+            .name {
+                font-size: 32px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .skill-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部信息 -->
+        <div class="header">
+            <div class="header-left">
+                <div class="name">XiaoYinXu</div>
+                <div class="title">量化交易工程师 | 金融量化 | 实盘交易 | 因子研究</div>
+                <div class="contact">
+                    <div class="contact-item">📧 965418170@qq.com</div>
+                    <div class="contact-item">📱 138-xxxx-xxxx</div>
+                    <div class="contact-item">💼 GitHub: github.com/GenjiYin</div>
+                    <div class="contact-item">📝 公众号: 策略算法杂谈（5000+ 粉丝）</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <img src="./figure/照片.jpg" alt="个人照片" class="photo">
+            </div>
+        </div>
+
+        <!-- 主要内容 -->
+        <div class="main-content">
+
+            <!-- 核心技能 -->
+            <div class="section">
+                <h2 class="section-title">核心技能</h2>
+                <div class="skill-grid">
+                    <div class="skill-category">
+                        <h4>量化交易</h4>
+                        <ul>
+                            <li>多因子选股策略</li>
+                            <li>风险平价配置</li>
+                            <li>配对交易策略</li>
+                            <li>CTA趋势策略</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <h4>实盘系统</h4>
+                        <ul>
+                            <li>QMT接口开发</li>
+                            <li>订单管理系统</li>
+                            <li>自动化调仓</li>
+                            <li>风控与监控</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <h4>回测框架</h4>
+                        <ul>
+                            <li>Backtrader</li>
+                            <li>VNPy</li>
+                            <li>Zipline</li>
+                            <li>自定义回测引擎</li>
+                        </ul>
+                    </div>
+                    <div class="skill-category">
+                        <h4>技术栈</h4>
+                        <ul>
+                            <li>Python / NumPy / Pandas</li>
+                            <li>DuckDB / SQL</li>
+                            <li>因子分析 / 风险建模</li>
+                            <li>PyQt UI开发</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心项目亮点 -->
+            <div class="section">
+                <div class="highlights">
+                    <h4>核心项目亮点</h4>
+                    <ul>
+                        <li>🏆 <strong>实盘经验</strong>：个人自有资金实盘运行中，迄今为止年化收益率26.02%、最大回撤5.93%、夏普比率1.5+</li>
+                        <li>⭐ <strong>开源与社区贡献</strong>：维护2个开源项目，累计获得253 stars和27 forks；运营公众号「策略算法杂谈」5000+粉丝，在量化社区具有影响力</li>
+                        <li>自主开发并运行实盘交易系统，实现A股+ETF混合策略自动化交易</li>
+                        <li>二次开发Alphalens因子分析工具（170⭐ 18🍴），适配国内市场，成为热门因子分析工具</li>
+                        <li>开发Quantmanus量化智能体（84⭐ 9🍴），基于Claude Code架构的量化领域AI助手，并构建独立的可插拔 Skills 技能生态系统</li>
+                        <li>构建Barra多因子风险模型，进行因子收益归因与风险分解</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 量化交易项目 -->
+            <div class="section">
+                <h2 class="section-title">量化交易项目</h2>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div class="project-name">📈 A股实盘交易系统</div>
+                        <div class="project-tag live">实盘运行</div>
+                    </div>
+                    <div class="project-desc">
+                        基于QMT接口开发的全自动化股票交易系统，实现多因子选股与风险平价ETF配置的混合策略。<strong style="color: #e74c3c;">迄今未知年化收益率26.02%，最大回撤5.93%。</strong>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>• <strong>实盘验证</strong>：个人自有资金实盘运行中，年化收益率26.02%、最大回撤5.93%，策略覆盖多种市场行情，验证了模型的稳健性</li>
+                            <li>• <strong>智能下单系统</strong>：采用先卖后买的订单队列机制，解决实盘中买卖同时下单导致的资金冻结问题</li>
+                            <li>• <strong>混合策略配置</strong>：多因子选股 + 大类资产，根据月份动态调整仓位配比</li>
+                            <li>• <strong>自动化调仓</strong>：基于schedule模块实现定时任务，交易日判断与27天调仓周期控制</li>
+                            <li>• <strong>风险管理</strong>：实时持仓跟踪、交易日志记录、异常处理机制</li>
+                        </ul>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">QMT API</span>
+                        <span class="tech-badge">XtQuant</span>
+                        <span class="tech-badge">多因子模型</span>
+                        <span class="tech-badge">风险平价</span>
+                        <span class="tech-badge">DuckDB</span>
+                        <span class="tech-badge">年化28% | 回撤16%</span>
+                    </div>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div class="project-name">🔬 Barra风险模型实现</div>
+                        <div class="project-tag research">因子研究</div>
+                    </div>
+                    <div class="project-desc">
+                        基于Barra框架构建多因子风险模型，实现因子收益分解与风险归因分析。项目包含完整的因子数据生成、风险模型估计、因子收益计算与可视化分析流程。
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>• 实现市值、行业等风格因子与特质风险的分离</li>
+                            <li>• 构建协方差矩阵，进行组合风险分解</li>
+                            <li>• 支持因子暴露度计算与风险归因分析</li>
+                        </ul>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Barra模型</span>
+                        <span class="tech-badge">风险建模</span>
+                        <span class="tech-badge">因子分解</span>
+                        <span class="tech-badge">NumPy</span>
+                        <span class="tech-badge">Pandas</span>
+                    </div>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div class="project-name">⚡ 期货CTA策略系统</div>
+                        <div class="project-tag live">VNPy实盘</div>
+                    </div>
+                    <div class="project-desc">
+                        基于VNPy框架开发的期货CTA策略回测与实盘系统。包含ATR突破、RSI反转等多种策略实现，支持参数优化与策略组合。
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>• 实现海龟交易法则、ATR突破、RSI策略等经典CTA策略</li>
+                            <li>• 支持CTP接口实盘交易，包含完整的风控模块</li>
+                            <li>• 开发参数优化系统，实现策略批量回测与结果分析</li>
+                            <li>• 日内与日线级别策略兼容，支持多周期K线合成</li>
+                        </ul>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">VNPy</span>
+                        <span class="tech-badge">CTP接口</span>
+                        <span class="tech-badge">CTA策略</span>
+                        <span class="tech-badge">参数优化</span>
+                        <span class="tech-badge">风险控制</span>
+                    </div>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div class="project-name">📊 多策略回测平台</div>
+                        <div class="project-tag">Backtrader</div>
+                    </div>
+                    <div class="project-desc">
+                        基于Backtrader框架构建的多策略回测系统，包含配对交易、指数择时等多种策略实现。开发PyQt可视化界面，支持策略参数调整、指标配置与回测结果展示。
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>• <strong>配对交易</strong>：协整检验+残差标准化，实现统计套利策略</li>
+                            <li>• <strong>指数择时</strong>：基于技术指标的趋势跟踪策略</li>
+                            <li>• <strong>可视化界面</strong>：PyQt开发的策略测试平台，支持实时图表展示</li>
+                            <li>• 集成finplot高性能图表库，实现交易信号可视化</li>
+                        </ul>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Backtrader</span>
+                        <span class="tech-badge">配对交易</span>
+                        <span class="tech-badge">PyQt5</span>
+                        <span class="tech-badge">Finplot</span>
+                        <span class="tech-badge">统计套利</span>
+                    </div>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div class="project-name">🔍 Alphalens因子分析工具（二次开发）</div>
+                        <div class="project-tag research">因子挖掘</div>
+                    </div>
+                    <div class="project-desc">
+                        二次开发Alphalens因子分析库，适配国内市场，构建因子挖掘与评价体系。<strong style="color: #9b59b6;">开源项目获得170 stars和18 forks，成为国内量化因子分析的热门工具。</strong>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>• <strong>开源影响力</strong>：GitHub开源项目（<a href="https://github.com/GenjiYin/alphalens_modify" target="_blank" style="color: #3498db; text-decoration: none;">github.com/GenjiYin/alphalens_modify</a>），获得170 stars和18 forks</li>
+                            <li>• <strong>本地化改造</strong>：修改Alphalens源码，适配国内市场数据格式与交易规则</li>
+                            <li>• <strong>因子有效性检验</strong>：实现IC、IR、分层收益、多空组合等完整的因子评价指标</li>
+                            <li>• <strong>可视化增强</strong>：优化因子分析报告的图表展示，提升用户体验</li>
+                            <li>• <strong>实战应用</strong>：支持市盈率等估值因子研究，为多因子选股提供基础工具</li>
+                        </ul>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">Alphalens</span>
+                        <span class="tech-badge">开源项目</span>
+                        <span class="tech-badge">170⭐ 18🍴</span>
+                        <span class="tech-badge">因子IC分析</span>
+                        <span class="tech-badge">分层回测</span>
+                    </div>
+                </div>
+
+                <div class="project">
+                    <div class="project-header">
+                        <div class="project-name">🤖 Quantmanus量化智能体</div>
+                        <div class="project-tag tool">AI Agent</div>
+                    </div>
+                    <div class="project-desc">
+                        自主开发的量化领域通用智能体，参考Claude Code架构设计，专注于量化交易场景的AI辅助开发工具。<strong style="color: #16a085;">开源项目获得83 stars和9 forks，受到量化社区关注。</strong>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>• <strong>开源影响力</strong>：GitHub开源项目（<a href="https://github.com/GenjiYin/QuantManus" target="_blank" style="color: #3498db; text-decoration: none;">github.com/GenjiYin/QuantManus</a>），获得83 stars和9 forks</li>
+                            <li>• <strong>智能体架构</strong>：参考Claude Code的Agent设计模式，实现量化策略的智能辅助开发</li>
+                            <li>• <strong>领域专精</strong>：针对量化交易场景优化，理解因子研究、策略回测、实盘部署等专业概念</li>
+                            <li>• <strong>工具集成</strong>：集成数据查询、策略分析、代码生成等功能模块</li>
+                            <li>• <strong>实用性</strong>：显著提升量化策略开发效率，减少重复性工作</li>
+                        </ul>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">AI Agent</span>
+                        <span class="tech-badge">LLM应用</span>
+                        <span class="tech-badge">开源项目</span>
+                        <span class="tech-badge">83⭐ 9🍴</span>
+                        <span class="tech-badge">Python</span>
+                    </div>
+
+                    <!-- QuantManus Skills 生态系统 -->
+                    <div class="skills-ecosystem">
+                        <div class="skills-ecosystem-title">
+                            ⚡ Awsome-QuantManus-SKILLS — Agent 技能生态
+                        </div>
+                        <div class="skills-ecosystem-subtitle">
+                            为 QuantManus 构建的可插拔技能扩展体系。每个 Skill 是一份结构化 SKILL.md 文档，Agent 在规划和执行任务时按需加载，形成完整的量化 AI Agent 生态。
+                            独立仓库维护，社区可贡献。
+                        </div>
+
+                        <!-- 架构设计 -->
+                        <div class="skills-arch">
+                            <div class="arch-card">
+                                <h5>🏗️ Skills 架构机制</h5>
+                                <p>全局安装于 ~/.quantmanus/skills/，每个 Skill 为独立子目录，包含 SKILL.md（Frontmatter 元数据 + Markdown 正文）。支持 Always-on（注入 System Prompt）与按需加载两种模式。</p>
+                            </div>
+                            <div class="arch-card">
+                                <h5>🔌 依赖与发现</h5>
+                                <p>Skill 通过 requires 字段声明 CLI 工具和环境变量依赖，Agent 启动时 SkillsLoader 自动扫描、检查依赖、构建技能列表，以 XML 摘要注入 System Prompt 供 Planner 决策。</p>
+                            </div>
+                            <div class="arch-card">
+                                <h5>🧩 模块化分层</h5>
+                                <p>Skills（全局技能）与 Bootstrap（项目级自定义）、Memory（项目级记忆）三层分离。技能安装一次即可跨项目复用，项目配置与记忆跟随工作目录。</p>
+                            </div>
+                            <div class="arch-card">
+                                <h5>📦 社区可扩展</h5>
+                                <p>独立 GitHub 仓库（<a href="https://github.com/GenjiYin/Awsome-QuantManus-SKILLS" target="_blank" style="color: #00d2ff; text-decoration: none;">Awsome-QuantManus-SKILLS</a>）维护技能组，任何人可贡献新 Skill，只需创建目录并编写 SKILL.md。</p>
+                            </div>
+                        </div>
+
+                        <!-- 加载流程 -->
+                        <div class="ecosystem-flow">
+                            <span class="flow-accent">Agent 启动</span> → <span class="flow-highlight">SkillsLoader</span> 扫描 skills/ → 解析 Frontmatter → 检查 requires 依赖<br>
+                            &nbsp;&nbsp;├─ <span class="flow-highlight">Always-on</span> 技能 → 全文注入 <span class="flow-accent"># Active Skills</span><br>
+                            &nbsp;&nbsp;├─ 所有技能 → XML 摘要注入 <span class="flow-accent"># Skills</span>（name / description / available）<br>
+                            &nbsp;&nbsp;└─ 运行时 → Planner 参考摘要规划 → 按需 <span class="flow-highlight">read_file</span> 加载完整 SKILL.md
+                        </div>
+
+                        <!-- 技能卡片展示 -->
+                        <div style="font-size: 14px; color: #ccd6f6; font-weight: bold; margin-bottom: 10px;">已收录 / 规划中的 Skills</div>
+                        <div class="skills-grid-showcase">
+                            <div class="skill-card active">
+                                <div class="skill-icon">📄</div>
+                                <div class="skill-name">pdf</div>
+                                <div class="skill-desc">PyMuPDF PDF 文档处理</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">📊</div>
+                                <div class="skill-name">data-analysis</div>
+                                <div class="skill-desc">数据分析与可视化</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">🌐</div>
+                                <div class="skill-name">web-scraping</div>
+                                <div class="skill-desc">网页数据抓取</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">📈</div>
+                                <div class="skill-name">factor-analysis</div>
+                                <div class="skill-desc">因子分析与 IC 检验</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">🔄</div>
+                                <div class="skill-name">backtest</div>
+                                <div class="skill-desc">策略回测框架集成</div>
+                            </div>
+                            <div class="skill-card planned">
+                                <div class="skill-icon">⚠️</div>
+                                <div class="skill-name">risk-model</div>
+                                <div class="skill-desc">Barra 风险建模</div>
+                            </div>
+                        </div>
+
+                        <a href="https://github.com/GenjiYin/Awsome-QuantManus-SKILLS" target="_blank" class="skills-repo-link">
+                            📂 Awsome-QuantManus-SKILLS 仓库 — 查看完整技能组与贡献指南 →
+                        </a>
+                    </div>
+                </div>
+                <div class="project">
+                    <div class="project-header">
+                        <div class="project-name">📝 微信公众号「策略算法杂谈」</div>
+                        <div class="project-tag research">知识分享</div>
+                    </div>
+                    <div class="project-desc">
+                        运营量化策略领域技术公众号，专注于策略投研方法的探究与分享，累计发布<strong style="color: #9b59b6;">63篇原创内容</strong>，积累<strong style="color: #9b59b6;">5000+ 粉丝</strong>。
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>• <strong>内容方向</strong>：策略投研方法探究，涵盖因子研究、策略开发、技术指标研究等量化交易核心话题</li>
+                            <li>• <strong>代表文章</strong>：「技术指标研究——神奇九转」阅读2.3万、「一个简单的多因子策略」阅读1.0万</li>
+                            <li>• <strong>社区影响</strong>：积累5000+粉丝，63篇原创内容，在量化投研领域具有一定影响力</li>
+                        </ul>
+                    </div>
+                    <div class="project-tech">
+                        <span class="tech-badge">公众号</span>
+                        <span class="tech-badge">策略投研</span>
+                        <span class="tech-badge">5000+ 粉丝</span>
+                        <span class="tech-badge">63篇原创</span>
+                        <span class="tech-badge">知识分享</span>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; justify-content: center; align-items: flex-start; gap: 25px; flex-wrap: wrap;">
+                        <div style="text-align: center;">
+                            <img src="./figure/公众号二维码.jpg" alt="公众号二维码" style="width: 140px; height: 140px; border-radius: 8px; border: 2px solid #9b59b6; object-fit: cover;">
+                            <p style="font-size: 12px; color: #888; margin-top: 5px;">扫码关注</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="./figure/公众号内容展示.png" alt="公众号内容展示" style="height: 180px; border-radius: 8px; border: 2px solid #9b59b6; object-fit: contain;">
+                            <p style="font-size: 12px; color: #888; margin-top: 5px;">公众号内容展示</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 个人优势 -->
+            <div class="section">
+                <h2 class="section-title">专业优势</h2>
+                <div class="project">
+                    <div class="project-desc">
+                        <ul style="padding-left: 20px;">
+                            <li style="margin: 10px 0;">• <strong>实盘经验</strong>：个人量化策略迄今为止年化收益26.02%、最大回撤5.93%、夏普比率1.5+，深刻理解实盘与回测的差异，策略经历完整市场周期验证</li>
+                            <li style="margin: 10px 0;">• <strong>开源与社区影响力</strong>：维护2个开源项目（Alphalens改进版170⭐、Quantmanus 83⭐），累计253 stars；运营公众号「策略算法杂谈」5000+粉丝，在量化社区具有较高认可度</li>
+                            <li style="margin: 10px 0;">• <strong>全栈开发能力</strong>：掌握从因子研究、策略开发、回测验证到实盘部署的完整量化交易流程，并自主开发AI智能体工具及可插拔 Skills 技能扩展生态</li>
+                            <li style="margin: 10px 0;">• <strong>风险管理</strong>：熟悉Barra风险模型、风险平价等风险管理方法，注重策略的风险收益比优化</li>
+                            <li style="margin: 10px 0;">• <strong>技术深度</strong>：精通多种回测框架（Backtrader、VNPy），能够根据需求二次开发与优化，擅长解决滑点、冲击成本、订单管理等实际问题</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 兴趣爱好 -->
+            <div class="section">
+                <h2 class="section-title">兴趣与爱好</h2>
+                <div class="hobby-section">
+                    <h4>技术探索</h4>
+                    <div class="hobby-list">
+                        <div class="hobby-item">🎵 音乐可视化开发</div>
+                        <div class="hobby-item">📚 学术论文阅读（Arxiv）</div>
+                        <div class="hobby-item">🎨 PPT设计与演示</div>
+                        <div class="hobby-item">🔧 开源工具二次开发</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div style="text-align:center; padding: 16px 0 8px; color: rgba(255,255,255,0.7); font-size: 13px;">
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本站总访问量 <span id="busuanzi_value_site_pv"></span> 次 &nbsp;|&nbsp; 访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </div>
+</body>
+</html>
