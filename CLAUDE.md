@@ -38,6 +38,7 @@
   4. 提供"下载图片"按钮
 - 依赖：`https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js`
 - 卡片内容：作者名、分类标签、标题、摘要、页面 URL、二维码
+- **卡片摘要（excerpt）必须与主页文章卡片的 `post-excerpt` 内容保持一致**
 
 ---
 
