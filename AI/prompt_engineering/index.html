@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不用学编程，也能用好AI：写给新手的"提示词工程"入门指南 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-ai { background: rgba(255,165,0,0.12); color: #ffa657; border: 1px solid rgba(255,165,0,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p {
+            margin-bottom: 16px;
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li {
+            margin-bottom: 8px;
+        }
+
+        .article-body strong {
+            color: #e6edf3;
+        }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: bold;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #21262d;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .article-body td {
+            padding: 10px 14px;
+            border: 1px solid #21262d;
+            vertical-align: top;
+        }
+
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td  { background: #161b22; }
+
+        .formula-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .formula-block .formula-title {
+            font-size: 12px;
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .formula-block .formula-main {
+            font-size: 17px;
+            color: #e6edf3;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .formula-block .formula-example {
+            font-size: 13px;
+            color: #8b949e;
+            line-height: 1.8;
+        }
+
+        .formula-block .formula-example span {
+            color: #ffa657;
+            font-weight: bold;
+        }
+
+        .tip-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .tip-block .tip-label {
+            font-size: 12px;
+            color: #3fb950;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .error-block {
+            background: rgba(248,81,73,0.06);
+            border: 1px solid rgba(248,81,73,0.2);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+
+        .error-block .error-label {
+            font-size: 12px;
+            color: #f85149;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .summary-block {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 32px 0;
+            text-align: center;
+            font-size: 18px;
+            color: #e6edf3;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-ai">AI 工程</span>
+                <span class="article-date">2026-04</span>
+            </div>
+            <h1 class="article-title">不用学编程，也能用好 AI：写给新手的"提示词工程"入门指南</h1>
+            <p class="article-subtitle">你有没有遇到过这种情况：看到别人用 AI 写出精彩的文章、做出漂亮的图表，但自己打开 ChatGPT 或 Kimi 时，却不知道该说什么，只能干巴巴地问一句"你好"？</p>
+        </div>
+
+        <div class="article-body">
+
+            <p>如果你点头了，那这篇文章就是为你写的。</p>
+
+            <h2>一、什么是"提示词工程"？别被名字吓到</h2>
+
+            <p>提示词工程（Prompt Engineering），听起来像是一门需要写代码的技术课，对吧？</p>
+            <p>其实不是。它更像是一门"说话的艺术"——学习怎么跟 AI "好好说话"，让它听懂你的需求，给出你想要的答案。</p>
+
+            <blockquote>
+                你走进一家餐厅，如果只说一句"我要吃饭"，服务员可能会愣住。<br>
+                但如果说"我想吃清淡一点的，有推荐吗？预算 100 元左右"，结果就会好很多。
+            </blockquote>
+
+            <p>跟 AI 交流也是一样的道理。提示词工程，就是教你如何把模糊的"我要吃饭"，变成清晰的"我要吃什么、怎么吃、花多少钱"。</p>
+
+            <h2>二、为什么你总觉得 AI "不太聪明"？</h2>
+
+            <p>很多时候，不是 AI 不够聪明，而是我们给它的指令太模糊了。来看一组对比：</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>❌ 模糊的提问</th>
+                        <th>✅ 清晰的提问</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>"帮我写个文案"</td>
+                        <td>"帮我写一条朋友圈文案，推广我新开的咖啡店，风格要温馨治愈，字数 50 字左右"</td>
+                    </tr>
+                    <tr>
+                        <td>"解释一下量子力学"</td>
+                        <td>"用小学生能听懂的话，解释一下什么是量子力学，最好举个生活中的例子"</td>
+                    </tr>
+                    <tr>
+                        <td>"给我一些建议"</td>
+                        <td>"我是一名大三学生，想找工作但不知道选互联网还是国企，能分析一下各自的优缺点吗？"</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>发现规律了吗？</strong>清晰的提问通常包含这些要素：</p>
+            <ul>
+                <li><strong>身份：</strong>你是谁（大学生 / 职场人 / 家长……）</li>
+                <li><strong>任务：</strong>具体要做什么（写文案 / 做分析 / 给建议……）</li>
+                <li><strong>风格：</strong>希望用什么语气（专业 / 幽默 / 简单……）</li>
+                <li><strong>格式：</strong>输出形式（列表 / 段落 / 表格……）</li>
+            </ul>
+
+            <h2>三、一个万能公式，新手直接套用</h2>
+
+            <p>不想记太多理论？给你一个"傻瓜公式"，每次用 AI 前填个空就行：</p>
+
+            <div class="formula-block">
+                <div class="formula-title">万能公式</div>
+                <div class="formula-main">【角色】 + 【任务】 + 【要求】 + 【格式】</div>
+                <div class="formula-example">
+                    <span>角色：</span>你是一位有 10 年经验的健身教练<br>
+                    <span>任务：</span>帮我制定一周的减脂食谱<br>
+                    <span>要求：</span>食材要常见、做法简单，每餐热量控制在 500 卡以内<br>
+                    <span>格式：</span>用表格呈现，包含早餐、午餐、晚餐
+                </div>
+            </div>
+
+            <p>把这段话发给 AI，你会得到一份比"帮我做个减肥计划"好得多的方案。</p>
+
+            <h2>四、三个小技巧，让你的 AI "更听话"</h2>
+
+            <div class="tip-block">
+                <div class="tip-label">技巧 1：给 AI 一个"人设"</div>
+                <p>AI 可以扮演任何角色。当你需要专业建议时，不妨直接告诉它：</p>
+                <blockquote style="margin: 12px 0 0;">"你是一位资深 HR，帮我看看这份简历有什么需要改进的地方"</blockquote>
+                <p style="margin-top:12px; color:#8b949e; font-size:13px;">这比"帮我看看简历"有效得多，因为 AI 会调用"HR"的知识库和表达习惯来回答你。</p>
+            </div>
+
+            <div class="tip-block">
+                <div class="tip-label">技巧 2：用"举个例子"让 AI 理解你的风格</div>
+                <p>如果你不知道怎么说清楚要求，直接给例子：</p>
+                <blockquote style="margin: 12px 0 0;">"请用类似下面这种轻松幽默的风格，写一段关于'拖延症'的文案：<br>【例子】'我的健身卡已经过期了，但我的健身计划还没开始。'"</blockquote>
+                <p style="margin-top:12px; color:#8b949e; font-size:13px;">这就是"少样本提示"——给 AI 一个样本，它就能模仿你的风格。</p>
+            </div>
+
+            <div class="tip-block">
+                <div class="tip-label">技巧 3：让 AI "一步步想"</div>
+                <p>遇到复杂问题（比如数学题、逻辑分析），在问题最后加一句：</p>
+                <blockquote style="margin: 12px 0 0;">"请一步步思考" 或 "Let's think step by step"</blockquote>
+                <p style="margin-top:12px; color:#8b949e; font-size:13px;">这句话有魔力。它会让 AI 展示思考过程，而不是直接给答案，准确率会明显提升。</p>
+            </div>
+
+            <h2>五、新手常犯的 3 个错误</h2>
+
+            <div class="error-block">
+                <div class="error-label">❌ 错误 1：一次问太多</div>
+                <p>"帮我写一篇文章，分析一下经济形势，再做个 PPT 大纲，顺便给几个演讲建议……"</p>
+                <p style="margin-top:8px; color:#8b949e; font-size:13px;">AI 会懵。一次只问一件事，或者明确说"分三点回答"。</p>
+            </div>
+
+            <div class="error-block">
+                <div class="error-label">❌ 错误 2：不说明背景</div>
+                <p>"这个方案怎么样？"</p>
+                <p style="margin-top:8px; color:#8b949e; font-size:13px;">AI 不知道"这个方案"是什么。粘贴上下文很重要。</p>
+            </div>
+
+            <div class="error-block">
+                <div class="error-label">❌ 错误 3：不满意就放弃</div>
+                <p>第一次回答不好？继续追问！比如：</p>
+                <ul style="margin-top:8px; color:#8b949e; font-size:13px;">
+                    <li>"能不能更简洁一点？"</li>
+                    <li>"请用更通俗的语言解释"</li>
+                    <li>"第三点我不太懂，能展开说说吗？"</li>
+                </ul>
+                <p style="margin-top:8px; color:#8b949e; font-size:13px;">对话是连续的，你不需要一次问完美。</p>
+            </div>
+
+            <h2>六、写在最后</h2>
+
+            <p>提示词工程不是什么高深技术，它更像是一种思维方式——学会清晰地表达需求，学会给 AI 足够的上下文，学会在对话中逐步优化。</p>
+            <p>你不需要记住所有技巧，只要记住这句话：</p>
+
+            <div class="summary-block">
+                跟 AI 说话，就像跟一位聪明但有点"直"的朋友说话。<br>
+                <span style="font-size:15px; font-weight:normal; color:#8b949e; margin-top:8px; display:block;">你说得越清楚，他做得越好。</span>
+            </div>
+
+            <p>现在，打开你的 AI 工具，试试今天学到的技巧吧。从"你好"到"你好，请帮我……"，这就是进步的开始。</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+</body>
+</html>
