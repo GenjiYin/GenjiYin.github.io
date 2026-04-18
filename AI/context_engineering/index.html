@@ -360,6 +360,7 @@
             </div>
             <h1 class="article-title">AI 总是"失忆"？一篇文章看懂什么是"上下文工程"</h1>
             <p class="article-subtitle">你有没有遇到过这种情况：和 AI 聊了半天，它突然忘了你之前说过什么？或者你让它分析一份长文档，它却漏看了关键段落？</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
         </div>
 
         <div class="article-body">
@@ -557,10 +558,6 @@
             </div>
 
         </div>
-
-        <button class="share-btn" onclick="openShareModal()">
-            ↗ 分享这篇文章
-        </button>
     </div>
 
     <!-- 分享弹窗 -->
@@ -591,9 +588,9 @@
             tagColor: '#ffa657',
             title: 'AI 总是"失忆"？\n一篇文章看懂什么是"上下文工程"',
             excerpt: '上下文工程不是教 AI 怎么回答，而是帮 AI 准备好资料再回答。\n从信息筛选、记忆管理到连接外部知识库，一文看懂 AI 的"桌面整理术"。',
-            site: 'genjiyin.github.io',
             author: 'XiaoYinXu',
-            tag: 'AI 工程'
+            tag: 'AI 工程',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
         };
 
         function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
@@ -642,7 +639,7 @@
             const pad = 40;
 
             // author + tag row
-            ctx.font = 'bold 13px "Microsoft YaHei", Arial, sans-serif';
+            ctx.font = 'bold 13px ' + CARD.font;
             ctx.fillStyle = CARD.textSecondary;
             ctx.fillText(CARD.author, pad, 44);
 
@@ -652,7 +649,7 @@
             ctx.fillStyle = CARD.tagBg;
             roundRect(ctx, tagX, 30, tagW, 20, 4);
             ctx.fill();
-            ctx.font = 'bold 11px "Microsoft YaHei", Arial, sans-serif';
+            ctx.font = 'bold 11px ' + CARD.font;
             ctx.fillStyle = CARD.tagColor;
             ctx.fillText(CARD.tag, tagX + 8, 44);
 
@@ -665,19 +662,20 @@
             ctx.stroke();
 
             // title
-            ctx.font = 'bold 22px "Microsoft YaHei", Arial, sans-serif';
+            ctx.font = 'bold 22px ' + CARD.font;
             ctx.fillStyle = CARD.textPrimary;
             const titleBottom = wrapText(ctx, CARD.title, pad, 96, CARD.w - pad * 2, 34);
 
             // excerpt
-            ctx.font = '13px "Microsoft YaHei", Arial, sans-serif';
+            ctx.font = '13px ' + CARD.font;
             ctx.fillStyle = CARD.textSecondary;
             wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, CARD.w - pad * 2, 22);
 
             // bottom site url
-            ctx.font = '12px "Microsoft YaHei", Arial, sans-serif';
+            const site = window.location.href;
+            ctx.font = '12px ' + CARD.font;
             ctx.fillStyle = CARD.accent;
-            ctx.fillText('↗  ' + CARD.site, pad, CARD.h - 24);
+            ctx.fillText('↗  ' + site, pad, CARD.h - 24);
         }
 
         function roundRect(ctx, x, y, w, h, r) {
