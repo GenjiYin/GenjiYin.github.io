@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI总是"失忆"？一篇文章看懂什么是"上下文工程" — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-ai { background: rgba(255,165,0,0.12); color: #ffa657; border: 1px solid rgba(255,165,0,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p {
+            margin-bottom: 16px;
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li {
+            margin-bottom: 8px;
+        }
+
+        .article-body strong {
+            color: #e6edf3;
+        }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: bold;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #21262d;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .article-body td {
+            padding: 10px 14px;
+            border: 1px solid #21262d;
+            vertical-align: top;
+        }
+
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td  { background: #161b22; }
+
+        .tip-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .tip-block .tip-label {
+            font-size: 12px;
+            color: #3fb950;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .scene-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .scene-block .scene-label {
+            font-size: 13px;
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .summary-block {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 32px 0;
+            text-align: center;
+            font-size: 18px;
+            color: #e6edf3;
+            font-weight: bold;
+        }
+
+        .practice-block {
+            background: rgba(63,185,80,0.06);
+            border: 1px solid rgba(63,185,80,0.2);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 32px 0;
+        }
+
+        .practice-block .practice-label {
+            font-size: 13px;
+            color: #3fb950;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-ai">AI 工程</span>
+                <span class="article-date">2026-04</span>
+            </div>
+            <h1 class="article-title">AI 总是"失忆"？一篇文章看懂什么是"上下文工程"</h1>
+            <p class="article-subtitle">你有没有遇到过这种情况：和 AI 聊了半天，它突然忘了你之前说过什么？或者你让它分析一份长文档，它却漏看了关键段落？</p>
+        </div>
+
+        <div class="article-body">
+
+            <p>如果有，那今天这篇文章就是为你写的。我们要聊一个听起来很技术、但其实很生活化的概念——<strong>上下文工程</strong>。</p>
+
+            <h2>一、先讲个故事：为什么 AI 会"失忆"？</h2>
+
+            <p>想象一下，你请了一位超级聪明的助理，但他有个奇怪的设定：只能记住最近 10 分钟对话，而且一次最多只能看 20 页文件。</p>
+            <p>这就是现在 AI 的真实情况。</p>
+            <p>虽然 ChatGPT、Kimi 这些 AI 看起来很聪明，但它们有个"生理限制"——<strong>上下文窗口</strong>。你可以把它理解为 AI 的"工作记忆"或"桌面空间"：</p>
+            <ul>
+                <li>桌面太小 → 文件铺不开 → 找东西费劲</li>
+                <li>聊太久 → 前面的内容被"挤"出记忆 → AI 开始"失忆"</li>
+            </ul>
+            <p>上下文工程，就是解决这个问题的"空间整理术"。</p>
+
+            <h2>二、从"好好说话"到"整理好桌面"</h2>
+
+            <p>你可能听说过"提示词工程"——就是学习怎么跟 AI "好好说话"。比如：</p>
+            <ul>
+                <li>❌ 普通说法："写个文案"</li>
+                <li>✅ 优化说法："你是一位资深文案，帮我写一条朋友圈推广咖啡，风格温馨，50 字左右"</li>
+            </ul>
+            <p>这很重要，但到 2024 年，大家发现光会"说话"不够了。</p>
+            <p>因为当 AI 要处理几百页合同、分析一整年的销售数据、或者陪你聊一个下午的工作时，问题的关键不再是"怎么说"，而是<strong>"给 AI 看什么"</strong>。</p>
+
+            <blockquote>
+                提示词工程 = 你告诉厨师"我要吃辣一点的宫保鸡丁"<br>
+                上下文工程 = 你把新鲜的鸡肉、花生、辣椒摆在厨师面前，并确保厨房整洁、工具顺手
+            </blockquote>
+
+            <p>这就是上下文工程的核心：<strong>不是教 AI 怎么回答，而是帮 AI "准备好资料"再回答。</strong></p>
+
+            <h2>三、上下文工程到底在做什么？</h2>
+
+            <p>简单来说，就是帮 AI 动态地、精准地准备"参考资料"。具体包括：</p>
+
+            <h3>1. 筛选信息，而非堆砌信息</h3>
+
+            <p>AI 的"桌面"有限，不能什么都往上堆。上下文工程要做的，是只放最相关的东西。</p>
+            <p>举个例子：你让 AI 分析一份 100 页的合同，找出"违约责任"条款。</p>
+            <ul>
+                <li>❌ 笨办法：把 100 页全塞给 AI</li>
+                <li>✅ 聪明办法：先用搜索工具找到包含"违约""责任""赔偿"的页面，只把这几页给 AI 看</li>
+            </ul>
+            <p>这就像你考试前不会把整本书背下来，而是只看老师划的重点。</p>
+
+            <h3>2. 记住该记住的，忘掉该忘掉的</h3>
+
+            <p>AI 不会自动区分"重要信息"和"废话"。上下文工程要帮它管理记忆：</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>怎么处理</th>
+                        <th>例子</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>临时信息</td>
+                        <td>用完就扔</td>
+                        <td>刚才算的数学题步骤</td>
+                    </tr>
+                    <tr>
+                        <td>对话历史</td>
+                        <td>精简摘要</td>
+                        <td>把 10 轮对话总结成 3 句话</td>
+                    </tr>
+                    <tr>
+                        <td>长期偏好</td>
+                        <td>存起来下次用</td>
+                        <td>你喜欢简洁风格还是详细解释</td>
+                    </tr>
+                    <tr>
+                        <td>实时数据</td>
+                        <td>需要时再去查</td>
+                        <td>今天的股价、天气</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3. 连接外部"工具"和"知识库"</h3>
+
+            <p>AI 本身只知道训练时的知识，会过时。上下文工程让它能实时查资料：</p>
+            <ul>
+                <li>查公司内部的规章制度</li>
+                <li>调用计算器做复杂运算</li>
+                <li>搜索最新的新闻和数据</li>
+            </ul>
+            <p>这就像给 AI 配了一个"research 团队"，需要资料时随时支援。</p>
+
+            <h2>四、一个生活中的类比：整理行李箱</h2>
+
+            <p>假设你要出差一周，行李箱（上下文窗口）空间有限，你会怎么收拾？</p>
+
+            <div class="tip-block">
+                <div class="tip-label">❌ 普通做法（没有上下文工程）</div>
+                <p>把所有衣服、鞋子、洗漱用品胡乱塞进去</p>
+                <p style="color:#8b949e; font-size:13px; margin-top:8px;">结果：箱子爆了，到了酒店找不到东西，重要文件被压在底下</p>
+            </div>
+
+            <div class="tip-block">
+                <div class="tip-label">✅ 上下文工程的做法</div>
+                <ul>
+                    <li>看天气预报（了解需求）→ 决定带什么衣服</li>
+                    <li>分装收纳袋（结构化）→ 内衣一袋、外套一袋、证件单独放</li>
+                    <li>每天出门前整理（动态更新）→ 今天穿的放最上面</li>
+                    <li>重要文件随身带（优先级）→ 护照、身份证永远好拿</li>
+                </ul>
+            </div>
+
+            <p>上下文工程，就是帮 AI 做这样的"行李箱整理"。</p>
+
+            <h2>五、实际应用场景</h2>
+
+            <div class="scene-block">
+                <div class="scene-label">场景 1：智能客服</div>
+                <p><strong>以前：</strong>你问"我上周的订单怎么了"，AI 回答"请问您要查询哪笔订单？"（忘了你是谁）</p>
+                <p style="margin-top:12px;"><strong>用上上下文工程后：</strong></p>
+                <ul style="margin-top:8px;">
+                    <li>自动调取你的用户档案</li>
+                    <li>查看最近 30 天的订单记录</li>
+                    <li>结合当前物流状态</li>
+                </ul>
+                <p style="margin-top:8px; color:#8b949e;">回答："您上周三购买的咖啡机，今天已经到上海转运中心，预计明天送达"</p>
+            </div>
+
+            <div class="scene-block">
+                <div class="scene-label">场景 2：法律助手</div>
+                <p><strong>以前：</strong>上传 100 页合同，AI 分析到后面忘了前面的定义条款</p>
+                <p style="margin-top:12px;"><strong>用上上下文工程后：</strong></p>
+                <ul style="margin-top:8px;">
+                    <li>先扫描全文，提取所有"定义"和"关键条款"</li>
+                    <li>建立索引："第 3 页提到'不可抗力'，第 15 页、第 28 页有详细说明"</li>
+                    <li>分析时随时跳转查阅，像律师查资料一样</li>
+                </ul>
+            </div>
+
+            <div class="scene-block">
+                <div class="scene-label">场景 3：编程助手</div>
+                <p><strong>以前：</strong>AI 建议的代码和项目现有风格不一致</p>
+                <p style="margin-top:12px;"><strong>用上上下文工程后：</strong></p>
+                <ul style="margin-top:8px;">
+                    <li>自动读取项目的技术架构文档</li>
+                    <li>分析你之前写的代码风格</li>
+                    <li>查看相关的 API 接口定义</li>
+                    <li>生成的新代码完美融入现有项目</li>
+                </ul>
+            </div>
+
+            <h2>六、给普通用户的实用建议</h2>
+
+            <p>你不需要懂技术，也能用上上下文工程的思想：</p>
+
+            <div class="tip-block">
+                <div class="tip-label">✅ 做这些</div>
+                <ul>
+                    <li><strong>分段对话：</strong>长任务拆成几步，每步确认清楚再下一步</li>
+                    <li><strong>主动提供背景：</strong>开头就说"我是高中生""我在做市场调研"</li>
+                    <li><strong>粘贴关键资料：</strong>把相关段落复制进来，别指望 AI 记得全文</li>
+                    <li><strong>定期总结：</strong>聊久了可以说"总结一下我们刚才讨论的要点"</li>
+                </ul>
+            </div>
+
+            <div class="tip-block" style="border-color: rgba(248,81,73,0.2); background: rgba(248,81,73,0.04);">
+                <div class="tip-label" style="color: #f85149;">❌ 避免这些</div>
+                <ul>
+                    <li>一次扔给 AI 几十页文档让它"随便看看"</li>
+                    <li>聊了很久后突然问"你觉得我一开始说的那个方案怎么样"（AI 可能已遗忘）</li>
+                    <li>期待 AI 记住你上周聊过的内容（除非产品有专门的历史记录功能）</li>
+                </ul>
+            </div>
+
+            <h2>七、写在最后</h2>
+
+            <p>AI 的能力越来越强，但它依然需要你的帮助来"准备舞台"。</p>
+            <p>上下文工程不是什么高深技术，它更像是一种信息管理的思维方式——学会筛选、组织、更新信息，让 AI 在有限的"注意力"里，看到最重要的事。</p>
+
+            <div class="summary-block">
+                AI 不是全知全能的神，而是一个需要好资料的聪明助理。<br>
+                <span style="font-size:15px; font-weight:normal; color:#8b949e; margin-top:8px; display:block;">你的工作，就是帮它准备好那些资料。</span>
+            </div>
+
+            <p>下次当 AI "答非所问"或"失忆"时，不妨想想：是不是该帮它整理一下"桌面"了？</p>
+
+            <div class="practice-block">
+                <div class="practice-label">💡 小练习</div>
+                <p>试着在和 AI 对话时，用这个方法开头：</p>
+                <blockquote style="margin-top: 12px; font-style: normal; color: #c9d1d9;">
+                    "我要做[什么事]，背景是[简单介绍]，相关资料如下：[粘贴关键内容]"
+                </blockquote>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+</body>
+</html>
