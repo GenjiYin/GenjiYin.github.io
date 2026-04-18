@@ -263,6 +263,74 @@
 
         .back-link:hover { opacity: 0.75; }
 
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+
         footer {
             text-align: center;
             padding: 20px;
@@ -299,6 +367,7 @@
             </div>
             <h1 class="article-title">不用学编程，也能用好 AI：写给新手的"提示词工程"入门指南</h1>
             <p class="article-subtitle">你有没有遇到过这种情况：看到别人用 AI 写出精彩的文章、做出漂亮的图表，但自己打开 ChatGPT 或 Kimi 时，却不知道该说什么，只能干巴巴地问一句"你好"？</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
         </div>
 
         <div class="article-body">
@@ -436,6 +505,112 @@
         <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
         本页访问量 <span id="busuanzi_value_page_pv"></span> 次
     </footer>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+            textPrimary: '#e6edf3', textSecondary: '#8b949e',
+            tagBg: 'rgba(255,165,0,0.12)', tagColor: '#ffa657',
+            title: '不用学编程，也能用好 AI：\n写给新手的"提示词工程"入门指南',
+            excerpt: '提示词工程不是写代码，是一门说话的艺术。\n一个万能公式、三个实用技巧，帮你把模糊的指令变成 AI 真正听得懂的语言。',
+            author: 'XiaoYinXu', tag: 'AI 工程',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const chars = line.split('');
+                let row = '';
+                for (let i = 0; i < chars.length; i++) {
+                    const test = row + chars[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = chars[i];
+                        curY += lineHeight;
+                    } else { row = test; }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        function drawCard(canvas) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const pad = 40;
+
+            ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+            ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, CARD.w - pad * 2, 34);
+
+            ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, CARD.w - pad * 2, 22);
+
+            ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + window.location.href, pad, CARD.h - 24);
+        }
+
+        function openShareModal() {
+            drawCard(document.getElementById('shareCanvas'));
+            document.getElementById('shareOverlay').classList.add('active');
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay'))
+                document.getElementById('shareOverlay').classList.remove('active');
+        }
+
+        function downloadCard() {
+            const a = document.createElement('a');
+            a.download = 'prompt-engineering-card.png';
+            a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+            a.click();
+        }
+    </script>
 
 </body>
 </html>
