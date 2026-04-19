@@ -703,11 +703,29 @@
             }
         }
 
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
         function openShareModal() {
             const url = window.location.href;
             const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-            if (isMobile && navigator.share) {
-                navigator.share({ title: document.title, url: url }).catch(() => {});
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    try {
+                        const ta = document.createElement('textarea');
+                        ta.value = url; ta.style.cssText = 'position:fixed;opacity:0';
+                        document.body.appendChild(ta); ta.focus(); ta.select();
+                        document.execCommand('copy'); document.body.removeChild(ta);
+                    } catch(e) {}
+                    showToast('链接已复制');
+                }
                 return;
             }
             // desktop: auto copy link
