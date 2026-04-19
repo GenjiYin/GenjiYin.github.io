@@ -621,13 +621,23 @@
                 if (navigator.share) {
                     navigator.share({ title: document.title, url: url }).catch(() => {});
                 } else {
-                    try {
+                    const fallbackCopy = () => {
                         const ta = document.createElement('textarea');
-                        ta.value = url; ta.style.cssText = 'position:fixed;opacity:0';
-                        document.body.appendChild(ta); ta.focus(); ta.select();
-                        document.execCommand('copy'); document.body.removeChild(ta);
-                    } catch(e) {}
-                    showToast('链接已复制');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
                 }
                 return;
             }
