@@ -705,7 +705,12 @@
 
         function openShareModal() {
             const url = window.location.href;
-            // auto copy link
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile && navigator.share) {
+                navigator.share({ title: document.title, url: url }).catch(() => {});
+                return;
+            }
+            // desktop: auto copy link
             navigator.clipboard.writeText(url).catch(() => {});
 
             // generate QR off-screen then draw card

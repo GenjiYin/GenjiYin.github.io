@@ -444,6 +444,12 @@
 
         function openShareModal() {
             const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile && navigator.share) {
+                navigator.share({ title: document.title, url: url }).catch(() => {});
+                return;
+            }
+            // desktop: auto copy link
             navigator.clipboard.writeText(url).catch(() => {});
 
             const tmp = document.createElement('div');

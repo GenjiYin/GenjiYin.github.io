@@ -608,6 +608,11 @@
 
         function openShareModal() {
             const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile && navigator.share) {
+                navigator.share({ title: document.title, url: url }).catch(() => {});
+                return;
+            }
             navigator.clipboard.writeText(url).catch(() => {});
             const tmp = document.createElement('div');
             tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
