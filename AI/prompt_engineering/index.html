@@ -328,6 +328,8 @@
 
         .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
         .btn-download:hover { background: #2ea043; }
+        .btn-copy { background: #1f6feb; color: #fff; border-color: #388bfd !important; }
+        .btn-copy:hover { background: #388bfd; }
         .btn-cancel { background: transparent; color: #8b949e; }
         .btn-cancel:hover { color: #c9d1d9; }
 
@@ -509,10 +511,11 @@
     <!-- 分享弹窗 -->
     <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
         <div class="share-modal">
-            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <h3>分享卡片预览</h3>
             <canvas id="shareCanvas"></canvas>
             <div class="share-modal-actions">
                 <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-copy" onclick="copyShareLink()">复制链接</button>
                 <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
             </div>
         </div>
@@ -617,31 +620,11 @@
         function openShareModal() {
             const url = window.location.href;
             const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-            if (isMobile) {
-                if (navigator.share) {
-                    navigator.share({ title: document.title, url: url }).catch(() => {});
-                } else {
-                    const fallbackCopy = () => {
-                        const ta = document.createElement('textarea');
-                        ta.value = url;
-                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
-                        document.body.appendChild(ta);
-                        ta.focus(); ta.select();
-                        const ok = document.execCommand('copy');
-                        document.body.removeChild(ta);
-                        return ok;
-                    };
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
-                            fallbackCopy(); showToast('链接已复制');
-                        });
-                    } else {
-                        fallbackCopy(); showToast('链接已复制');
-                    }
-                }
+            if (isMobile && navigator.share) {
+                navigator.share({ title: document.title, url: url }).catch(() => {});
                 return;
             }
-            navigator.clipboard.writeText(url).catch(() => {});
+            navigator.clipboard && navigator.clipboard.writeText(url).catch(() => {});
             const tmp = document.createElement('div');
             tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
             document.body.appendChild(tmp);
@@ -672,6 +655,19 @@
             a.download = 'prompt-engineering-card.png';
             a.href = document.getElementById('shareCanvas').toDataURL('image/png');
             a.click();
+        }
+
+        function copyShareLink() {
+            const url = window.location.href;
+            const ta = document.createElement('textarea');
+            ta.value = url;
+            ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+            document.body.appendChild(ta); ta.focus(); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).catch(() => {});
+            }
+            showToast('链接已复制');
         }
     </script>
 
