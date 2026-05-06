@@ -414,19 +414,6 @@
             <img src="../../figure/TSC因子累计IC.png" alt="TSC 因子累计 IC 曲线" class="article-img">
             <p class="img-caption">图 2：TSC 因子累计 IC 曲线——反映因子对未来收益预测能力的方向性与稳定性</p>
 
-            <h2>处理"扭亏为盈"信号</h2>
-
-            <p>部分研究者认为"扭亏为盈"本身是一个独立的 Alpha 信号，不应被连续型因子平滑掉。这个判断有其合理性。</p>
-
-            <p>推荐的处理方式是<strong>构建因子对</strong>，而非试图在单一公式中同时编码连续强度与离散事件：</p>
-
-            <ul>
-                <li><strong>因子 A（TSC）</strong>：连续型，描述业绩变动的方向与强度</li>
-                <li><strong>因子 B（哑变量）</strong>：当期 &gt; 0 且上期 &lt; 0 时取 1，否则取 0</li>
-            </ul>
-
-            <p>在线性模型中：\(Y = \beta_1 A + \beta_2 B + \varepsilon\)，由回归系数决定"扭亏"事件的溢价幅度。在树模型（XGBoost / LightGBM）中，直接将两个因子同时输入，模型会自动捕捉 \(B=1\) 条件下 \(A\) 的非线性特征。</p>
-
             <h2>Python 实现</h2>
 
 <pre><code>import numpy as np
