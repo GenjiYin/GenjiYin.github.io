@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>量化选股中的业绩改造因子：TSC-Quant 的设计与实现 — XiaoYinXu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+
+        .article-date { font-size: 12px; color: #484f58; }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p { margin-bottom: 16px; }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li { margin-bottom: 8px; }
+
+        .article-body strong { color: #e6edf3; }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: bold;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #21262d;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .article-body td {
+            padding: 10px 14px;
+            border: 1px solid #21262d;
+            vertical-align: top;
+        }
+
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td  { background: #161b22; }
+
+        .article-body pre {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .article-body code {
+            font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+            color: #e6edf3;
+        }
+
+        .article-body p code, .article-body li code {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 13px;
+            color: #ffa657;
+        }
+
+        .formula-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .formula-block .formula-title {
+            font-size: 12px;
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .formula-block .formula-main {
+            font-size: 16px;
+            color: #e6edf3;
+            margin-bottom: 16px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .formula-block .formula-note {
+            font-size: 13px;
+            color: #8b949e;
+            line-height: 1.8;
+        }
+
+        .formula-block .formula-note span { color: #ffa657; font-weight: bold; }
+
+        .article-img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            margin: 8px 0 4px;
+            display: block;
+        }
+
+        .img-caption {
+            font-size: 12px;
+            color: #484f58;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .summary-block {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 32px 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-quant">量化交易</span>
+                <span class="article-date">2026-05</span>
+            </div>
+            <h1 class="article-title">量化选股中的业绩改造因子：TSC-Quant 的设计与实现</h1>
+            <p class="article-subtitle">传统同比在亏损公司上直接失效。TSC-Quant 用符号函数、对数变换与市值标准化三个组件，构造出一个连续、单调、横向可比的业绩改造因子。</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <h2>传统同比的结构性缺陷</h2>
+
+            <p>在量化多因子模型中，衡量公司业绩变化最直接的指标是同比增长率（YoY）。但它存在一个结构性缺陷——<strong>当上期利润为负时，计算结果失去经济意义</strong>。</p>
+
+            <p>A 股市场中亏损公司占比不低，这意味着在相当大比例的样本上，传统同比直接失效：</p>
+
+            <ul>
+                <li><strong>扭亏为盈</strong>（-100 → 50）：分母为负，结果为 -150%，方向完全错误</li>
+                <li><strong>亏损收窄</strong>（-100 → -50）：分母为负，结果为 -50%，看起来像"下跌"</li>
+                <li><strong>由盈转亏</strong>（50 → -100）：结果为 -300%，数值失控</li>
+            </ul>
+
+            <p>更深层的问题在于：量化模型（尤其是线性多因子模型）要求因子具备<strong>连续性与单调性</strong>。如果因子在盈亏转换点附近存在跳跃，回归系数将受到干扰，选股结果也会随之失真。</p>
+
+            <h2>TSC-Quant 因子的设计</h2>
+
+            <p>TSC-Quant（Transformed Signed Change）的核心思路是：用对数函数将变动幅度映射到连续数值空间，用符号函数保留方向，用市值作为规模标准化分母。</p>
+
+            <div class="formula-block">
+                <div class="formula-title">核心公式</div>
+                <div class="formula-main">
+                    \[\text{TSC}_i = \text{sign}(\Delta P) \cdot \ln\!\left(1 + \frac{|\Delta P|}{\text{Scale}_i + C}\right)\]
+                </div>
+                <div class="formula-note">
+                    <span>Scale<sub>i</sub></span>：市值或净资产，规模标准化分母<br>
+                    <span>C</span>：平滑常数，建议取全市场净利润绝对值的 5% 分位数<br>
+                    <span>sign</span>：符号函数，业绩改善为正，恶化为负
+                </div>
+            </div>
+
+            <h3>Scale：规模标准化分母</h3>
+
+            <p>不能直接用 <code>|上期利润|</code> 作分母，因为不同市值的公司利润量级差异悬殊。建议使用市值或净资产作为 Scale。</p>
+
+            <p>这样计算出来的本质是<strong>业绩弹性</strong>——利润变动对每单位市值的贡献。它过滤掉了小基数公司的虚假高增长，使不同体量的公司具有横向可比性。</p>
+
+            <h3>C：平滑常数</h3>
+
+            <p>建议设为全市场过去一年净利润绝对值的 5% 分位数，而非固定值。其作用不仅是防止分母趋近于零：利润量级极小的公司，即便名义增幅很大，其 TSC 值也会接近 0，自动过滤小基数噪音。</p>
+
+            <h2>三个核心性质</h2>
+
+            <p><strong>单调性</strong>：无论是亏损收窄、扭亏为盈还是盈利增长，只要业绩改善，因子值严格递增。这是线性因子模型的基本要求。</p>
+
+            <p><strong>异常值压缩</strong>：对数变换天然将极端值压缩到合理区间。利润翻 10 倍对应 TSC ≈ 2.4，翻 100 倍对应 ≈ 4.6，无需额外的缩尾处理（Winsorization）。</p>
+
+            <p><strong>横向可比</strong>：通过市值标准化，解决了"大公司增长 10% 与小公司增长 100% 谁更值得关注"的问题。模型倾向于寻找对市值有实质性贡献的利润波动。</p>
+
+            <h2>回测结果</h2>
+
+            <p>以下是 TSC 因子在 A 股全市场的实证结果。</p>
+
+            <img src="../../figure/TSC分层净值.png" alt="TSC 因子分层净值曲线" class="article-img">
+            <p class="img-caption">图 1：TSC 因子分层净值曲线——按因子值从高到低分为五组，观察各层累计收益的单调分离程度</p>
+
+            <img src="../../figure/TSC因子累计IC.png" alt="TSC 因子累计 IC 曲线" class="article-img">
+            <p class="img-caption">图 2：TSC 因子累计 IC 曲线——反映因子对未来收益预测能力的方向性与稳定性</p>
+
+            <h2>处理"扭亏为盈"信号</h2>
+
+            <p>部分研究者认为"扭亏为盈"本身是一个独立的 Alpha 信号，不应被连续型因子平滑掉。这个判断有其合理性。</p>
+
+            <p>推荐的处理方式是<strong>构建因子对</strong>，而非试图在单一公式中同时编码连续强度与离散事件：</p>
+
+            <ul>
+                <li><strong>因子 A（TSC）</strong>：连续型，描述业绩变动的方向与强度</li>
+                <li><strong>因子 B（哑变量）</strong>：当期 &gt; 0 且上期 &lt; 0 时取 1，否则取 0</li>
+            </ul>
+
+            <p>在线性模型中：\(Y = \beta_1 A + \beta_2 B + \varepsilon\)，由回归系数决定"扭亏"事件的溢价幅度。在树模型（XGBoost / LightGBM）中，直接将两个因子同时输入，模型会自动捕捉 \(B=1\) 条件下 \(A\) 的非线性特征。</p>
+
+            <h2>Python 实现</h2>
+
+<pre><code>import numpy as np
+
+def tsc_quant(current_profit, previous_profit, market_cap, C):
+    """
+    TSC-Quant 因子
+    C: 建议取全市场净利润绝对值的 5% 分位数
+    """
+    delta = current_profit - previous_profit
+    scale = market_cap  # 或使用净资产
+    return np.sign(delta) * np.log1p(np.abs(delta) / (scale + C))
+
+# 计算 C：全市场净利润绝对值的 5% 分位数
+C = all_market_profit.abs().quantile(0.05)
+
+# 计算因子
+tsc = tsc_quant(current_profit, previous_profit, market_cap, C)
+
+# 截面 Z-Score 标准化，用于多因子合成
+tsc_standardized = (tsc - tsc.mean()) / tsc.std()</code></pre>
+
+            <h2>延伸思考：还有哪些方案可以替代传统同比？</h2>
+
+            <p>TSC 并非唯一的解法。这里提供一个思路供参考。</p>
+
+            <p>将 Scale 从市值替换为两期利润绝对值的均值 \(\frac{|P_t|+|P_{t-1}|}{2}\)，使分母完全由利润自身决定，不依赖外部数据，即可得到另一种构造——全场景统一增长因子（UGF）：</p>
+
+            <div class="formula-block">
+                <div class="formula-title">UGF（供参考）</div>
+                <div class="formula-main">
+                    \[\text{UGF} = \text{sign}(\Delta P) \cdot \ln\!\left(1 + \frac{|\Delta P|}{\dfrac{|P_t|+|P_{t-1}|}{2} + C}\right)\]
+                </div>
+                <div class="formula-note">
+                    与 TSC 的唯一差异在于 Scale 的选取：TSC 用市值标准化，衡量的是<span>业绩弹性</span>；UGF 用利润均值标准化，衡量的是<span>变动幅度本身</span>。
+                </div>
+            </div>
+
+            <p>不同的 Scale 选择背后是不同的投资逻辑。TSC 更适合关注"单位市值的业绩贡献"，UGF 则更纯粹地度量业绩变动的相对强度。两者都值得根据具体策略场景进行实证验证。</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+            textPrimary: '#e6edf3', textSecondary: '#8b949e',
+            tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+            title: '量化选股中的业绩改造因子：\nTSC-Quant 的设计与实现',
+            excerpt: '传统同比在亏损公司上直接失效。TSC-Quant 用符号函数、对数变换与市值标准化，构造出连续、单调、横向可比的业绩改造因子。',
+            author: 'XiaoYinXu', tag: '量化交易',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const chars = line.split('');
+                let row = '';
+                for (let i = 0; i < chars.length; i++) {
+                    const test = row + chars[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = chars[i];
+                        curY += lineHeight;
+                    } else { row = test; }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const pad = 40, qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+            ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + window.location.href, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else { fallbackCopy(); showToast('链接已复制'); }
+                }
+                return;
+            }
+            navigator.clipboard.writeText(url).catch(() => {});
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            new QRCode(tmp, { text: url, width: 160, height: 160, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+            setTimeout(() => {
+                const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+                if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'), null); document.getElementById('shareOverlay').classList.add('active'); }
+            }, 50);
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay'))
+                document.getElementById('shareOverlay').classList.remove('active');
+        }
+
+        function downloadCard() {
+            const a = document.createElement('a');
+            a.download = 'tsc-quant-card.png';
+            a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+            a.click();
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '\\[', right: '\\]', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false }
+            ]
+        });
+    </script>
+
+</body>
+</html>
