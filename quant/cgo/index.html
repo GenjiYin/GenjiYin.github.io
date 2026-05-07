@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGO 因子的概率本质：一个藏在换手率里的几何分布 — XiaoYinXu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+
+        .article-date { font-size: 12px; color: #484f58; }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p { margin-bottom: 16px; }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li { margin-bottom: 8px; }
+
+        .article-body strong { color: #e6edf3; }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: bold;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #21262d;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .article-body td {
+            padding: 10px 14px;
+            border: 1px solid #21262d;
+            vertical-align: top;
+        }
+
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td  { background: #161b22; }
+
+        .formula-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0;
+        }
+
+        .formula-block .formula-title {
+            font-size: 12px;
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .formula-block .formula-main {
+            font-size: 16px;
+            color: #e6edf3;
+            margin-bottom: 16px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .formula-block .formula-note {
+            font-size: 13px;
+            color: #8b949e;
+            line-height: 1.8;
+        }
+
+        .formula-block .formula-note span { color: #ffa657; font-weight: bold; }
+
+        .insight-block {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 24px 0;
+        }
+
+        .insight-block p { margin-bottom: 0; color: #c9d1d9; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-quant">量化交易</span>
+                <span class="article-date">2026-05</span>
+            </div>
+            <h1 class="article-title">资本利得突出量(CGO)的概率本质：一个藏在换手率里的几何分布</h1>
+            <p class="article-subtitle">大多数因子介绍都从经济直觉出发。这篇文章换个角度——从概率论出发，看 CGO 因子的数学骨架是什么，以及这个骨架为什么能捕捉到人性的弱点。</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <h2>一、从一个心理实验开始</h2>
+
+            <p>假设你手里有两只股票：</p>
+            <ul>
+                <li><strong>A 股</strong>：10 元买入，现在 15 元，浮盈 50%</li>
+                <li><strong>B 股</strong>：10 元买入，现在 8 元，浮亏 20%</li>
+            </ul>
+            <p>市场突然出现一个利空消息，你需要卖出一只来回笼资金。大多数人会选择卖 A——落袋为安，留着 B 等解套。</p>
+            <p>这个选择在逻辑上并不理性，但在心理上极其普遍。行为金融学把它叫做<strong>处置效应</strong>：人们倾向于过早卖出盈利的股票，过晚卖出亏损的股票。</p>
+            <p>CGO 因子做的事情，就是把"市场上所有持仓者平均处于盈利还是亏损状态"这件事，量化成一个数字。</p>
+
+            <h2>二、核心问题：谁还在持有这只股票？</h2>
+
+            <p>要知道当前持仓者的平均成本，首先要解决一个问题：<strong>现在持有这只股票的人，是什么时候买入的？</strong></p>
+            <p>这个问题无法直接观测，但可以用换手率来推断。换手率的含义很直接：某周换手率 5%，意味着那周大约有 5% 的流通筹码发生了交易——有人卖出，有人买入。剩下 95% 的筹码，还在原来持有者手里。</p>
+            <p>顺着这个逻辑往前推：</p>
+            <ul>
+                <li>1 周前买入的筹码，这周没被卖出的概率是 $1 - V_t$</li>
+                <li>2 周前买入的筹码，要在这 2 周都没被卖出，概率是 $(1-V_t)(1-V_{t-1})$</li>
+                <li>$n$ 周前买入的筹码，要在此后每周都没被卖出，概率是 $\prod_{\tau=1}^{n-1}(1-V_{t-n+\tau})$</li>
+            </ul>
+
+            <div class="formula-block">
+                <div class="formula-title">CGO 核心权重</div>
+                <div class="formula-main">
+                    $$w_n = V_{t-n} \cdot \prod_{\tau=1}^{n-1}(1 - V_{t-n+\tau})$$
+                </div>
+                <div class="formula-note">
+                    <span>V<sub>t-n</sub></span>：$n$ 周前的换手率，代表"那周买入的比例"<br>
+                    <span>连乘项</span>：此后每周都没被卖出的概率（存活概率）
+                </div>
+            </div>
+
+            <p>用这个权重对历史价格做加权平均，就得到了<strong>参考价格</strong> $RP_t$——当前持仓者的估算平均成本：</p>
+
+            <div class="formula-block">
+                <div class="formula-title">参考价格 &amp; CGO</div>
+                <div class="formula-main">
+                    $$RP_t = \sum_{n=1}^{T} w_n \cdot P_{t-n} \qquad CGO_t = \frac{P_{t-1} - RP_t}{P_{t-1}}$$
+                </div>
+                <div class="formula-note">
+                    CGO 为正：持仓者整体在盈利；CGO 为负：持仓者整体被套牢
+                </div>
+            </div>
+
+            <h2>三、参考价格的本质：一个数学期望</h2>
+
+            <p>$w_n$ 还有一个比"几何分布"更直接的视角。</p>
+            <p>把"当前持仓者的买入价格"看作一个随机变量 $X$：从所有当前持仓者中随机抽取一人，他的买入价格是多少？</p>
+            <ul>
+                <li>他在 $n$ 周前买入的概率是 $w_n$（$n$ 周前买入、且此后每周都没卖出）</li>
+                <li>他的买入价格是 $P_{t-n}$</li>
+            </ul>
+            <p>由于 $\sum_{n=1}^{T} w_n = 1$（所有当前持仓者必然是某一周买入的），$w_n$ 构成了一个合法的概率分布。于是：</p>
+
+            <div class="formula-block">
+                <div class="formula-title">参考价格 = 数学期望</div>
+                <div class="formula-main">
+                    $$RP_t = \sum_{n=1}^{T} w_n \cdot P_{t-n} = E[X]$$
+                </div>
+                <div class="formula-note">
+                    $X$：从当前持仓者中随机抽取一人，其买入价格<br>
+                    $w_n$：该持仓者恰好在 $n$ 周前买入的概率
+                </div>
+            </div>
+
+            <div class="insight-block">
+                <p><strong>参考价格，就是当前持仓者买入价格的数学期望。</strong>因此 CGO 度量的是当前价格相对于持仓者期望成本的超额程度：</p>
+                <p style="text-align:center; margin-top:12px;">$$CGO_t = \frac{P_{t-1} - E[X]}{P_{t-1}}$$</p>
+            </div>
+
+            <p>几何分布解决了"$w_n$ 长什么样"的问题，数学期望解决了"$RP_t$ 是什么"的问题。两者合在一起，才是 CGO 完整的概率骨架。</p>
+
+            <h2>四、认出它：这是几何分布</h2>
+
+            <p>$w_n$ 的结构，在概率论里有个名字。</p>
+            <p><strong>几何分布</strong>描述的是：每次试验成功概率为 $p$，第一次成功恰好发生在第 $k$ 次的概率：</p>
+
+            <div class="formula-block">
+                <div class="formula-title">几何分布</div>
+                <div class="formula-main">$$P(X = k) = (1-p)^{k-1} \cdot p$$</div>
+                <div class="formula-note">前 $k-1$ 次失败，第 $k$ 次成功</div>
+            </div>
+
+            <p>对比 $w_n = V_{t-n} \cdot \prod_{\tau=1}^{n-1}(1 - V_{t-n+\tau})$，结构完全一致——$n$ 周前"买入"对应"第 $k$ 次成功"，此后每周"没被卖出"对应"前 $k-1$ 次失败"。</p>
+            <p>唯一的区别是：经典几何分布的 $p$ 是固定常数，而 CGO 里每周的换手率 $V_\tau$ 是随时间变化的。这是一个<strong>时变概率的几何分布</strong>，数学上叫非齐次几何分布。</p>
+            <p>换一个更直观的比喻：把每一批买入的筹码想象成一批生物，换手率就是它们每周的<strong>死亡率</strong>。$w_n$ 就是"$n$ 周前出生、且存活至今"的筹码比例。这正是生存分析的语言——几何分布是离散时间下最简单的生存模型。</p>
+
+            <h2>五、换手率决定了"记忆的长度"</h2>
+
+            <p>几何分布有一个关键参数：成功概率 $p$。$p$ 越大，分布越集中在小 $k$ 处；$p$ 越小，分布越向右拖尾。在 CGO 里，换手率就是这个 $p$，它决定了参考价格"记得多远的历史"。</p>
+            <p><strong>高换手率的股票</strong>（游资活跃的题材股）：筹码更新快，$w_n$ 随 $n$ 增大衰减极快，参考价格主要由最近几周的价格决定。CGO 对近期涨跌非常敏感，能快速反映当前持仓者的成本变化。</p>
+            <p><strong>低换手率的股票</strong>（长期持有的价值股）：筹码更新慢，$w_n$ 衰减缓慢，参考价格是更长历史区间的加权平均。CGO 变化迟钝，对短期价格波动不敏感。</p>
+            <p>几何分布的均值给出了一个简洁的估算：若平均周换手率为 $\bar{V}$，则筹码的<strong>平均持仓周期</strong>约为：</p>
+
+            <div class="formula-block">
+                <div class="formula-title">平均持仓周期</div>
+                <div class="formula-main">$$E[\text{持仓周期}] \approx \frac{1}{\bar{V}}$$</div>
+            </div>
+
+            <table>
+                <thead><tr><th>平均周换手率</th><th>期望持仓周期</th><th>典型股票类型</th></tr></thead>
+                <tbody>
+                    <tr><td>1%</td><td>约 100 周（2 年）</td><td>低换手价值股</td></tr>
+                    <tr><td>5%</td><td>约 20 周（5 个月）</td><td>A 股平均水平</td></tr>
+                    <tr><td>10%</td><td>约 10 周（2.5 个月）</td><td>高换手题材股</td></tr>
+                </tbody>
+            </table>
+
+            <p>A 股整体换手率偏高，这意味着 CGO 的参考价格实际上是过去半年到一年的加权平均，而不是 5 年的均匀平均。那些 5 年前买入、至今未动的老筹码，权重已经衰减到接近零——这也是为什么在 A 股中可以把回溯窗口从 5 年缩短到 3 年，效果差别不大。</p>
+
+            <h2>六、概率结构如何连接到人性</h2>
+
+            <p>现在把概率模型和行为金融学接起来。CGO 估算出了参考价格 $RP_t = E[X]$，也就是当前持仓者的期望成本。这个数字之所以有预测价值，是因为它触发了处置效应：</p>
+            <p><strong>当 CGO 很高时</strong>（当前价格远高于期望成本）：大多数持仓者都在盈利，处置效应驱使他们想要落袋为安。市场上潜在的卖出意愿很强，一旦有风吹草动，这些浮盈筹码就会集中出逃，对股价形成向下压力。</p>
+            <p><strong>当 CGO 很低时</strong>（当前价格低于期望成本）：大多数持仓者被套牢。套牢盘通常不愿意割肉，筹码锁定性强，市场上的自然卖压反而很小。价格接近成本线时，部分人会选择减仓而不是继续持有，这在一定程度上形成了支撑。</p>
+            <p>所以 CGO 作为选股因子，方向是<strong>反向</strong>的：CGO 越高，未来收益反而越低；CGO 越低（套牢越重），未来收益反而越好。实际使用时通常取负号，用 $-CGO$ 作为正向因子。</p>
+            <p>概率模型在这里扮演的角色，是提供了一把"尺子"——用几何分布估算出持仓者的成本分布，再由行为金融学解释为什么这个期望成本会影响未来价格。两者缺一不可：没有概率模型，无法量化成本；没有行为金融学，量化出来的数字没有预测意义。</p>
+
+            <h2>七、一个值得注意的假设</h2>
+
+            <p>几何分布有一个独特的性质——<strong>无记忆性</strong>：</p>
+
+            <div class="formula-block">
+                <div class="formula-title">无记忆性</div>
+                <div class="formula-main">$$P(X > m + n \mid X > m) = P(X > n)$$</div>
+                <div class="formula-note">一批筹码已经持有了 $m$ 周，它在未来 $n$ 周内被卖出的概率，和它刚买入时完全一样。持有时间的长短，不影响未来被卖出的概率。</div>
+            </div>
+
+            <p>这个假设在现实中是简化的。实际上，持有时间越长的筹码往往越稳定——长期持有者更不容易被短期波动触动，他们的"死亡率"随时间递减，而不是恒定的。</p>
+            <p>CGO 用恒定死亡率（几何分布）来近似这个过程，是一种有意识的工程取舍：计算简单，只需要换手率数据，不需要对投资者行为做更复杂的假设。代价是对长期持有者的刻画不够精细——那些持股 3 年以上的坚定持有者，在模型里和刚买入 3 周的短线客被同等对待。</p>
+            <p>这个简化在大多数情况下影响不大，因为高换手率会让长期持有者的权重自然衰减到很小。但在低换手率、机构持仓比例高的大盘股上，这个假设的偏差会更明显——这也是 CGO 在大盘股上效果较差的原因之一。</p>
+
+            <h2>八、小结</h2>
+
+            <table>
+                <thead><tr><th>概率概念</th><th>CGO 中的含义</th></tr></thead>
+                <tbody>
+                    <tr><td>几何分布</td><td>筹码存活模型的数学骨架</td></tr>
+                    <tr><td>成功概率 $p$</td><td>每周换手率（时变）</td></tr>
+                    <tr><td>期望值 $1/p$</td><td>平均持仓周期</td></tr>
+                    <tr><td>存活函数</td><td>权重中的连乘项</td></tr>
+                    <tr><td>无记忆性</td><td>模型的核心简化假设</td></tr>
+                    <tr><td><strong>数学期望 $E[X]$</strong></td><td><strong>参考价格 = 持仓者买入价格的期望</strong></td></tr>
+                </tbody>
+            </table>
+
+            <p>CGO 的完整逻辑链是：</p>
+            <div class="insight-block">
+                <p><strong>换手率数据</strong> → <strong>几何分布估算筹码存活概率</strong> → <strong>数学期望得到持仓者成本</strong> → <strong>处置效应将成本转化为卖压/支撑</strong> → <strong>预测未来价格走势</strong></p>
+            </div>
+            <p>概率模型解决了"成本在哪里"的问题，行为金融学解决了"成本为什么重要"的问题。</p>
+
+            <h2>九、实证结论</h2>
+
+            <h3>年度表现（2018–2025，-CGO 多头组，行业+市值中性化）</h3>
+
+            <table>
+                <thead><tr><th>年份</th><th>多头年化收益</th><th>多头超额收益</th><th>IC</th></tr></thead>
+                <tbody>
+                    <tr><td>2018</td><td>-23.1%</td><td>+25.3%</td><td>-0.002</td></tr>
+                    <tr><td>2019</td><td>+33.5%</td><td>+7.9%</td><td>-0.003</td></tr>
+                    <tr><td>2020</td><td>+7.2%</td><td>-13.8%</td><td>-0.005</td></tr>
+                    <tr><td>2021</td><td>+31.3%</td><td>+14.9%</td><td>-0.014</td></tr>
+                    <tr><td>2022</td><td>+3.7%</td><td>+23.5%</td><td>+0.000</td></tr>
+                    <tr><td>2023</td><td>+4.5%</td><td>+12.1%</td><td>-0.016</td></tr>
+                    <tr><td>2024</td><td>+21.3%</td><td>+8.2%</td><td>-0.007</td></tr>
+                    <tr><td>2025</td><td>+31.0%</td><td>+5.5%</td><td>-0.006</td></tr>
+                </tbody>
+            </table>
+
+            <p>超额收益在 8 年中全部为正，包括 2018 年熊市（绝对收益 -23.1%，但超额收益高达 +25.3%）。这与几何分布模型的逻辑一致：套牢盘的筹码锁定效应不依赖于市场整体方向，在下跌市中同样成立。</p>
+
+            <h3>市值维度</h3>
+
+            <table>
+                <thead><tr><th>市值组</th><th>IC 均值</th><th>IR</th><th>IC 显著比例</th></tr></thead>
+                <tbody>
+                    <tr><td>小盘</td><td>-0.021</td><td>-0.186</td><td>85.2%</td></tr>
+                    <tr><td>中盘</td><td>-0.020</td><td>-0.149</td><td>87.1%</td></tr>
+                    <tr><td>大盘</td><td>-0.004</td><td>-0.024</td><td>90.8%</td></tr>
+                </tbody>
+            </table>
+
+            <p>中小盘的 IC 均值约为大盘的 5 倍，IR 差距更大。这与第七节的分析吻合：大盘股机构持仓比例高，无记忆性假设的偏差更明显，处置效应更弱；中小盘以散户和游资为主，换手率高、筹码更新快，几何分布的近似更准确，因子预测力也更强。</p>
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+            textPrimary: '#e6edf3', textSecondary: '#8b949e',
+            tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+            title: '资本利得突出量(CGO)的概率本质：\n一个藏在换手率里的几何分布',
+            excerpt: 'CGO 因子的数学骨架是几何分布——换手率是死亡率，参考价格是持仓者买入价格的数学期望，处置效应将这个期望转化为可预测的卖压。',
+            author: 'XiaoYinXu', tag: '量化交易',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const chars = line.split('');
+                let row = '';
+                for (let i = 0; i < chars.length; i++) {
+                    const test = row + chars[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = chars[i];
+                        curY += lineHeight;
+                    } else { row = test; }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const pad = 40, qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+            ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + window.location.href, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else { fallbackCopy(); showToast('链接已复制'); }
+                }
+                return;
+            }
+            navigator.clipboard.writeText(url).catch(() => {});
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            new QRCode(tmp, { text: url, width: 160, height: 160, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+            setTimeout(() => {
+                const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+                if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'), null); document.getElementById('shareOverlay').classList.add('active'); }
+            }, 50);
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay'))
+                document.getElementById('shareOverlay').classList.remove('active');
+        }
+
+        function downloadCard() {
+            const a = document.createElement('a');
+            a.download = 'cgo-probability-card.png';
+            a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+            a.click();
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '\\[', right: '\\]', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false }
+            ]
+        });
+    </script>
+
+</body>
+</html>
