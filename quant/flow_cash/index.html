@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>现金流量化策略调研报告 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        .nav-logo { font-size: 18px; font-weight: bold; color: #58a6ff; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #8b949e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #c9d1d9; }
+        .article-wrap { max-width: 760px; margin: 60px auto 80px; padding: 0 40px; }
+        .article-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #21262d; }
+        .article-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .post-category { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+        .article-date { font-size: 12px; color: #484f58; }
+        .article-title { font-size: 28px; color: #e6edf3; font-weight: bold; line-height: 1.4; margin-bottom: 14px; }
+        .article-subtitle { font-size: 15px; color: #8b949e; line-height: 1.7; }
+        .article-body { font-size: 15px; line-height: 1.9; color: #c9d1d9; }
+        .article-body h2 { font-size: 20px; color: #e6edf3; margin: 40px 0 16px; padding-left: 12px; border-left: 3px solid #58a6ff; }
+        .article-body h3 { font-size: 16px; color: #e6edf3; margin: 28px 0 12px; }
+        .article-body p { margin-bottom: 16px; }
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body strong { color: #e6edf3; }
+        .article-body a { color: #58a6ff; text-decoration: none; }
+        .article-body a:hover { text-decoration: underline; }
+        .article-body blockquote { border-left: 3px solid #30363d; padding: 4px 0 4px 16px; margin: 16px 0; color: #8b949e; font-size: 14px; line-height: 1.8; }
+        .article-body table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .article-body th { background: #161b22; color: #8b949e; font-weight: bold; padding: 10px 14px; text-align: left; border: 1px solid #21262d; font-size: 12px; }
+        .article-body td { padding: 10px 14px; border: 1px solid #21262d; vertical-align: top; }
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+        .article-body pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; overflow-x: auto; font-size: 13px; line-height: 1.7; }
+        .article-body code { font-family: 'Consolas', 'Courier New', monospace; color: #e6edf3; }
+        .insight-block { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .insight-block p { margin-bottom: 0; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #58a6ff; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: opacity 0.2s; }
+        .back-link:hover { opacity: 0.75; }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; }
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; max-width: 680px; width: 95%; text-align: center; }
+        .share-modal h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; font-weight: normal; }
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+        .share-modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+        .share-modal-actions button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid #30363d; }
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+        footer { text-align: center; padding: 20px; color: #484f58; font-size: 12px; border-top: 1px solid #21262d; }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+    <ul class="nav-links">
+        <li><a href="../../index.html">首页</a></li>
+        <li><a href="../../resume/">关于我</a></li>
+        <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+    </ul>
+</nav>
+
+<div class="article-wrap">
+    <a href="../../index.html" class="back-link">← 返回首页</a>
+    <div class="article-header">
+        <div class="article-meta">
+            <span class="post-category cat-quant">量化交易</span>
+            <span class="article-date">2026-05</span>
+        </div>
+        <h1 class="article-title">现金流量化策略调研报告</h1>
+        <p class="article-subtitle">基于 A 股与海外市场实证，系统梳理自由现金流因子的有效性边界、策略构建框架与风险特征。本文由 AI 调用自研 Crawl4AI Skills 完成网页抓取与数据采集，内容经 AI 整理生成。</p>
+        <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+    </div>
+    <div class="article-body">
+
+        <h2>一、核心逻辑：为什么用现金流选股</h2>
+        <p>自由现金流（Free Cash Flow, FCF）是企业在满足再投资需求后，可自由分配给股东和债权人的现金。相比净利润，它更难被会计手段操纵，能更真实反映企业的<strong>盈利质量、内生增长能力和财务健康状况</strong>。</p>
+        <h3>现金流 vs 净利润的优势</h3>
+        <table>
+            <thead><tr><th>维度</th><th>净利润</th><th>自由现金流</th></tr></thead>
+            <tbody>
+                <tr><td>可操纵性</td><td>高（可通过会计政策调整）</td><td>低（真金白银）</td></tr>
+                <tr><td>反映能力</td><td>账面盈利</td><td>实际可支配现金</td></tr>
+                <tr><td>再投资考量</td><td>未扣除资本支出</td><td>已扣除资本支出</td></tr>
+                <tr><td>分红能力</td><td>间接反映</td><td>直接反映</td></tr>
+            </tbody>
+        </table>
+        <p>在中国 A 股市场，自由现金流因子呈现出显著的<strong>大盘价值属性</strong>，在沪深 300 等大盘指数中效果最为突出。</p>
+
+        <h2>二、关键现金流因子与回测对比</h2>
+        <h3>2.1 四类核心现金流比率因子</h3>
+        <p>根据源达信息证券研究所的深度回测（区间：2014/6–2025/9，样本：中证全指剔除金融地产），四类因子的有效性差异显著：</p>
+        <table>
+            <thead><tr><th>因子类型</th><th>中证全指有效性</th><th>沪深300表现</th><th>中证1000表现</th><th>核心评价</th></tr></thead>
+            <tbody>
+                <tr><td><strong>FCF TTM / 企业价值</strong></td><td>Rank ICIR=15.50%</td><td>最优，Rank ICIR=12.92%，多空年化3.17%</td><td>无效/反向，多空年化-9.27%</td><td>综合最优，衡量单位企业价值创造的现金流</td></tr>
+                <tr><td><strong>FCF TTM / 归母净利润</strong></td><td>Rank ICIR=0.85%</td><td>极佳，Rank ICIR=15.35%，多空年化13.40%</td><td>单调性为负</td><td>衡量盈利质量，在沪深300中表现卓越</td></tr>
+                <tr><td><strong>FCF TTM / 营业收入</strong></td><td>基本无效（IC均值为负）</td><td>有效</td><td>完全无效</td><td>衡量经营效率，仅适用于大盘</td></tr>
+                <tr><td><strong>FCF TTM / 净资产</strong></td><td>基本无效</td><td>阶段性有效</td><td>无效</td><td>反映资产运营效率，仅2020年避险行情表现突出</td></tr>
+            </tbody>
+        </table>
+        <div class="insight-block">
+            <p><strong>结论：</strong>"自由现金流/企业价值"和"自由现金流/归母净利润"是有效性最高的两个因子，但均<strong>仅在沪深300等大盘指数中效果显著</strong>，中小盘中效果差甚至反向。</p>
+        </div>
+
+        <h3>2.2 回测业绩表现</h3>
+        <table>
+            <thead><tr><th>策略类型</th><th>年化收益率</th><th>基准对比</th><th>来源</th></tr></thead>
+            <tbody>
+                <tr><td><strong>FCF/企业价值 Top100</strong></td><td><strong>17.06%</strong></td><td>显著跑赢沪深300全收益（约10.13%）</td><td>源达证券研究所</td></tr>
+                <tr><td>FCF/企业价值 精选策略</td><td><strong>21.91%</strong></td><td>超额收益显著</td><td>源达证券研究所</td></tr>
+                <tr><td>FCF/归母净利润 Top10</td><td>11.51%</td><td>超额收益不明显</td><td>源达证券研究所</td></tr>
+                <tr><td>沪深300指数增强</td><td>10.93%（超额5.46%）</td><td>信息比率0.49</td><td>东方财富证券</td></tr>
+                <tr><td>中证500指数增强</td><td>10.42%（超额5.61%）</td><td>信息比率0.53</td><td>东方财富证券</td></tr>
+                <tr><td>中证全指增强</td><td>12.98%（超额7.89%）</td><td>信息比率0.84</td><td>东方财富证券</td></tr>
+            </tbody>
+        </table>
+
+        <h2>三、策略构建框架</h2>
+        <h3>3.1 股票池筛选（基础过滤）</h3>
+        <ol>
+            <li><strong>剔除ST/*ST</strong> 及综合金融、<strong>房地产、银行、非银金融</strong></li>
+            <li><strong>流动性过滤</strong>：过去一年日均成交金额排名位于样本空间前80%</li>
+            <li><strong>财务质量筛选</strong>：近一年/近三年经营活动现金流为正；近一年自由现金流为正；企业价值（总市值+总负债-货币资金）为正；剔除近一年经营活动净现金流占净利润比例排名后30%的证券</li>
+        </ol>
+        <h3>3.2 因子打分与选股权重</h3>
+        <ul>
+            <li><strong>排序</strong>：按自由现金流TTM/企业价值从大到小排序</li>
+            <li><strong>选样</strong>：选取前100只（或前10%）</li>
+            <li><strong>加权</strong>：采用自由现金流TTM加权，个股权重上限20%</li>
+            <li><strong>调仓频率</strong>：月度或季度调仓</li>
+        </ul>
+        <h3>3.3 多因子增强（进阶）</h3>
+        <table>
+            <thead><tr><th>组合方式</th><th>效果提升</th></tr></thead>
+            <tbody>
+                <tr><td><strong>FCF Yield + Momentum</strong></td><td>欧洲12年回测中，组合收益755% vs FCF单因子248.7%，提升506%</td></tr>
+                <tr><td>FCF + Quality</td><td>提升财务质量维度，降低尾部风险</td></tr>
+                <tr><td>FCF + Low Volatility</td><td>增强防御属性，适合震荡市</td></tr>
+            </tbody>
+        </table>
+
+        <h2>四、市值风格分化：大盘有效，小盘无效</h2>
+        <table>
+            <thead><tr><th>指数</th><th>有效性</th><th>原因分析</th></tr></thead>
+            <tbody>
+                <tr><td><strong>沪深300（大盘蓝筹）</strong></td><td><strong>最有效</strong></td><td>成熟期企业资本开支主要用于维护而非扩张，高FCF意味着扎实的盈利质量</td></tr>
+                <tr><td><strong>中证800</strong></td><td>有效性尚可</td><td>中盘股的拖累使多空收益微薄</td></tr>
+                <tr><td><strong>中证500/中证1000（中小盘成长）</strong></td><td><strong>基本无效甚至负向</strong></td><td>成长期企业需要大量资本开支扩张，高资本开支往往对应更高成长性，FCF低反而可能预示未来高增长</td></tr>
+            </tbody>
+        </table>
+        <div class="insight-block">
+            <p><strong>策略启示：</strong>现金流选股策略应<strong>限定在大盘蓝筹池中</strong>，不宜在全市场无脑使用。沪深300成分股的资本支出/折旧摊销显著低于中证1000。</p>
+        </div>
+
+        <h2>五、自由现金流策略 vs 红利策略</h2>
+        <table>
+            <thead><tr><th>维度</th><th>自由现金流策略</th><th>红利策略</th></tr></thead>
+            <tbody>
+                <tr><td><strong>核心关注点</strong></td><td>创造现金流的内生能力、财务健康</td><td>历史分红行为与分红意愿</td></tr>
+                <tr><td><strong>选股逻辑</strong></td><td>现金流强、资本支出合理的高质量公司</td><td>高股息率、盈利稳定的成熟公司</td></tr>
+                <tr><td><strong>收益来源</strong></td><td>股价上涨 + 潜在分红/回购</td><td>股息收益 + 稳健股价表现</td></tr>
+                <tr><td><strong>市场风格</strong></td><td>适合经济复苏期或成长风格切换期</td><td>适合震荡下行市场，防御属性显著</td></tr>
+                <tr><td><strong>成长弹性</strong></td><td>具备中长期成长弹性</td><td>成长空间有限，偏向纯价值</td></tr>
+                <tr><td><strong>行业处理</strong></td><td>明确剔除金融地产</td><td>通常不剔除金融地产</td></tr>
+                <tr><td><strong>前瞻性</strong></td><td>前瞻指标（预测未来分红能力）</td><td>滞后指标（反映过去分红行为）</td></tr>
+            </tbody>
+        </table>
+        <p><strong>总结：</strong>自由现金流策略是对红利策略的<strong>增强与升级</strong>——它延续了核心收益特征，但在选股前瞻性和质量维度上更优。</p>
+
+        <h2>六、海外实证研究</h2>
+        <h3>6.1 学术支持</h3>
+        <ul>
+            <li><strong>Lakonishok et al. (1994)</strong>：发现现金流/价格比（Cash Flow-to-Price）更高的股票提供更高收益</li>
+            <li><strong>Fama-French框架</strong>：自由现金流被明确列为"价值"因子家族的核心指标，与PE、PB并列</li>
+            <li><strong>Multi-Factor Models</strong>：现代量化模型在评估证券时，会同时考察盈利、现金流、销售和资产特征</li>
+        </ul>
+        <h3>6.2 海外机构实践</h3>
+        <ul>
+            <li><strong>系统筛选</strong>：一些机构流程在约8,000只股票中应用30+量化过滤器，核心关注自由现金流占公司市值的比例</li>
+            <li><strong>机器学习整合</strong>：现代策略使用机器学习处理64+候选因子，包括OCF_TTM（经营活动现金流TTM/市值）alongside估值、增长和质量因子</li>
+        </ul>
+
+        <h2>七、相关ETF产品</h2>
+        <table>
+            <thead><tr><th>基金公司</th><th>产品类型</th><th>特点</th></tr></thead>
+            <tbody>
+                <tr><td>富国基金</td><td>自由现金流ETF</td><td>跟踪富时中国A股自由现金流聚焦指数</td></tr>
+                <tr><td>华夏基金</td><td>自由现金流ETF</td><td>跟踪国证自由现金流指数</td></tr>
+                <tr><td>国泰基金</td><td>自由现金流ETF</td><td>跟踪中证全指自由现金流指数</td></tr>
+            </tbody>
+        </table>
+        <p>这些产品的出现说明现金流因子已从学术研究走向了实际产品化。</p>
+
+        <h2>八、2025年市场表现与注意事项</h2>
+        <h3>8.1 近期表现偏弱</h3>
+        <p>研究显示，<strong>2025年以来自由现金流因子表现偏弱</strong>。可能原因包括：</p>
+        <ul>
+            <li>市场风格偏向小盘成长或主题炒作，与大盘价值因子背离</li>
+            <li>部分高现金流行业（如能源、周期）面临价格压力</li>
+            <li>资金面宽松环境下，市场更偏好资本开支大的扩张型叙事</li>
+        </ul>
+        <h3>8.2 策略风险</h3>
+        <ol>
+            <li><strong>市值风格风险</strong>：策略在大盘风格中有效，在小盘成长风格中会失效甚至亏损</li>
+            <li><strong>行业集中风险</strong>：高现金流公司往往集中在特定行业（如能源、消费、公用事业）</li>
+            <li><strong>周期波动风险</strong>：经济下行期，即使FCF高的公司也可能面临需求萎缩</li>
+            <li><strong>数据质量风险</strong>：A股现金流数据的可靠性和可比性不如净利润</li>
+        </ol>
+
+        <h2>九、策略代码实现思路</h2>
+        <pre><code>def select_stocks(universe):
+    # 1. 基础过滤
+    filtered = universe[
+        (~universe.is_st) &
+        (~universe.sector.isin(['银行', '非银金融', '房地产'])) &
+        (universe.adtv > universe.adtv.quantile(0.2)) &
+        (universe.ocf_ttm > 0) &
+        (universe.fcf_ttm > 0) &
+        (universe.ev > 0)
+    ]
+
+    # 2. 计算核心因子
+    filtered['fcf_yield'] = filtered['fcf_ttm'] / filtered['ev']
+    filtered['fcf_profit'] = filtered['fcf_ttm'] / filtered['net_profit']
+
+    # 3. 剔除盈利质量差的公司
+    filtered['ocf_profit_ratio'] = filtered['ocf_ttm'] / filtered['net_profit']
+    filtered = filtered[
+        filtered['ocf_profit_ratio'] > filtered['ocf_profit_ratio'].quantile(0.3)
+    ]
+
+    # 4. 排序选样
+    selected = filtered.nlargest(100, 'fcf_yield')
+
+    # 5. 自由现金流加权
+    selected['weight'] = selected['fcf_ttm'] / selected['fcf_ttm'].sum()
+    selected['weight'] = selected['weight'].clip(upper=0.20)
+    selected['weight'] = selected['weight'] / selected['weight'].sum()
+
+    return selected[['code', 'name', 'weight']]</code></pre>
+
+        <h2>十、总结与建议</h2>
+        <h3>核心结论</h3>
+        <ol>
+            <li><strong>现金流因子在A股有效，但有明显边界</strong>：仅在大盘蓝筹（沪深300）中有效，在中小盘成长中无效甚至反向</li>
+            <li><strong>最佳因子是"FCF/企业价值"</strong>，在沪深300中Rank ICIR达12.92%</li>
+            <li><strong>策略本质是"红利Plus"</strong>：比红利策略更具前瞻性，但需承受更大的风格波动</li>
+            <li><strong>建议作为指数增强的底仓因子</strong>：而非独立的多头策略</li>
+        </ol>
+        <h3>实施建议</h3>
+        <ol>
+            <li><strong>限定股票池</strong>：仅在中证800或沪深300成分股中使用</li>
+            <li><strong>多因子增强</strong>：结合动量或质量因子，避免单一因子失效</li>
+            <li><strong>季度调仓</strong>：月度调仓收益提升有限但换手率高，季度调仓性价比更优</li>
+            <li><strong>关注市场风格</strong>：在大盘价值风格占优时加大配置，小盘成长风格时降低仓位</li>
+        </ol>
+
+        <h2>参考资料</h2>
+        <ol>
+            <li><a href="https://finance.sina.com.cn/roll/2025-10-30/doc-infvskcp9531207.shtml" target="_blank">源达研究报告：四类自由现金流比率因子对比</a></li>
+            <li><a href="https://finance.sina.com.cn/roll/2025-09-03/doc-infpfakm2800339.shtml" target="_blank">源达研究报告：自由现金流因子研究与策略构建</a></li>
+            <li><a href="https://xueqiu.com/3338215700/350757402" target="_blank">雪球：源达自由现金流因子研究</a></li>
+            <li><a href="https://xueqiu.com/3338215700/359109356" target="_blank">雪球：四类自由现金流比率因子对比</a></li>
+            <li><a href="https://xueqiu.com/8745013228/328710660" target="_blank">雪球：如何利用自由现金流来选股</a></li>
+            <li><a href="https://pdf.dfcfw.com/pdf/H301_AP202504121655376240_1.pdf" target="_blank">Smart Beta策略概述与市场发展 - 东方财富研报</a></li>
+            <li><a href="https://www.investopedia.com/terms/f/factor-investing.asp" target="_blank">Investopedia: Factor Investing</a></li>
+            <li><a href="https://www.quant-investing.com/blog/find-high-free-cash-flow-stocks" target="_blank">Quant Investing: Find High Free Cash Flow Stocks</a></li>
+            <li><a href="https://wepub.org/index.php/TEBMR/article/download/1027/1025/1905" target="_blank">Research on Multi Factor Quantitative Investment Strategies Based on Machine Learning</a></li>
+        </ol>
+
+    </div><!-- /article-body -->
+</div><!-- /article-wrap -->
+
+<footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+</footer>
+
+<div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+    <div class="share-modal">
+        <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+        <canvas id="shareCanvas"></canvas>
+        <div class="share-modal-actions">
+            <button class="btn-download" onclick="downloadCard()">下载图片</button>
+            <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const CARD = {
+        w: 640, h: 360,
+        bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+        textPrimary: '#e6edf3', textSecondary: '#8b949e',
+        tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+        title: '现金流量化策略调研报告',
+        excerpt: '基于 A 股与海外市场实证，系统梳理自由现金流因子的有效性边界、策略构建框架与风险特征。',
+        author: 'XiaoYinXu', tag: '量化交易',
+        font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const lines = text.split('\n');
+        let curY = y;
+        lines.forEach(line => {
+            const chars = line.split('');
+            let row = '';
+            for (let i = 0; i < chars.length; i++) {
+                const test = row + chars[i];
+                if (ctx.measureText(test).width > maxWidth && row) {
+                    ctx.fillText(row, x, curY); row = chars[i]; curY += lineHeight;
+                } else { row = test; }
+            }
+            if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+        });
+        return curY;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+        ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r);
+        ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h);
+        ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r);
+        ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+    }
+
+    function drawCard(canvas, qrImg) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CARD.w*dpr; canvas.height = CARD.h*dpr;
+        canvas.style.width = CARD.w+'px'; canvas.style.height = CARD.h+'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const pad = 40, qrSize = 80;
+        const textMaxW = CARD.w - pad*2 - qrSize - 16;
+        ctx.fillStyle = CARD.bg; ctx.fillRect(0,0,CARD.w,CARD.h);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.strokeRect(0.5,0.5,CARD.w-1,CARD.h-1);
+        ctx.fillStyle = CARD.accent; ctx.fillRect(0,0,CARD.w,3);
+        ctx.font = 'bold 13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        ctx.fillText(CARD.author, pad, 44);
+        const tagX = pad + ctx.measureText(CARD.author).width + 14;
+        const tagW = ctx.measureText(CARD.tag).width + 16;
+        ctx.fillStyle = CARD.tagBg; roundRect(ctx,tagX,30,tagW,20,4); ctx.fill();
+        ctx.font = 'bold 11px '+CARD.font; ctx.fillStyle = CARD.tagColor;
+        ctx.fillText(CARD.tag, tagX+8, 44);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(CARD.w-pad,62); ctx.stroke();
+        ctx.font = 'bold 22px '+CARD.font; ctx.fillStyle = CARD.textPrimary;
+        const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+        ctx.font = '13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        wrapText(ctx, CARD.excerpt, pad, titleBottom+16, textMaxW, 22);
+        ctx.font = '12px '+CARD.font; ctx.fillStyle = CARD.accent;
+        ctx.fillText('↗  '+window.location.href, pad, CARD.h-24);
+        if (qrImg) {
+            const qrX = CARD.w-pad-qrSize, qrY = Math.round((CARD.h-qrSize)/2);
+            ctx.fillStyle = '#fff'; roundRect(ctx,qrX-4,qrY-4,qrSize+8,qrSize+8,6); ctx.fill();
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>document.body.removeChild(t),500); }, 2000);
+    }
+
+    function openShareModal() {
+        const url = window.location.href;
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            if (navigator.share) { navigator.share({title:document.title,url}).catch(()=>{}); }
+            else {
+                const ta = document.createElement('textarea');
+                ta.value = url; ta.style.cssText='position:fixed;top:-9999px;left:-9999px';
+                document.body.appendChild(ta); ta.focus(); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                showToast('链接已复制');
+            }
+            return;
+        }
+        navigator.clipboard.writeText(url).catch(()=>{});
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, {text:url,width:160,height:160,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(() => {
+            const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+            if (el) {
+                const img = new Image();
+                img.onload = () => { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),img); document.getElementById('shareOverlay').classList.add('active'); };
+                img.src = el.tagName==='CANVAS' ? el.toDataURL() : el.src;
+            } else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),null); document.getElementById('shareOverlay').classList.add('active'); }
+        }, 50);
+    }
+
+    function closeShareModal(e) {
+        if (!e || e.target===document.getElementById('shareOverlay'))
+            document.getElementById('shareOverlay').classList.remove('active');
+    }
+
+    function downloadCard() {
+        const a = document.createElement('a');
+        a.download = 'flow-cash-strategy-card.png';
+        a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+        a.click();
+    }
+</script>
+
+</body>
+</html>
