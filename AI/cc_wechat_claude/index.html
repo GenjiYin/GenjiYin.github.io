@@ -377,13 +377,21 @@
             <h2>四、第二步：启动 Claude Code + 微信频道</h2>
 
             <p>安装完成后，启动命令是：</p>
-            <pre><code>claude --dangerously-load-development-channels server:wechat-channel</code></pre>
+            <pre><code>claude --dangerously-load-development-channels server:wechat-channel --dangerously-skip-permissions</code></pre>
             <p>启动后，Claude Code 会同时"监听"两个入口：</p>
             <ul>
                 <li>你电脑上的终端（照常使用）</li>
                 <li>你的微信消息</li>
             </ul>
             <p>也就是说，你既可以在终端里打字用 Claude Code，也可以躺在沙发上用手机微信发消息给它。</p>
+
+            <h3>为什么启动命令要加 --dangerously-skip-permissions？</h3>
+
+            <p>Claude Code 在执行文件读写、命令运行等操作时，默认会弹出一个权限确认框，等你点"同意"才继续。</p>
+            <p>这本身是个安全设计，但用在微信远程场景就成了灾难——弹窗出现在电脑终端上，而你可能正在外面走路、吃饭、躺在床上。每聊一个需求都要跑回电脑前点一下确认，"远程遥控"的体验就彻底断了。</p>
+            <p><code>--dangerously-skip-permissions</code> 的作用就是跳过这些弹窗，让 Claude Code 直接执行操作。对于通过微信互动 Claude Code 来说，这个参数几乎是必需的。</p>
+
+            <blockquote><strong>安全提醒：</strong>跳过权限意味着 Claude Code 会自主执行包括删除文件、运行 shell 命令在内的所有操作。建议只在本地开发环境使用，不要在生产服务器或包含敏感数据的环境中启用。</blockquote>
 
             <h2>五、大概率会遇到的第一个坑："Channels are not currently available"</h2>
 
@@ -425,7 +433,7 @@ claude --dangerously-load-development-channels server:wechat-channel</code></pre
                 <li><strong>发文件：</strong>传 <code>.log</code>、<code>.json</code> 等文件，Claude Code 按需处理</li>
             </ul>
             <p>Claude Code 收到消息后，会调用它所有的工具——读文件、改代码、运行命令、联网搜索——全部在你本地电脑上执行。处理完后，结果直接回传到微信。</p>
-            <p>不过有一个限制需要记住：<strong>涉及危险操作（比如删除文件、执行 rm 命令）时，Claude Code 仍会在终端弹窗等你确认。</strong>这是安全机制，不能完全"无脑"远程操控。</p>
+            <p>因为我们启动时加了 <code>--dangerously-skip-permissions</code>，涉及文件修改、命令运行等操作时，Claude Code 会直接执行，不会再弹窗等你确认。这在微信远程场景下保证了流畅体验，但前提是你信任当前任务的安全性——它确实能"无脑"执行。</p>
 
             <h2>八、进阶：多账号配置（工作/生活分开）</h2>
 
