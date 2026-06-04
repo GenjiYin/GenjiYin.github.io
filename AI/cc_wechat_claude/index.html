@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>把 Claude Code 装进微信：零代码门槛的 cc-wechat 部署指南 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-ai { background: rgba(255,165,0,0.12); color: #ffa657; border: 1px solid rgba(255,165,0,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 30px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p {
+            margin-bottom: 16px;
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li {
+            margin-bottom: 8px;
+        }
+
+        .article-body strong {
+            color: #e6edf3;
+        }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: bold;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #21262d;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .article-body td {
+            padding: 10px 14px;
+            border: 1px solid #21262d;
+            vertical-align: top;
+        }
+
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+
+        .article-body pre {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .article-body code {
+            background: rgba(110, 118, 129, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #e6edf3;
+        }
+
+        .article-body pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">&#8592; 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-ai">AI 工程</span>
+                <span class="article-date">2026-06</span>
+            </div>
+            <h1 class="article-title">把 Claude Code 装进微信：零代码门槛的 cc-wechat 部署指南</h1>
+            <p class="article-subtitle">一条 npx 命令、一次扫码登录，让你的手机微信变成 Claude Code 的远程遥控器。文字、图片、文件全支持，不需要懂逆向工程。</p>
+            <button class="share-btn" onclick="openShareModal()">&#8599; 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <p>你有没有想过，不用守在电脑前，也能用手机微信直接指挥 Claude Code 帮你写代码、改 bug、查文档？</p>
+            <p>这不是科幻。一个叫 <strong>cc-wechat</strong> 的开源工具，把这件事变成了一条命令就能搞定的事。</p>
+            <p>这篇文章，我会带你从零开始，一步步把 Claude Code 桥接到微信——不需要你懂逆向工程，不需要折腾微信协议，扫码登录即可使用。</p>
+
+            <h2>一、cc-wechat 是什么？一句话讲清楚</h2>
+
+            <p>cc-wechat 是一个开源的"消息桥接器"。它的工作方式非常直白：</p>
+            <pre><code>你在微信里发消息 &rarr; 腾讯 iLink API 转发 &rarr; 本地 Claude Code 处理 &rarr; 结果回传到微信</code></pre>
+            <p>也就是说，你的手机微信变成了 Claude Code 的"远程遥控器"。文字、图片、文件都能发，Claude Code 在本地电脑上运行，处理完直接把结果发回微信。</p>
+            <p>不用 OpenClaw，不用破解微信，全部走腾讯官方的 iLink Bot API。安全、稳定、合法。</p>
+
+            <h2>二、开始前，确认这三样东西</h2>
+
+            <p>别急着动手，先花 30 秒确认你的环境是否满足要求：</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>要求</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Claude Code</strong></td>
+                        <td>版本 v2.1.80 及以上</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Node.js</strong></td>
+                        <td>版本 &gt;= 22</td>
+                    </tr>
+                    <tr>
+                        <td><strong>微信</strong></td>
+                        <td>iOS / Android / macOS / Windows 均可，支持 iLink Bot 扫码</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Claude Code 版本怎么查？</strong></p>
+            <p>打开终端，输入：</p>
+            <pre><code>claude --version</code></pre>
+            <p>如果显示的版本号低于 2.1.80，先升级 Claude Code 再往下看。</p>
+
+            <h2>三、第一步：一键安装（真的就一条命令）</h2>
+
+            <p>打开终端，复制粘贴下面这行命令，回车：</p>
+            <pre><code>npx cc-wechat@latest install</code></pre>
+            <p>这条命令会自动帮你做三件事：</p>
+            <ol>
+                <li>把 cc-wechat 注册为 Claude Code 的 MCP Server</li>
+                <li>在终端弹出一个二维码，用微信扫码授权登录</li>
+                <li>告诉你下一步怎么启动</li>
+            </ol>
+            <p>扫码成功后，你的登录信息会自动保存在本地（<code>~/.claude/channels/wechat/</code> 目录下），下次不用再扫。</p>
+
+            <h2>四、第二步：启动 Claude Code + 微信频道</h2>
+
+            <p>安装完成后，启动命令是：</p>
+            <pre><code>claude --dangerously-load-development-channels server:wechat-channel</code></pre>
+            <p>启动后，Claude Code 会同时"监听"两个入口：</p>
+            <ul>
+                <li>你电脑上的终端（照常使用）</li>
+                <li>你的微信消息</li>
+            </ul>
+            <p>也就是说，你既可以在终端里打字用 Claude Code，也可以躺在沙发上用手机微信发消息给它。</p>
+
+            <h2>五、大概率会遇到的第一个坑："Channels are not currently available"</h2>
+
+            <p>如果你启动后看到这句话，别慌。这不是你操作错了，而是 Anthropic 对 Channel 功能做了灰度发布，你的账号可能还没被放开。</p>
+            <p>解决方式同样是一条命令：</p>
+            <pre><code>npx cc-channel-patch@latest</code></pre>
+            <p>这个补丁工具会自动找到你电脑上的 Claude Code，修改三处限制：</p>
+            <ul>
+                <li>绕过 Anthropic 的灰度检查</li>
+                <li>跳过 accessToken 验证（适合用代理的用户）</li>
+                <li>移除"Channels are not currently available"的提示</li>
+            </ul>
+            <p>它支持 Windows、macOS、Linux、WSL，还能自动识别你是原生安装还是 npm 安装的 Claude Code。打完补丁就能正常用了。</p>
+
+            <blockquote>小提示：Claude Code 自动更新后，补丁可能会被覆盖。如果哪天突然又不能用了，重跑一次上面的命令即可。想还原的话，运行 <code>npx cc-channel-patch unpatch</code>。</blockquote>
+
+            <h2>六、手动安装方式（如果你想完全掌控每一步）</h2>
+
+            <p>如果你不喜欢"一键安装"的魔法感，也可以分步来：</p>
+            <pre><code># 1. 全局安装 cc-wechat
+npm i -g cc-wechat
+
+# 2. 手动注册 MCP Server
+claude mcp add -s user wechat-channel -- npx -y cc-wechat@latest
+
+# 3. 扫码登录
+npx cc-wechat login
+
+# 4. 启动
+claude --dangerously-load-development-channels server:wechat-channel</code></pre>
+            <p>手动方式的好处是出了问题更容易排查——你知道每一步做了什么。</p>
+
+            <h2>七、实际用起来是什么体验？</h2>
+
+            <p>登录成功后，在微信里找到你授权的 iLink Bot 对话，直接发消息就行：</p>
+            <ul>
+                <li><strong>发文字：</strong>"帮我检查一下 src/auth/token.ts 里的刷新逻辑"</li>
+                <li><strong>发图片：</strong>截一张报错截图发过去，Claude Code 会读取并分析</li>
+                <li><strong>发文件：</strong>传 <code>.log</code>、<code>.json</code> 等文件，Claude Code 按需处理</li>
+            </ul>
+            <p>Claude Code 收到消息后，会调用它所有的工具——读文件、改代码、运行命令、联网搜索——全部在你本地电脑上执行。处理完后，结果直接回传到微信。</p>
+            <p>不过有一个限制需要记住：<strong>涉及危险操作（比如删除文件、执行 rm 命令）时，Claude Code 仍会在终端弹窗等你确认。</strong>这是安全机制，不能完全"无脑"远程操控。</p>
+
+            <h2>八、进阶：多账号配置（工作/生活分开）</h2>
+
+            <p>cc-wechat 支持按项目使用不同的微信账号。比如个人微信用来玩，公司微信用来处理工作项目。</p>
+            <p>在项目根目录创建一个 <code>.mcp.json</code> 文件：</p>
+            <pre><code>{
+  "mcpServers": {
+    "wechat-channel": {
+      "command": "npx",
+      "args": ["-y", "cc-wechat@latest"],
+      "env": { "WECHAT_PROFILE": "work" }
+    }
+  }
+}</code></pre>
+            <p>每个 profile 的登录信息独立存储。不带 <code>WECHAT_PROFILE</code> 时用默认账号。典型用法：个人用默认，工作加 <code>WECHAT_PROFILE=work</code>。</p>
+
+            <h2>九、六个常见踩坑点（提前帮你排雷）</h2>
+
+            <p><strong>1. 补丁被更新覆盖</strong></p>
+            <p>Claude Code 自动更新后，cc-channel-patch 的补丁会失效。解法：更新后重跑一次补丁命令。</p>
+
+            <p><strong>2. 登录态过期</strong></p>
+            <p>iLink Bot 的 session 会过期。过期后重新扫码：<code>npx cc-wechat login</code>。</p>
+
+            <p><strong>3. 语音消息只有文字</strong></p>
+            <p>cc-wechat 对语音只提取文字转写，不传递原始音频。这是设计选择，Claude Code 本身也不处理音频。</p>
+
+            <p><strong>4. 图片发过去没反应</strong></p>
+            <p>确认你用的 Claude 模型支持 vision（多模态）。某些第三方中转的纯文本模型会忽略图片。</p>
+
+            <p><strong>5. 必须先由微信端发第一条消息</strong></p>
+            <p>iLink Bot 的机制要求用户先发起对话。Claude Code 不能主动推消息到微信——必须你先开口。</p>
+
+            <p><strong>6. 安全问题</strong></p>
+            <p>微信触发的操作在本地机器执行。建议：不要在生产服务器上运行；保持默认权限模式；如果多人能发消息给你，考虑限制白名单。</p>
+
+            <h2>十、写在最后</h2>
+
+            <p>cc-wechat 把"在微信里用 Claude Code"这件事压缩到了极致：一条 <code>npx install</code>、一次扫码、一个启动命令。它不重新包装 Claude Code，只做消息桥接——架构简单，出问题容易排查。</p>
+            <p>把它当成你已有 Claude Code 工作流的"微信遥控器"来用，而不是一个可以脱离终端独立运行的自动化系统，就不容易出事。</p>
+            <p>现在，拿起你的手机，发一条消息给你的 Claude Code 试试吧。</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+            textPrimary: '#e6edf3', textSecondary: '#8b949e',
+            tagBg: 'rgba(255,165,0,0.12)', tagColor: '#ffa657',
+            title: '把 Claude Code 装进微信：\n零代码门槛的 cc-wechat 部署指南',
+            excerpt: '一条 npx 命令、一次扫码登录，让手机微信变成 Claude Code 的远程遥控器。\n新手也能轻松部署的完整教程。',
+            author: 'XiaoYinXu', tag: 'AI 工程',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const chars = line.split('');
+                let row = '';
+                for (let i = 0; i < chars.length; i++) {
+                    const test = row + chars[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = chars[i];
+                        curY += lineHeight;
+                    } else { row = test; }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+            ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+            ctx.fillText('&#8599;  ' + window.location.href, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            navigator.clipboard.writeText(url).catch(() => {});
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            new QRCode(tmp, { text: url, width: 160, height: 160, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+            setTimeout(() => {
+                const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+                if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'), null); document.getElementById('shareOverlay').classList.add('active'); }
+            }, 50);
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay'))
+                document.getElementById('shareOverlay').classList.remove('active');
+        }
+
+        function downloadCard() {
+            const a = document.createElement('a');
+            a.download = 'cc-wechat-claude-guide-card.png';
+            a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
