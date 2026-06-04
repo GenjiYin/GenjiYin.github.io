@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xtquant.xtdata 实战速查：MiniQMT 数据接口全解 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        .nav-logo { font-size: 18px; font-weight: bold; color: #58a6ff; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #8b949e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #c9d1d9; }
+        .article-wrap { max-width: 760px; margin: 60px auto 80px; padding: 0 40px; }
+        .article-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #21262d; }
+        .article-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .post-category { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+        .article-date { font-size: 12px; color: #484f58; }
+        .article-title { font-size: 28px; color: #e6edf3; font-weight: bold; line-height: 1.4; margin-bottom: 14px; }
+        .article-subtitle { font-size: 15px; color: #8b949e; line-height: 1.7; }
+        .article-body { font-size: 15px; line-height: 1.9; color: #c9d1d9; }
+        .article-body h2 { font-size: 20px; color: #e6edf3; margin: 40px 0 16px; padding-left: 12px; border-left: 3px solid #58a6ff; }
+        .article-body h3 { font-size: 16px; color: #e6edf3; margin: 28px 0 12px; }
+        .article-body p { margin-bottom: 16px; }
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body strong { color: #e6edf3; }
+        .article-body a { color: #58a6ff; text-decoration: none; }
+        .article-body a:hover { text-decoration: underline; }
+        .article-body blockquote { border-left: 3px solid #30363d; padding: 4px 0 4px 16px; margin: 16px 0; color: #8b949e; font-size: 14px; line-height: 1.8; }
+        .article-body table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .article-body th { background: #161b22; color: #8b949e; font-weight: bold; padding: 10px 14px; text-align: left; border: 1px solid #21262d; font-size: 12px; }
+        .article-body td { padding: 10px 14px; border: 1px solid #21262d; vertical-align: top; }
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+        .article-body pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; overflow-x: auto; font-size: 13px; line-height: 1.7; }
+        .article-body code { font-family: 'Consolas', 'Courier New', monospace; color: #e6edf3; }
+        .insight-block { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .insight-block p { margin-bottom: 0; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #58a6ff; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: opacity 0.2s; }
+        .back-link:hover { opacity: 0.75; }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; }
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; max-width: 680px; width: 95%; text-align: center; }
+        .share-modal h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; font-weight: normal; }
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+        .share-modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+        .share-modal-actions button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid #30363d; }
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+        footer { text-align: center; padding: 20px; color: #484f58; font-size: 12px; border-top: 1px solid #21262d; }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+    <ul class="nav-links">
+        <li><a href="../../index.html">首页</a></li>
+        <li><a href="../../resume/">关于我</a></li>
+        <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+    </ul>
+</nav>
+
+<div class="article-wrap">
+    <a href="../../index.html" class="back-link">← 返回首页</a>
+
+    <div class="article-header">
+        <div class="article-meta">
+            <span class="post-category cat-quant">量化交易</span>
+            <span class="article-date">2026-05</span>
+        </div>
+        <h1 class="article-title">xtquant.xtdata 实战速查：MiniQMT 数据接口全解</h1>
+        <p class="article-subtitle">整理了一份 xtquant.xtdata 的实战速查手册，覆盖行情获取、板块管理、财务数据、交易日历等高频接口，附常用别名与返回格式速记。</p>
+        <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+    </div>
+
+    <div class="article-body">
+
+        <h2>一、xtquant.xtdata 是什么</h2>
+
+        <p><strong>MiniQMT</strong> 是迅投提供的轻量化量化交易平台，可以在本地 Python 环境中直接调用行情和交易接口。而 <code>xtquant.xtdata</code> 就是负责「取数据」的模块——行情、财务、板块、日历、Level2 等数据都从这里出。</p>
+
+        <p>这篇文章不是官方文档的翻译，而是我从日常研究和实盘开发中整理出来的<strong>高频接口速查</strong>。核心目标只有一个：当你需要某种数据时，能在一分钟内定位到正确的函数、搞清楚参数含义、写出能跑的代码。</p>
+
+        <div class="insight-block">
+            <p><strong>使用前提：</strong>已安装 MiniQMT 客户端并保持登录，Python 环境中已安装 <code>xtquant</code> 包。接口调用前通常需要先下载历史数据到本地缓存。</p>
+        </div>
+
+        <h2>二、行情数据：最常用的一组接口</h2>
+
+        <h3>2.1 获取历史 K 线 / 分笔数据</h3>
+
+        <pre><code>from xtquant import xtdata
+
+# 获取日线 K 线数据
+data = xtdata.get_market_data(
+    field_list=['time', 'open', 'high', 'low', 'close', 'volume', 'amount'],
+    stock_list=['000001.SZ', '600000.SH'],
+    period='1d',
+    start_time='20240101',
+    end_time='20241231',
+    count=-1,
+    dividend_type='front',
+    fill_data=True
+)</code></pre>
+
+        <p><code>get_market_data</code> 是日常用量最大的接口。几个关键参数的理解直接影响取数效率：</p>
+
+        <table>
+            <thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr><td><code>field_list</code></td><td>list[str]</td><td>字段列表，<code>[]</code> 表示全部字段</td></tr>
+                <tr><td><code>stock_list</code></td><td>list[str]</td><td>股票代码列表，格式为 <code>代码.市场</code></td></tr>
+                <tr><td><code>period</code></td><td>str</td><td><code>tick</code>（分笔）、<code>1m</code> / <code>5m</code>（分钟）、<code>1d</code>（日线）</td></tr>
+                <tr><td><code>count</code></td><td>int</td><td><code>-1</code> 取全部，<code>n</code> 从结束时间向前取 n 条</td></tr>
+                <tr><td><code>dividend_type</code></td><td>str</td><td>复权类型：<code>none</code>（不复权）、<code>front</code>（前复权）、<code>back</code>（后复权）</td></tr>
+                <tr><td><code>fill_data</code></td><td>bool</td><td>K 线缺失时是否填充（<code>True</code> 以前收盘填充，<code>False</code> 填 NaN）</td></tr>
+            </tbody>
+        </table>
+
+        <p><strong>返回格式是很多人踩坑的地方：</strong></p>
+        <ul>
+            <li>K 线周期（<code>1m/5m/1d</code>）：返回 <code>{field: pd.DataFrame}</code>，DataFrame 的 index 是股票代码，columns 是时间戳</li>
+            <li>分笔周期（<code>tick</code>）：返回 <code>{stock: np.ndarray}</code>，数组按 time 升序排列</li>
+        </ul>
+
+        <h3>2.2 扩展版：get_market_data_ex</h3>
+
+        <pre><code># 扩展版返回格式更直观：{stock: pd.DataFrame}
+data_ex = xtdata.get_market_data_ex(
+    field_list=['open', 'high', 'low', 'close'],
+    stock_list=['000001.SZ'],
+    period='1d',
+    start_time='20240101',
+    end_time='20241231'
+)
+# data_ex['000001.SZ'] 直接拿到该股票的 DataFrame</code></pre>
+
+        <p>参数与 <code>get_market_data</code> 完全一致，区别在于 K 线数据返回 <code>{stock: pd.DataFrame}</code> 格式，每只股票的 OHLCV 集中在一张表里，更符合直觉。</p>
+
+        <h3>2.3 实时盘口快照</h3>
+
+        <pre><code># 获取最新全量盘口
+tick = xtdata.get_full_tick(['000001.SZ', '600000.SH'])
+# 返回：{'000001.SZ': {五档买卖、最新价、成交量...}}</code></pre>
+
+        <p><code>get_full_tick</code> 不做历史查询，只返回当前最新盘口，适合实时监控或盘中信号触发。</p>
+
+        <h3>2.4 订阅与回调机制</h3>
+
+        <pre><code># 订阅单只股票行情
+seq = xtdata.subscribe_quote(
+    stock_code='000001.SZ',
+    period='1m',
+    start_time='20250501093000',
+    end_time='20250531150000',
+    count=0,
+    callback=on_data
+)
+
+# 订阅全推（整个市场）
+seq2 = xtdata.subscribe_whole_quote(
+    code_list=['SH', 'SZ'],
+    callback=on_whole_data
+)
+
+# 取消订阅
+xtdata.unsubscribe_quote(seq)
+
+# 阻塞接收回调（通常在子线程中运行）
+xtdata.run()</code></pre>
+
+        <p>订阅机制适合盘中实时策略。注意 <code>subscribe_whole_quote</code> 的回调数据结构是 <code>{stock1: data1, stock2: data2}</code> 的扁平字典，和 <code>subscribe_quote</code> 的列表格式不同。</p>
+
+        <h2>三、板块与合约：选股的第一步</h2>
+
+        <p>做因子选股，第一步通常是确定股票池。xtdata 提供了完整的板块管理和合约信息接口。</p>
+
+        <h3>3.1 获取板块列表与成份股</h3>
+
+        <pre><code># 获取所有板块名称
+sectors = xtdata.get_sector_list()
+
+# 获取某板块的全部成份股
+stocks = xtdata.get_stock_list_in_sector('沪深A股')
+stocks = xtdata.get_stock_list_in_sector('中证500')
+stocks = xtdata.get_stock_list_in_sector('自选股')  # 也支持自定义板块
+
+# 添加自定义板块
+xtdata.add_sector('我的策略池', ['000001.SZ', '600000.SH'])
+
+# 删除自定义板块
+xtdata.remove_sector('我的策略池')</code></pre>
+
+        <p><code>get_sector_list</code> 返回的是 MiniQMT 客户端左侧板块树中所有可见的板块名称，包括系统板块（行业、概念、指数）和用户自定义板块。这是构建股票池最方便的入口。</p>
+
+        <h3>3.2 合约详情与类型判断</h3>
+
+        <pre><code># 获取合约详细信息
+detail = xtdata.get_instrument_detail('600000.SH')
+# 包含：上市日期、涨跌停价、流通股本、总股本、最小变动单位、合约乘数等
+
+# 判断证券类型
+types = xtdata.get_instrument_type('000001.SZ')
+# 返回：{'stock': True, 'index': False, 'fund': False, ...}</code></pre>
+
+        <p><code>get_instrument_detail</code> 返回的信息在做风控和参数计算时非常实用——比如根据 <code>PriceTick</code> 和 <code>VolumeMultiple</code> 计算最小变动金额，根据 <code>UpStopPrice</code> / <code>DownStopPrice</code> 判断涨跌停状态。</p>
+
+        <h2>四、财务数据：基本面因子来源</h2>
+
+        <pre><code># 获取财务数据
+fin = xtdata.get_financial_data(
+    stock_list=['000001.SZ', '600000.SH'],
+    table_list=['Balance', 'Income', 'CashFlow'],
+    start_time='20200101',
+    end_time='20241231',
+    report_type='report_time'  # report_time: 报表期; announce_time: 公告期
+)</code></pre>
+
+        <table>
+            <thead><tr><th>表名</th><th>对应报表</th></tr></thead>
+            <tbody>
+                <tr><td><code>Balance</code></td><td>资产负债表</td></tr>
+                <tr><td><code>Income</code></td><td>利润表</td></tr>
+                <tr><td><code>CashFlow</code></td><td>现金流量表</td></tr>
+                <tr><td><code>Capital</code></td><td>股本结构</td></tr>
+                <tr><td><code>HolderNum</code></td><td>股东户数</td></tr>
+                <tr><td><code>Top10Holder</code></td><td>十大股东</td></tr>
+                <tr><td><code>Top10FlowHolder</code></td><td>十大流通股东</td></tr>
+                <tr><td><code>PershareIndex</code></td><td>每股指标</td></tr>
+            </tbody>
+        </table>
+
+        <p><strong>返回格式：</strong><code>field</code>、<code>date</code>、<code>stock</code>、<code>value</code> 四个列表，需要自行转换为宽表格式。<code>report_type</code> 的选择决定了时间对齐方式——<code>report_time</code> 按财报期对齐，<code>announce_time</code> 按公告日对齐，后者更适合回测避免未来信息泄露。</p>
+
+        <pre><code># 预下载财务数据（建议首次使用时先下载）
+xtdata.download_financial_data(
+    stock_list=['000001.SZ'],
+    table_list=['Income', 'Balance'],
+    start_time='20200101',
+    end_time='20241231'
+)</code></pre>
+
+        <h2>五、除权除息与复权</h2>
+
+        <pre><code># 获取除权除息因子表
+df = xtdata.get_divid_factors('000001.SZ', start_time='20200101', end_time='20241231')
+# 返回 pd.DataFrame，包含分红、送股、配股等权息信息</code></pre>
+
+        <p>当你需要自己做复权计算（比如自定义复权方式或验证数据一致性）时，这个接口是必需的。<code>get_market_data</code> 里的 <code>dividend_type</code> 参数已经内置了复权逻辑，日常用不到手动处理。</p>
+
+        <h2>六、交易日历：容易被忽视但极其重要</h2>
+
+        <p>很多策略的 bug 不是模型问题，而是「在非交易日调仓」「在交易时段外发单」这类低级错误。xtdata 提供了完整的日历接口。</p>
+
+        <pre><code># 获取交易日列表（返回毫秒时间戳列表）
+dates = xtdata.get_trading_dates('SH', start_time='20240101', end_time='20241231')
+
+# 获取节假日列表
+holidays = xtdata.get_holidays()
+
+# 获取交易日历（含日内时段）
+calendar = xtdata.get_trading_calendar('SH', '20240101', '20241231', tradetimes=True)
+# tradetimes=False: 返回日期列表
+# tradetimes=True:  返回 {日期: [[开盘,收盘,类型], ...]}，类型 2=开盘竞价 3=连续交易 8=收盘竞价 9=盘后定价
+
+# 获取指定股票的交易时段
+times = xtdata.get_trade_times('600000.SH')
+# 返回 [[开始时间, 结束时间, 交易类型], ...]</code></pre>
+
+        <div class="insight-block">
+            <p><strong>实战建议：</strong>在策略主循环开头，先用 <code>get_trading_dates</code> 校验当日是否为交易日；在定时任务中，用 <code>get_trade_times</code> 判断当前是否处于连续交易时段（类型 3），避免在竞价或盘后发单被拒。</p>
+        </div>
+
+        <h2>七、数据下载：缓存是性能的关键</h2>
+
+        <pre><code># 下载单只股票历史数据到本地缓存
+ok = xtdata.download_history_data(
+    stock_code='000001.SZ',
+    period='1d',
+    start_time='20200101',
+    end_time='20241231'
+)
+
+# 下载板块数据
+xtdata.download_sector_data()
+
+# 下载可转债数据
+xtdata.download_cb_data()</code></pre>
+
+        <p>MiniQMT 的数据机制是「先下载，后查询」。第一次调用 <code>get_market_data</code> 取某只股票的历史数据时，如果本地没有缓存，接口会返回空或极慢。<strong>建议在策略启动时批量预下载股票池的历史数据</strong>，而不是每次现取现下。</p>
+
+        <h2>八、Level2 数据</h2>
+
+        <pre><code># Level2 实时行情（十档/千档）
+l2_quote = xtdata.get_l2_quote(
+    field_list=[], stock_code='000001.SZ',
+    start_time='', end_time='', count=-1
+)
+
+# Level2 逐笔委托
+l2_order = xtdata.get_l2_order(
+    field_list=[], stock_code='000001.SZ',
+    start_time='', end_time='', count=-1
+)
+
+# Level2 逐笔成交
+l2_trans = xtdata.get_l2_transaction(
+    field_list=[], stock_code='000001.SZ',
+    start_time='', end_time='', count=-1
+)</code></pre>
+
+        <p>Level2 接口需要开通相应权限。逐笔委托和逐笔成交是 A 股市场粒度最细的数据，适合高频因子挖掘（如大单流入、委托簿失衡等）。</p>
+
+        <h2>九、工具函数：时间格式转换</h2>
+
+        <pre><code># 日期字符串 -> 毫秒时间戳
+ts = xtdata.datetime_to_timetag('20240101150000', format='%Y%m%d%H%M%S')
+
+# 毫秒时间戳 -> 日期字符串
+dt = xtdata.timetag_to_datetime(1704096000000, '%Y%m%d')</code></pre>
+
+        <p>xtdata 内部大量使用毫秒时间戳，而策略代码通常用字符串或 datetime 对象。这两个工具函数是数据类型转换的桥梁。</p>
+
+        <h2>十、常用别名速查</h2>
+
+        <table>
+            <thead><tr><th>别名</th><th>原函数</th></tr></thead>
+            <tbody>
+                <tr><td><code>gmd</code></td><td><code>get_market_data</code></td></tr>
+                <tr><td><code>gmd2</code></td><td><code>get_market_data_ex</code></td></tr>
+                <tr><td><code>gld</code></td><td><code>get_local_data</code></td></tr>
+                <tr><td><code>t2d</code></td><td><code>timetag_to_datetime</code></td></tr>
+                <tr><td><code>gsl</code></td><td><code>get_stock_list_in_sector</code></td></tr>
+                <tr><td><code>get_stock_type</code></td><td><code>get_instrument_type</code></td></tr>
+                <tr><td><code>supply_history_data</code></td><td><code>download_history_data</code></td></tr>
+            </tbody>
+        </table>
+
+        <p>别名在交互式研究时很实用，比如 <code>xtdata.gmd(...)</code> 比全称短不少。但建议在生产代码中写全名，可读性更好。</p>
+
+        <h2>十一、小结</h2>
+
+        <table>
+            <thead><tr><th>场景</th><th>推荐接口</th></tr></thead>
+            <tbody>
+                <tr><td>批量获取历史 K 线</td><td><code>get_market_data_ex</code></td></tr>
+                <tr><td>获取最新盘口快照</td><td><code>get_full_tick</code></td></tr>
+                <tr><td>盘中实时订阅</td><td><code>subscribe_whole_quote</code></td></tr>
+                <tr><td>构建股票池</td><td><code>get_sector_list</code> + <code>get_stock_list_in_sector</code></td></tr>
+                <tr><td>基本面因子</td><td><code>get_financial_data</code></td></tr>
+                <tr><td>调仓日判断</td><td><code>get_trading_dates</code></td></tr>
+                <tr><td>盘中时段判断</td><td><code>get_trade_times</code></td></tr>
+                <tr><td>数据预下载</td><td><code>download_history_data</code></td></tr>
+            </tbody>
+        </table>
+
+        <p>xtquant.xtdata 的接口设计整体上是「功能全、参数多、返回格式不统一」。这篇速查的核心价值，是把散落在官方文档里的关键信息按实战场景重新组织，并标出那些真正会踩坑的地方——返回格式、时间格式、复权方式、预下载机制。</p>
+
+        <p>如果你也在用 MiniQMT 做研究，建议把这张表打印出来贴在显示器旁边。至少对我来说，它省下了不少翻文档的时间。</p>
+
+    </div>
+</div>
+
+<footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+</footer>
+
+<!-- 分享弹窗 -->
+<div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+    <div class="share-modal">
+        <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+        <canvas id="shareCanvas"></canvas>
+        <div class="share-modal-actions">
+            <button class="btn-download" onclick="downloadCard()">下载图片</button>
+            <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const CARD = {
+        w: 640, h: 360,
+        bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+        textPrimary: '#e6edf3', textSecondary: '#8b949e',
+        tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+        title: 'xtquant.xtdata 实战速查：\nMiniQMT 数据接口全解',
+        excerpt: '整理了一份 xtquant.xtdata 的实战速查手册，覆盖行情获取、板块管理、财务数据、交易日历等高频接口，附常用别名与返回格式速记。',
+        author: 'XiaoYinXu', tag: '量化交易',
+        font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const lines = text.split('\n');
+        let curY = y;
+        lines.forEach(line => {
+            const chars = line.split('');
+            let row = '';
+            for (let i = 0; i < chars.length; i++) {
+                const test = row + chars[i];
+                if (ctx.measureText(test).width > maxWidth && row) {
+                    ctx.fillText(row, x, curY);
+                    row = chars[i];
+                    curY += lineHeight;
+                } else { row = test; }
+            }
+            if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+        });
+        return curY;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+        ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+        ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+        ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+        ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+    }
+
+    function drawCard(canvas, qrImg) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+        canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const pad = 40, qrSize = 80;
+        const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+        ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+        ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+        ctx.font = 'bold 13px ' + CARD.font;
+        ctx.fillStyle = CARD.textSecondary;
+        ctx.fillText(CARD.author, pad, 44);
+
+        const tagX = pad + ctx.measureText(CARD.author).width + 14;
+        const tagW = ctx.measureText(CARD.tag).width + 16;
+        ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+        ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+        ctx.fillText(CARD.tag, tagX + 8, 44);
+
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+        ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+        const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+        ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+        wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+        ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+        ctx.fillText('↗  ' + window.location.href, pad, CARD.h - 24);
+
+        if (qrImg) {
+            const qrX = CARD.w - pad - qrSize;
+            const qrY = Math.round((CARD.h - qrSize) / 2);
+            ctx.fillStyle = '#fff';
+            roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+            ctx.fill();
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+    }
+
+    function openShareModal() {
+        const url = window.location.href;
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            if (navigator.share) {
+                navigator.share({ title: document.title, url: url }).catch(() => {});
+            } else {
+                const fallbackCopy = () => {
+                    const ta = document.createElement('textarea');
+                    ta.value = url;
+                    ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                    document.body.appendChild(ta);
+                    ta.focus(); ta.select();
+                    const ok = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return ok;
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                        fallbackCopy(); showToast('链接已复制');
+                    });
+                } else { fallbackCopy(); showToast('链接已复制'); }
+            }
+            return;
+        }
+        navigator.clipboard.writeText(url).catch(() => {});
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, { text: url, width: 160, height: 160, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+        const finish = (src) => {
+            const img = new Image();
+            img.onload = () => {
+                document.body.removeChild(tmp);
+                drawCard(document.getElementById('shareCanvas'), img);
+                document.getElementById('shareOverlay').classList.add('active');
+            };
+            img.src = src;
+        };
+        setTimeout(() => {
+            const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+            if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+            else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'), null); document.getElementById('shareOverlay').classList.add('active'); }
+        }, 50);
+    }
+
+    function closeShareModal(e) {
+        if (!e || e.target === document.getElementById('shareOverlay'))
+            document.getElementById('shareOverlay').classList.remove('active');
+    }
+
+    function downloadCard() {
+        const a = document.createElement('a');
+        a.download = 'xtdata-api-card.png';
+        a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+        a.click();
+    }
+</script>
+
+</body>
+</html>
