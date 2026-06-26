@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>围棋入门：一文讲透"真眼"和"假眼"的判断 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-go { background: rgba(46,204,113,0.12); color: #56d364; border: 1px solid rgba(46,204,113,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 30px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #56d364;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p {
+            margin-bottom: 16px;
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li {
+            margin-bottom: 8px;
+        }
+
+        .article-body strong {
+            color: #e6edf3;
+        }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+        }
+
+        .article-body code {
+            background: rgba(110, 118, 129, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #e6edf3;
+        }
+
+        .article-img {
+            width: 100%;
+            max-width: 480px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            margin: 16px auto 4px;
+            display: block;
+        }
+
+        .img-caption {
+            font-size: 12px;
+            color: #484f58;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover { border-color: #56d364; color: #56d364; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">&#8592; 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-go">围棋</span>
+                <span class="article-date">2026-06</span>
+            </div>
+            <h1 class="article-title">围棋入门：一文讲透"真眼"和"假眼"的判断</h1>
+            <p class="article-subtitle">从"气"和"禁入点"讲起，用最通俗的语言带你理解围棋里"做眼"的门道——什么是真眼、什么是假眼，以及如何用两个真眼让一块棋永远活着。</p>
+            <button class="share-btn" onclick="openShareModal()">&#8599; 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <p>相信大家对围棋最基本的认识是吃子，让对方的棋越来越少。这其实是从结果的角度去理解围棋，但其实在下围棋的过程中才能感觉到围棋的最大乐趣！我自己学了有半年的围棋，起初我对围棋的认知仅停留在吃子的地步，但是随着我对围棋的深入，我逐渐爱上了围棋。我和别人下过几场围棋（虽然都是惨败），但是我发现：一个小小的棋盘上存在着巨多变数和无限可能！而且最让人激动的时刻莫过于你推演局势并计算出了这种局势逆转一手的时刻，给人一种"统御全局"的感觉。</p>
+
+            <p>我自己也在学习阶段，我开围棋这系列的博客一方面是想要和大家分享我的学习内容，另一方面是希望我能更好地理解我的学习内容。因为我知道一个知识点能不能被消化取决于你能不能讲清楚它，所以我尽可能用通俗语言给大家讲解围棋的知识点。</p>
+
+            <p>我今天想讲的是围棋的<strong>"真假眼"</strong>的判断。</p>
+
+            <h2>一、先从"气"说起</h2>
+
+            <p>在讲眼之前，需要讲什么是禁入点；为讲清楚禁入点，我还是会从大家最熟悉的"吃子"开始讲起。首先，我们围棋中有一个概念叫做<strong>"气"</strong>，一颗棋子的"气"的数量就是它左右上下相邻的空白交叉点的个数。</p>
+
+            <img src="../../figure/气的数量.png" alt="气的数量示意" class="article-img">
+            <p class="img-caption">气的数量</p>
+
+            <p>通过图片我们可以看到：左上角红色框框内黑棋有左、下两口气，右上角黑棋有上、下、右三口气，右下角四周都是空白交叉点，而左下角的黑棋只有一口气——也就是说白棋往下一堵，黑子就被吃了（但实际当前轮到黑棋下，所以目前白棋方只是在"征吃"，黑棋只需要往下走一步，也就是"长"，那黑棋就活过来了）。</p>
+
+            <h2>二、棋子的"连通"与共用气</h2>
+
+            <p>当然实际过程中很少会让棋子孤立存在，所以如果棋子形成"连通"状，则连通棋子的气共用：</p>
+
+            <img src="../../figure/棋子连通.png" alt="棋子连通示意" class="article-img">
+            <p class="img-caption">棋子连通，气共用</p>
+
+            <p>图片中左上角三颗黑棋共用 6 口气，右上角白棋 6 口气，左下角白棋 6 口气。值得注意的是，<strong>连通只存在于上下左右，斜对角同色不算连通</strong>，所以右下角黑棋其实是两个孤立的棋子，没有连通。（连通就是上下左右有一枚棋是同种颜色的棋，那么当前的棋子就是连通的状态。）</p>
+
+            <p>总而言之，只要你的气被不同颜色的棋子给占据了，那么你的棋子就被吃了。</p>
+
+            <h2>三、什么是"禁入点"</h2>
+
+            <p>知道了被吃的条件，我们就可以开始讲禁入点了！通俗来说，只要你下下去，如果发现你下的地方使得你这一片（或者是一个）棋子没气了，那就是禁入点。<strong>但是如果落子后能提掉对方的棋子，那这个地方就不是禁入点</strong>，下图就有现成的例子。</p>
+
+            <img src="../../figure/禁入点.png" alt="禁入点示意" class="article-img">
+            <p class="img-caption">禁入点</p>
+
+            <p>实际上图中显示的两块地方都有黑棋的禁入点位。左边你往白棋中间下，你落下的黑子四周全是白棋，你就没气了（实际这地方就不让下）；右方本来有一口气，但是你往中间下导致整块棋都没气了。（如果换成白棋下这里，它可以提掉四颗黑子，之后又有四口气了，所以这地方白棋可以下——它反而是黑棋的禁入点。）</p>
+
+            <h2>四、回到"眼"：禁入点的特殊形态</h2>
+
+            <p>现在回到我们的"眼"的概念。你可以通俗理解为对方暂时不能下的地方，所以眼算是一个禁入点。上图中左边就是一个眼，右边不是眼，因为白棋可以下到中间——但是白棋下到中间后就做出了四个眼（不过全都是假眼）！</p>
+
+            <p>那么眼也分<strong>假眼</strong>和<strong>真眼</strong>。</p>
+
+            <img src="../../figure/真眼和假眼.png" alt="真眼和假眼对比" class="article-img">
+            <p class="img-caption">真眼和假眼</p>
+
+            <p>上图中棋盘上面的三块棋围成的眼就是真眼，而棋盘中间围成的眼是假眼。其实判断很简单：<strong>所有同种颜色的棋子在眼的周围能够连通，那它就是真眼，反之是假眼！</strong></p>
+
+            <p>还有一种比较抽象的情况：</p>
+
+            <img src="../../figure/真眼.png" alt="特殊真眼示意" class="article-img">
+            <p class="img-caption">特殊情况下的真眼</p>
+
+            <p>右下角那个禁入点它也是真眼……我好几次都在这块地方翻了车。你可以将禁入点看作是我们的棋子，这样右下角那块黑棋就连通了。这种情况在实战中非常常用，因为它极具迷惑性，否则你正常下连通棋容易被对手看穿！</p>
+
+            <h2>五、假眼的最大特征</h2>
+
+            <p>假眼的最大特征就是——<strong>即便当前可能是禁入点，但是眼周围至少有一个棋子能被吃掉。</strong></p>
+
+            <img src="../../figure/假眼.png" alt="假眼示意一" class="article-img">
+            <img src="../../figure/假眼2.png" alt="假眼示意二" class="article-img">
+            <p class="img-caption">假眼：周围有棋子可被吃掉</p>
+
+            <p>只要黑棋下到红色箭头指向的位置，就会将一颗围着的白棋给吃掉，此时白棋围成的禁入点不再成立。</p>
+
+            <h2>六、做眼：一种防御手段</h2>
+
+            <p>围棋虽然在一个小小的棋盘上开拓战场，但是这个战场远远比我们想象的复杂！你会有非常多的手段来赢得这场战争，其中<strong>做眼可以认为是一种防御手段</strong>（我说的是做真眼……）。你只要在对方包围圈里做出两个真眼，那么这块棋你就死不了！</p>
+
+            <img src="../../figure/活棋.png" alt="活棋示意" class="article-img">
+            <p class="img-caption">两个真眼即为活棋</p>
+
+            <p>当然，对手也不是傻子，如果让他看到你做眼，他就会提前下你要下的地方，这样一来你就没法做活了，这就是俗话说的<strong>"走别人的路，让别人无路可走"</strong>。</p>
+
+            <img src="../../figure/堵眼.png" alt="堵眼示意" class="article-img">
+            <p class="img-caption">堵眼，破坏对方做活</p>
+
+            <p>只要白棋先一步下在红色箭头处，那包围中的黑棋必定是死棋！</p>
+
+            <blockquote>各位可以联想一下：白下红色箭头处，黑棋不可能堵眼，否则白棋下另外一个眼，黑棋全灭。如果黑棋下在别处，白棋下左上方的假眼提上面的黑子，黑子不能立刻再下回上方，必须要下一手其他地方再吃回来——这是规定（这处算是一个"劫材"）。那么白棋堵住右下角的眼，黑棋全灭。</blockquote>
+
+            <p>真假眼的判断是围棋死活计算的基础。一旦你能在脑子里快速分辨出哪块棋是"真活"、哪块是"假活"，对局面的掌控感会上一个台阶。这也是我开这个围棋系列的初衷——把学到的东西讲清楚，自己也理解得更透。下一篇我们继续聊围棋里那些有趣的门道。</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117', border: '#30363d', accent: '#56d364',
+            textPrimary: '#e6edf3', textSecondary: '#8b949e',
+            tagBg: 'rgba(46,204,113,0.12)', tagColor: '#56d364',
+            title: '围棋入门：\n一文讲透"真眼"和"假眼"的判断',
+            excerpt: '从"气"和"禁入点"讲起，用最通俗的语言带你理解围棋里"做眼"的门道，\n以及如何用两个真眼让一块棋永远活着。',
+            author: 'XiaoYinXu', tag: '围棋',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const chars = line.split('');
+                let row = '';
+                for (let i = 0; i < chars.length; i++) {
+                    const test = row + chars[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = chars[i];
+                        curY += lineHeight;
+                    } else { row = test; }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+            ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + window.location.href, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            navigator.clipboard.writeText(url).catch(() => {});
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            new QRCode(tmp, { text: url, width: 160, height: 160, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+            setTimeout(() => {
+                const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+                if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'), null); document.getElementById('shareOverlay').classList.add('active'); }
+            }, 50);
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay'))
+                document.getElementById('shareOverlay').classList.remove('active');
+        }
+
+        function downloadCard() {
+            const a = document.createElement('a');
+            a.download = 'go-true-false-eye-card.png';
+            a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
