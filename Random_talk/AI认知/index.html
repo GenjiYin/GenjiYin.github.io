@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>别把 AI 当成你的元认知 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-talk { background: rgba(255,123,156,0.12); color: #ff7b9c; border: 1px solid rgba(255,123,156,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #ff7b9c;
+        }
+
+        .article-body p { margin-bottom: 16px; }
+
+        .article-body strong { color: #e6edf3; }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-body ol, .article-body ul {
+            margin: 0 0 16px 24px;
+        }
+
+        .article-body li { margin-bottom: 8px; }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+
+        .article-body table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .article-body th, .article-body td {
+            border: 1px solid #30363d;
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: top;
+            line-height: 1.6;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #e6edf3;
+            font-weight: bold;
+        }
+
+        .article-body td:first-child {
+            color: #e6edf3;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 32px;
+        }
+
+        .share-btn:hover { border-color: #ff7b9c; color: #ff7b9c; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download {
+            background: #238636;
+            color: #fff;
+            border-color: #2ea043 !important;
+        }
+
+        .btn-download:hover { background: #2ea043; }
+
+        .btn-cancel {
+            background: transparent;
+            color: #8b949e;
+        }
+
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-talk">杂谈</span>
+                <span class="article-date">2026-07</span>
+            </div>
+            <h1 class="article-title">别把 AI 当成你的元认知</h1>
+            <p class="article-subtitle">聊聊"我上我也行"这种认知偏差,以及为什么真正用 AI 做出东西的人,反而最清楚它的边界。</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <h2>一、AI 输出的东西,不是你的元认知</h2>
+
+            <p>随着 AI 的普及,每个人都能很轻松地使用 AI。大到 Claude Code、Codex 这种通用智能体,小到手机上一问一答的 AI app,大家都能靠它轻而易举地拿到自己想要的信息。</p>
+            <p>但有一点始终要明确——<strong>在你看来 AI 输出的东西也许理所当然,但这些东西并不是你的元认知。</strong></p>
+
+            <h2>二、"我上我也行"的陷阱</h2>
+
+            <p>我见过很多人,包括一些机构的老板,似乎都看不起 AI 产品。只要聊到某个项目里掺了 AI 的成分,就嗤之以鼻。</p>
+            <p>这种心理底层就是"我上我也行"。实际上这就陷入了一种误区——现在很多人会把 AI 当作自己的元认知,认为自己也能用 AI 做出一个替代品。这是一种认知偏差。</p>
+
+            <h2>三、做一个闭环项目,到底需要什么</h2>
+
+            <p>要知道,做一个闭环的项目需要:</p>
+            <ol>
+                <li><strong>市场调研</strong>——市面上某个领域存在什么问题;</li>
+                <li><strong>明确自己的能力边界</strong>——能否解决这个问题,或者为这个问题提供有价值的内容;</li>
+                <li><strong>明确构建解决方案</strong>;</li>
+                <li><strong>动手构建解决方案</strong>;</li>
+                <li><strong>产品化和营销渠道</strong>。</li>
+            </ol>
+            <p>我们都知道 AI 写代码很强,所以它在一定程度上确实能帮我们构建解决方案。但实际上,AI 目前能做得好的也就第三、第四点,其余流程都需要人的全力支持。看不起 AI 产品的本质,就是认为 AI 可以完全替代人类做决策。</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>环节</th>
+                            <th>需要的人类能力</th>
+                            <th>AI 能做什么</th>
+                            <th>为什么人不可替代</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1. 市场调研</td>
+                            <td>田野观察、痛点直觉、行业人脉、对"非显性需求"的嗅觉</td>
+                            <td>总结已有报告、生成问卷</td>
+                            <td>无法真正"在场",感知不到那些没人写成文字的问题</td>
+                        </tr>
+                        <tr>
+                            <td>2. 能力边界判断</td>
+                            <td>自我认知、诚实面对无知、战略取舍</td>
+                            <td>几乎无法做到</td>
+                            <td>这是关于"我是谁、我不能做什么"的元认知,AI 没有自我</td>
+                        </tr>
+                        <tr>
+                            <td>3. 方案设计</td>
+                            <td>系统思维、权衡取舍、价值观排序</td>
+                            <td>辅助生成候选方案</td>
+                            <td>可以枚举,但无法替你做选择——选择意味着放弃</td>
+                        </tr>
+                        <tr>
+                            <td>4. 动手构建</td>
+                            <td>工程判断、调试耐心、对细节的执着</td>
+                            <td>很强,是主场</td>
+                            <td>但需要你来定义"对"的标准</td>
+                        </tr>
+                        <tr>
+                            <td>5. 产品化与营销</td>
+                            <td>信任建立、叙事能力、渠道运营、对人性的理解</td>
+                            <td>生成文案、辅助分析</td>
+                            <td>无法替你承担风险,也无法替你面对用户的真实反馈</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>四、为什么这种偏见会一直存在</h2>
+
+            <p>再往深一层想,我觉得还有几个心理机制在起作用。</p>
+
+            <p><strong>第一,防御性贬低。</strong>说白了就是:如果那个东西我也能做,那它的成功就威胁不到我的自我价值。承认一个"用了 AI"的项目有壁垒,等于承认"我用了 AI 却做不出来",这会伤自尊。那还不如先把它贬低了再说。</p>
+
+            <p><strong>第二,可见性偏差。</strong>人们只看到 AI 输出的最终文本和代码,看不到背后:多少次 prompt 迭代、多少次被 AI 带偏又拉回来、多少次人类判断"这个方向不对"。就像观众只看到魔术师的最终效果,看不到后台的机关和练习。</p>
+
+            <p><strong>第三,把"AI 辅助"当成了"AI 自动生成"。</strong>很多优秀的 AI 产品,人类投入的其实是策展和把关——决定什么该留、什么该扔。这种"编辑能力"是隐性的,外人根本看不出来,自然就以为是 AI 一键生成的。</p>
+
+            <h2>五、一个残酷的真相</h2>
+
+            <p>那些真正用 AI 做出闭环项目的人,往往比不用 AI 的人更清楚 AI 的局限性。</p>
+            <p>他们知道:AI 会一本正经地胡说八道;会在你不懂的领域,给你一个"看起来很对"的错误答案;会过度迎合你的预设,把你推进确认偏误的坑里;它也没有"手感",根本不知道什么叫"感觉对了"。</p>
+            <p>正是因为知道这些,他们才更懂得——哪些环节必须亲自下场,哪些环节可以放手交给 AI。</p>
+            <p>而那些张口就是"我上我也行"的人,往往还没被 AI 骗过足够多次,还没经历过那种"AI 给了一个看起来很完美的方案,上线后才发现根本不符合真实场景"的毒打。</p>
+
+            <blockquote>AI 是一把很好的锤子,但决定往哪儿钉钉子的,始终得是你自己。</blockquote>
+
+        </div>
+    </div>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117',
+            border: '#30363d',
+            accent: '#ff7b9c',
+            textPrimary: '#e6edf3',
+            textSecondary: '#8b949e',
+            tagBg: 'rgba(255,123,156,0.12)',
+            tagColor: '#ff7b9c',
+            title: '别把 AI 当成你的元认知',
+            excerpt: '"我上我也行"是一种认知偏差。真正用 AI 做出东西的人,\n反而最清楚它的边界在哪里。',
+            author: 'XiaoYinXu',
+            tag: '杂谈',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const words = line.split('');
+                let row = '';
+                for (let i = 0; i < words.length; i++) {
+                    const test = row + words[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = words[i];
+                        curY += lineHeight;
+                    } else {
+                        row = test;
+                    }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r);
+            ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r);
+            ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr;
+            canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px';
+            canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = CARD.bg;
+            ctx.fillRect(0, 0, CARD.w, CARD.h);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+
+            ctx.fillStyle = CARD.accent;
+            ctx.fillRect(0, 0, CARD.w, 3);
+
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg;
+            roundRect(ctx, tagX, 30, tagW, 20, 4);
+            ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font;
+            ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad, 62);
+            ctx.lineTo(CARD.w - pad, 62);
+            ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font;
+            ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            const site = window.location.href;
+            ctx.font = '12px ' + CARD.font;
+            ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + site, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            // desktop: auto copy link
+            navigator.clipboard.writeText(url).catch(() => {});
+
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            const qr = new QRCode(tmp, {
+                text: url,
+                width: 160,
+                height: 160,
+                colorDark: '#000',
+                colorLight: '#fff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            const qrImg = tmp.querySelector('img') || tmp.querySelector('canvas');
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+
+            if (qrImg && qrImg.tagName === 'CANVAS') {
+                finish(qrImg.toDataURL());
+            } else if (qrImg && qrImg.src) {
+                finish(qrImg.src);
+            } else {
+                setTimeout(() => {
+                    const el = tmp.querySelector('img') || tmp.querySelector('canvas');
+                    if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                    else {
+                        document.body.removeChild(tmp);
+                        drawCard(document.getElementById('shareCanvas'), null);
+                        document.getElementById('shareOverlay').classList.add('active');
+                    }
+                }, 100);
+            }
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay')) {
+                document.getElementById('shareOverlay').classList.remove('active');
+            }
+        }
+
+        function downloadCard() {
+            const canvas = document.getElementById('shareCanvas');
+            const a = document.createElement('a');
+            a.download = 'ai-metacognition-card.png';
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
