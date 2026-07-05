@@ -159,7 +159,7 @@
                 $$X_M \equiv \sum_i w_i z_i = \sum_i w_i\frac{x_i-\mu}{\sigma} = \frac{1}{\sigma}\Big(\sum_i w_i x_i - \mu\sum_i w_i\Big) = \frac{\sum_i w_i x_i - \mu}{\sigma}$$
             </div>
             <div class="formula-note">
-                其中 <span>w_i</span> 是第 i 只股票的市值权重，满足 <span>Σ w_i = 1</span>。
+                其中 $w_i$ 是第 $i$ 只股票的市值权重，满足 $\sum_i w_i = 1$。
             </div>
         </div>
         <p>要让 <code>X_M = 0</code>，充要条件就是 <code>μ = Σ wᵢxᵢ</code>——也就是市值加权均值。反过来，如果用简单均值 <code>x̄</code>，那么 <code>X_M = (Σ wᵢxᵢ − x̄) / σ ≠ 0</code>。我前面 Size 实测到的那个 +2.12，就是这个 <code>X_M</code>。</p>
@@ -172,7 +172,7 @@
                 $$r_M=\sum_i w_i r_i = f_0\sum_i w_i + \sum_k f_k\Big(\sum_i w_i z_{ik}\Big) + \sum_i w_i u_i$$
             </div>
             <div class="formula-note">
-                若各因子都市值加权标准化，中间项 <span>Σ w_i z_ik = X_M = 0</span>，末项残差 ≈ 0，于是 <span>r_M = f_0</span>。
+                若各因子都市值加权标准化，中间项 $\sum_i w_i z_{ik} = X_M = 0$，末项残差 ≈ 0，于是 $r_M = f_0$。
             </div>
         </div>
         <p>结果非常干净：<strong>市场收益 = 纯截距 f₀，风格因子一点都没泄漏进 r_M</strong>。市场整体的涨跌归 <code>f₀</code>，各风格的超额归 <code>fₖ</code>，两者井水不犯河水。</p>
