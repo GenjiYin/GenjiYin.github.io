@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标准化因子时用简单平均，我把市场风格看反了 — XiaoYinXu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        .nav-logo { font-size: 18px; font-weight: bold; color: #58a6ff; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #8b949e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #c9d1d9; }
+        .article-wrap { max-width: 760px; margin: 60px auto 80px; padding: 0 40px; }
+        .article-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #21262d; }
+        .article-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .post-category { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+        .article-date { font-size: 12px; color: #484f58; }
+        .article-title { font-size: 28px; color: #e6edf3; font-weight: bold; line-height: 1.4; margin-bottom: 14px; }
+        .article-subtitle { font-size: 15px; color: #8b949e; line-height: 1.7; }
+        .article-body { font-size: 15px; line-height: 1.9; color: #c9d1d9; }
+        .article-body h2 { font-size: 20px; color: #e6edf3; margin: 40px 0 16px; padding-left: 12px; border-left: 3px solid #58a6ff; }
+        .article-body h3 { font-size: 16px; color: #e6edf3; margin: 28px 0 12px; }
+        .article-body p { margin-bottom: 16px; }
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body strong { color: #e6edf3; }
+        .article-body a { color: #58a6ff; text-decoration: none; }
+        .article-body a:hover { text-decoration: underline; }
+        .article-body blockquote { border-left: 3px solid #30363d; padding: 4px 0 4px 16px; margin: 16px 0; color: #8b949e; font-size: 14px; line-height: 1.8; }
+        .article-body table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .article-body th { background: #161b22; color: #8b949e; font-weight: bold; padding: 10px 14px; text-align: left; border: 1px solid #21262d; font-size: 12px; }
+        .article-body td { padding: 10px 14px; border: 1px solid #21262d; vertical-align: top; }
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+        .article-body pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; overflow-x: auto; font-size: 13px; line-height: 1.7; }
+        .article-body code { font-family: 'Consolas', 'Courier New', monospace; color: #e6edf3; }
+        .article-body pre code { color: #c9d1d9; }
+        .formula-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+        .formula-block .formula-title { font-size: 12px; color: #58a6ff; font-weight: bold; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .formula-block .formula-main { font-size: 16px; color: #e6edf3; margin-bottom: 16px; line-height: 1.8; text-align: center; }
+        .formula-block .formula-note { font-size: 13px; color: #8b949e; line-height: 1.8; }
+        .formula-block .formula-note span { color: #ffa657; font-weight: bold; }
+        .insight-block { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .insight-block p { margin-bottom: 0; }
+        .warn-block { background: rgba(255,123,92,0.06); border: 1px solid rgba(255,123,92,0.25); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .warn-block p { margin-bottom: 0; }
+        .warn-block strong { color: #ffa657; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #58a6ff; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: opacity 0.2s; }
+        .back-link:hover { opacity: 0.75; }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; }
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; max-width: 680px; width: 95%; text-align: center; }
+        .share-modal h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; font-weight: normal; }
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+        .share-modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+        .share-modal-actions button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid #30363d; }
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+        footer { text-align: center; padding: 20px; color: #484f58; font-size: 12px; border-top: 1px solid #21262d; }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+    <ul class="nav-links">
+        <li><a href="../../index.html">首页</a></li>
+        <li><a href="../../resume/">关于我</a></li>
+        <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+    </ul>
+</nav>
+
+<div class="article-wrap">
+    <a href="../../index.html" class="back-link">← 返回首页</a>
+    <div class="article-header">
+        <div class="article-meta">
+            <span class="post-category cat-quant">量化交易</span>
+            <span class="article-date">2026-07</span>
+        </div>
+        <h1 class="article-title">标准化因子时用简单平均，我把市场风格看反了</h1>
+        <p class="article-subtitle">一次真实的踩坑复盘：z-score 标准化里那个不起眼的均值口径，让我的市场基准偏离原点 2.1 个标准差，从此对市场大小盘风格的判断全错了。这篇文章讲清楚为什么风险模型里的均值必须市值加权。</p>
+        <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+    </div>
+    <div class="article-body">
+        <h2>一、先说结论：一个不报错的错误</h2>
+        <p>做多因子风险模型，绕不开一个叫"标准化"的步骤。它本身简单到近乎无聊——把每个因子的暴露值减去均值、再除以标准差，转成"均值 0、标准差 1"的无量纲分。公式就是初中生都认得的 z-score：</p>
+        <div class="formula-block">
+            <div class="formula-title">Z-Score 标准化</div>
+            <div class="formula-main">
+                $$z_i = \frac{x_i - \mu}{\sigma}$$
+            </div>
+            <div class="formula-note">
+                把不同量纲的因子（<span>Size ≈ 22</span>、<span>Value ≈ 0.4</span>、<span>股息率 ≈ 0.01</span>）拉到同一把尺子上，回归系数才能横向比较。
+            </div>
+        </div>
+        <p>我在里面栽了个大跟头。这个 <code>μ</code>——减掉的那个中心点——我一开始用的是最自然的<strong>简单平均</strong>：把当天所有股票的暴露值加起来除以只数。看上去天经地义，代码也跑得顺顺当当，没有任何报错。</p>
+        <p>但正是这个选择，让我在衡量市场大小盘风格的时候，做出了一次彻底的误判。</p>
+        <div class="warn-block">
+            <p><strong>教训先行：</strong>在横截面风险模型里，标准化的均值 <code>μ</code> 必须用<strong>市值加权均值</strong>，不能用简单平均。用错了程序不会报错，只会让你的"市场基准"悄悄偏离原点，进而把整个市场的涨跌错误地摊派到各个风格因子头上。</p>
+        </div>
+
+        <h2>二、我到底看错了什么</h2>
+        <p>先交代背景。风险模型（Barra 那一类）想回答的问题是：<strong>某一天，风格暴露高的股票和暴露低的股票，收益差了多少？</strong>比如"小盘股今天是不是跑赢了大盘股"、"高价值的票是不是比低价值的强"。这些风格因子的收益，被定义为<strong>相对市场基准的超额收益</strong>。</p>
+        <p>注意"相对市场基准"这几个字。这意味着有一个隐含的约定：<strong>市场基准本身，必须站在原点上</strong>——它在每个风格因子上的暴露都应该约等于 0。只有基准站在原点，"超额"这个词才有意义。否则你测出来的东西是被污染的。</p>
+        <p>当时我拿标准化后的因子跑回归，看到 Size 因子（市值因子）的收益是正的，于是下意识地判断"这段时间市场偏好大盘股"。结果拿真实的大小盘指数一对，风格其实是反过来的。我百思不得其解——数据没错、代码没错，结论怎么会反？</p>
+        <p>根子就在那个简单平均的 <code>μ</code> 上。</p>
+
+        <h2>三、量化这个错误：Size 偏了 2.1 个标准差</h2>
+        <p>问题的核心是：<strong>市场组合是市值加权的（大盘股权重高），但简单平均把每只股票同等对待</strong>。这两者一旦不一致，市场基准就不在原点了。</p>
+        <p>我拿 2022-06-30 这天的全市场 4663 只股票做了个实测，对比两种均值口径：</p>
+        <table>
+            <thead><tr><th>因子</th><th>简单平均 μ</th><th>市值加权 μ</th><th>σ</th><th>两者差距</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Size（对数市值）</strong></td><td>22.70</td><td>25.15</td><td>1.15</td><td><strong>2.1 σ</strong></td></tr>
+                <tr><td>Value（1/pb）</td><td>0.514</td><td>0.667</td><td>0.469</td><td>0.33 σ</td></tr>
+                <tr><td>Dividend（股息率）</td><td>0.0117</td><td>0.0178</td><td>0.0203</td><td>0.30 σ</td></tr>
+            </tbody>
+        </table>
+        <p>这张表怎么读？如果我用简单平均去标准化 Size，那么<strong>市值加权的市场组合在 Size 上的残余暴露不是 0，而是 +2.12</strong>。</p>
+        <div class="insight-block">
+            <p>换句话说，"市场基准本身偏大盘"这个客观事实，会被我的错误标准化悄悄算进 Size 因子的收益里。我以为自己在测"小盘 vs 大盘的纯粹差异"，实际上掺进了"基准偏大盘"的系统性偏移。归因就这样失真了——市场整体的涨跌，被错误地记到了 Size 因子头上。</p>
+        </div>
+        <p>为什么偏偏 Size 最夸张（2.1σ），而 Value、Dividend 只有 0.3σ？因为<strong>市值和 Size 定义上强相关</strong>（市值大 → Size 大），加权和被加权的量是同一个东西，循环放大。Value 和 Dividend 差距小，但也非零，同样应该用加权。</p>
+
+        <h2>四、为什么市值加权就对了：三层等价</h2>
+        <p>这不是一个"经验法则"或者"业界惯例"，它有严格的数学理由。市值加权标准化，本质上等价于<strong>让风格因子与市场（国家）因子正交</strong>。我把它拆成三个逐层递进的命题。</p>
+
+        <h3>命题一：市值加权 ⟺ 市场组合暴露恰为 0</h3>
+        <p>市场组合在某因子上的暴露，就是各股暴露按市值加权的平均。把标准化后的 <code>z</code> 代进去：</p>
+        <div class="formula-block">
+            <div class="formula-title">市场组合的因子暴露</div>
+            <div class="formula-main">
+                $$X_M \equiv \sum_i w_i z_i = \sum_i w_i\frac{x_i-\mu}{\sigma} = \frac{1}{\sigma}\Big(\sum_i w_i x_i - \mu\sum_i w_i\Big) = \frac{\sum_i w_i x_i - \mu}{\sigma}$$
+            </div>
+            <div class="formula-note">
+                其中 <span>w_i</span> 是第 i 只股票的市值权重，满足 <span>Σ w_i = 1</span>。
+            </div>
+        </div>
+        <p>要让 <code>X_M = 0</code>，充要条件就是 <code>μ = Σ wᵢxᵢ</code>——也就是市值加权均值。反过来，如果用简单均值 <code>x̄</code>，那么 <code>X_M = (Σ wᵢxᵢ − x̄) / σ ≠ 0</code>。我前面 Size 实测到的那个 +2.12，就是这个 <code>X_M</code>。</p>
+
+        <h3>命题二：组合暴露为 0 ⟹ 因子收益干净</h3>
+        <p>横截面回归的形式是 <code>rᵢ = f₀ + Σ fₖ·zᵢₖ + uᵢ</code>，其中 <code>f₀</code> 是国家/市场因子（代表市场整体涨跌）。两边按市值加权求和：</p>
+        <div class="formula-block">
+            <div class="formula-title">市场收益的分解</div>
+            <div class="formula-main">
+                $$r_M=\sum_i w_i r_i = f_0\sum_i w_i + \sum_k f_k\Big(\sum_i w_i z_{ik}\Big) + \sum_i w_i u_i$$
+            </div>
+            <div class="formula-note">
+                若各因子都市值加权标准化，中间项 <span>Σ w_i z_ik = X_M = 0</span>，末项残差 ≈ 0，于是 <span>r_M = f_0</span>。
+            </div>
+        </div>
+        <p>结果非常干净：<strong>市场收益 = 纯截距 f₀，风格因子一点都没泄漏进 r_M</strong>。市场整体的涨跌归 <code>f₀</code>，各风格的超额归 <code>fₖ</code>，两者井水不犯河水。</p>
+        <p>可如果用简单均值，<code>X_M ≠ 0</code>，那么 <code>r_M = f₀ + Σ fₖ·X_M + …</code>——市场的涨跌被错误地摊派到各个风格头上。我的 <code>f_Size</code> 就吸收了一部分"市场涨跌 × 2.12"。这就是为什么我看到的 Size 收益是假的：它里面混进了本该属于市场整体的部分。</p>
+
+        <h3>命题三：本质是可识别性的正交条件</h3>
+        <p>用加权最小二乘（WLS）的语言看，市值权重构成对角矩阵 <code>W</code>，定义加权内积 <code>⟨a,b⟩_W = Σ wᵢaᵢbᵢ</code>。国家因子的暴露是全 1 向量 <code>𝟙</code>，风格因子的暴露是 <code>zₖ</code>。两者在 <code>W</code> 度量下正交的条件恰好是：</p>
+        <div class="formula-block">
+            <div class="formula-title">正交条件</div>
+            <div class="formula-main">
+                $$\langle\mathbf{1},\mathbf{z}_k\rangle_W=\sum_i w_i z_{ik}=X_M^{(k)}=0$$
+            </div>
+            <div class="formula-note">
+                又回到了命题一。于是四件事完全等价 ⤵
+            </div>
+        </div>
+        <div class="formula-block">
+            <div class="formula-title">四者等价</div>
+            <div class="formula-main">
+                $$\mu=\textstyle\sum_i w_i x_i \iff X_M=0 \iff \mathbf{z}_k\perp_W\mathbf{1} \iff \text{风格与市场因子正交}$$
+            </div>
+        </div>
+        <p>正交意味着回归矩阵 <code>X'WX</code> 中，国家因子与风格因子的交叉项为 0，矩阵块对角化，<code>f₀</code> 和 <code>fₖ</code> 可以<strong>分离识别</strong>。不正交，两者部分共线，矩阵病态，系数"分不清账"——这正是我当初遇到的窘境。</p>
+        <div class="insight-block">
+            <p><strong>收束一句：</strong>市值加权标准化，数学上等价于让风格因子与市场因子正交，从而市场收益归市场、风格超额归风格，互不串账。简单均值破坏这个正交性——它污染归因不是"不好看"，而是违反了可识别性的正交条件。</p>
+        </div>
+
+        <h2>五、顺手记下的另外两个坑</h2>
+        <p>既然聊到标准化，把同一步骤里另外两个同样"不报错"的坑一起记下。它们都藏在这个看似傻瓜的操作里。</p>
+
+        <h3>坑一：横截面标准化，不是时序标准化</h3>
+        <p>z-score 里的"均值和标准差在谁身上算"，有两种截然不同的做法：</p>
+        <table>
+            <thead><tr><th></th><th>横截面标准化（对）</th><th>时序标准化（错）</th></tr></thead>
+            <tbody>
+                <tr><td>μ/σ 算在</td><td><strong>同一天所有股票之间</strong><br>PARTITION BY date</td><td>同一只股票的历史序列上<br>PARTITION BY instrument</td></tr>
+                <tr><td>回答的问题</td><td>"今天这只票在全市场排多高"</td><td>"这只票今天比自己历史高还是低"</td></tr>
+                <tr><td>用没用未来数据</td><td>否，只用当天截面</td><td><strong>是！σ 用到了未来的点，前视偏差</strong></td></tr>
+                <tr><td>适合</td><td>横截面风险模型</td><td>时序策略（单标的择时）</td></tr>
+            </tbody>
+        </table>
+        <p>风险模型比的是"同一天股票之间"，所以标准化也必须在当天截面内做。用时序标准化，等于拿"这只票和自己历史比"的分，去做"股票之间比"的回归——问错了问题，而且 σ 算到了未来的点，是赤裸裸的前视偏差。</p>
+
+        <h3>坑二：多子项因子，先标准化再合成</h3>
+        <p>像 Quality（ROE + CFOA）、EarningsYield（ETOP + CETOP）这类由多个子项合成的因子，合成顺序不能错：</p>
+        <pre><code>ROE_raw  ──→ z-score ──┐
+                        ├──→ (z_roe + z_cfoa) ──→ 再 z-score ──→ f_quality
+CFOA_raw ──→ z-score ──┘</code></pre>
+        <p>正确做法是各子项<strong>先各自 z-score</strong>，再等权相加，合成分<strong>再标准化一次</strong>（因为两个 z 相加后 σ 不再是 1）。错误做法是先把原始子项直接相加——ROE ≈ 0.014、CFOA ≈ −0.003 量纲不同，直接加等于让大尺度子项主导，加权失真。</p>
+
+        <h2>六、正确的实现：一段可跑的 SQL</h2>
+        <p>把上面的道理落到代码里。对去极值后的每个因子列，套同一个横截面标准化模板（<code>w</code> 为市值）：</p>
+        <pre><code>std AS (   -- 横截面标准化：市值加权均值、简单 σ、PARTITION BY date
+  SELECT date, instrument,
+    (f_x - capw_mu) / NULLIF(sd, 0) AS z_x
+  FROM (
+    SELECT date, instrument, f_x,
+      sum(f_x * w) OVER (PARTITION BY date) / sum(w) OVER (PARTITION BY date) AS capw_mu,
+      stddev_samp(f_x) OVER (PARTITION BY date) AS sd
+    FROM factor_wins            -- 上游：去极值后的因子 + 市值列 w
+  )
+)</code></pre>
+        <p>三个要点对应前面三个道理：</p>
+        <ul>
+            <li><code>PARTITION BY date</code> 保证横截面，不跨期（对应坑一）；</li>
+            <li>μ 用 <code>sum(f*w)/sum(w)</code> 市值加权（对应本文主角，陷阱二）；</li>
+            <li><code>NULLIF(sd,0)</code> 防某天该因子无波动时除零。</li>
+        </ul>
+        <p>还有一条容易忽略的<strong>顺序铁律</strong>：缺失值填充 → 去极值 → 标准化。σ 必须在去极值之后算，否则极端飞点会污染 σ，把标准差撑大，其他正常值全被压扁。</p>
+
+        <h3>验证：标准化后市场组合确实回到原点</h3>
+        <p>拿同样的 Size、2022-06-30、4663 只股票做验证，市值加权标准化后：</p>
+        <table>
+            <thead><tr><th>指标</th><th>数值</th><th>含义</th></tr></thead>
+            <tbody>
+                <tr><td>市值加权均值(z)</td><td><strong>0.0</strong> ✓</td><td>市场组合因子中性，基准回到原点（目的达成）</td></tr>
+                <tr><td>简单 σ(z)</td><td><strong>1.0</strong> ✓</td><td>量纲统一，可跨因子比较</td></tr>
+                <tr><td>简单均值(z)</td><td>−2.12</td><td>不是 bug，正是"大盘股 z 正、权重高；小盘股 z 负、数量多"导致简单平均偏负</td></tr>
+            </tbody>
+        </table>
+        <p>最后那个 −2.12 和前面陷阱二里的 +2.12 <strong>互为镜像</strong>，自洽得让人安心：市值加权口径把基准拉回了原点，而简单平均口径下基准偏了整整 2 个标准差——这正是我当初看错市场风格的全部原因。</p>
+
+        <h2>七、写在最后</h2>
+        <p>这次踩坑给我最大的启发，不是"记住均值要市值加权"这条规则本身，而是意识到：<strong>数据处理里最危险的错误，往往是那些不报错的错误。</strong></p>
+        <p>缺失值、类型不匹配这些错误会当场崩给你看，反而安全。而标准化里的均值口径、横截面还是时序、合成先后——用错了程序照跑，数字照出，只是每一个数都悄悄偏了。你甚至会拿着这些偏了的数，信心满满地得出一个完全相反的结论，就像我把市场风格看反了那样。</p>
+        <div class="insight-block">
+            <p>做量化久了越发觉得，写对代码只是及格线。真正的功夫在于<strong>知道每一步操作背后到底在假设什么</strong>——标准化假设了"市场基准站在原点"，而这个假设，只有市值加权才守得住。</p>
+        </div>
+    </div><!-- /article-body -->
+</div><!-- /article-wrap -->
+
+<footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+</footer>
+
+<div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+    <div class="share-modal">
+        <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+        <canvas id="shareCanvas"></canvas>
+        <div class="share-modal-actions">
+            <button class="btn-download" onclick="downloadCard()">下载图片</button>
+            <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const CARD = {
+        w: 640, h: 360,
+        bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+        textPrimary: '#e6edf3', textSecondary: '#8b949e',
+        tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+        title: '标准化因子时用简单平均，我把市场风格看反了',
+        excerpt: '一次真实踩坑：z-score 标准化里那个不起眼的均值口径，让市场基准偏离原点 2.1 个标准差，从此对大小盘风格的判断全错了。',
+        author: 'XiaoYinXu', tag: '量化交易',
+        font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const lines = text.split('\n');
+        let curY = y;
+        lines.forEach(line => {
+            const chars = line.split('');
+            let row = '';
+            for (let i = 0; i < chars.length; i++) {
+                const test = row + chars[i];
+                if (ctx.measureText(test).width > maxWidth && row) {
+                    ctx.fillText(row, x, curY); row = chars[i]; curY += lineHeight;
+                } else { row = test; }
+            }
+            if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+        });
+        return curY;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+        ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r);
+        ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h);
+        ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r);
+        ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+    }
+
+    function drawCard(canvas, qrImg) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CARD.w*dpr; canvas.height = CARD.h*dpr;
+        canvas.style.width = CARD.w+'px'; canvas.style.height = CARD.h+'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const pad = 40, qrSize = 80;
+        const textMaxW = CARD.w - pad*2 - qrSize - 16;
+        ctx.fillStyle = CARD.bg; ctx.fillRect(0,0,CARD.w,CARD.h);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.strokeRect(0.5,0.5,CARD.w-1,CARD.h-1);
+        ctx.fillStyle = CARD.accent; ctx.fillRect(0,0,CARD.w,3);
+        ctx.font = 'bold 13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        ctx.fillText(CARD.author, pad, 44);
+        const tagX = pad + ctx.measureText(CARD.author).width + 14;
+        const tagW = ctx.measureText(CARD.tag).width + 16;
+        ctx.fillStyle = CARD.tagBg; roundRect(ctx,tagX,30,tagW,20,4); ctx.fill();
+        ctx.font = 'bold 11px '+CARD.font; ctx.fillStyle = CARD.tagColor;
+        ctx.fillText(CARD.tag, tagX+8, 44);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(CARD.w-pad,62); ctx.stroke();
+        ctx.font = 'bold 22px '+CARD.font; ctx.fillStyle = CARD.textPrimary;
+        const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+        ctx.font = '13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        wrapText(ctx, CARD.excerpt, pad, titleBottom+16, textMaxW, 22);
+        ctx.font = '12px '+CARD.font; ctx.fillStyle = CARD.accent;
+        ctx.fillText('↗  '+window.location.href, pad, CARD.h-24);
+        if (qrImg) {
+            const qrX = CARD.w-pad-qrSize, qrY = Math.round((CARD.h-qrSize)/2);
+            ctx.fillStyle = '#fff'; roundRect(ctx,qrX-4,qrY-4,qrSize+8,qrSize+8,6); ctx.fill();
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>document.body.removeChild(t),500); }, 2000);
+    }
+
+    function openShareModal() {
+        const url = window.location.href;
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            if (navigator.share) { navigator.share({title:document.title,url}).catch(()=>{}); }
+            else {
+                const ta = document.createElement('textarea');
+                ta.value = url; ta.style.cssText='position:fixed;top:-9999px;left:-9999px';
+                document.body.appendChild(ta); ta.focus(); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                showToast('链接已复制');
+            }
+            return;
+        }
+        navigator.clipboard.writeText(url).catch(()=>{});
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, {text:url,width:160,height:160,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(() => {
+            const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+            if (el) {
+                const img = new Image();
+                img.onload = () => { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),img); document.getElementById('shareOverlay').classList.add('active'); };
+                img.src = el.tagName==='CANVAS' ? el.toDataURL() : el.src;
+            } else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),null); document.getElementById('shareOverlay').classList.add('active'); }
+        }, 50);
+    }
+
+    function closeShareModal(e) {
+        if (!e || e.target===document.getElementById('shareOverlay'))
+            document.getElementById('shareOverlay').classList.remove('active');
+    }
+
+    function downloadCard() {
+        const a = document.createElement('a');
+        a.download = 'factor-zscore-card.png';
+        a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+        a.click();
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+    renderMathInElement(document.body, {
+        delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false }
+        ]
+    });
+</script>
+
+</body>
+</html>
