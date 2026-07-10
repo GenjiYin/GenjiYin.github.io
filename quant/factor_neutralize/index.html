@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不想在 SQL 里手写独热编码？用分步回归做市值行业中性化 — XiaoYinXu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        .nav-logo { font-size: 18px; font-weight: bold; color: #58a6ff; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #8b949e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #c9d1d9; }
+        .article-wrap { max-width: 760px; margin: 60px auto 80px; padding: 0 40px; }
+        .article-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #21262d; }
+        .article-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .post-category { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+        .article-date { font-size: 12px; color: #484f58; }
+        .article-title { font-size: 28px; color: #e6edf3; font-weight: bold; line-height: 1.4; margin-bottom: 14px; }
+        .article-subtitle { font-size: 15px; color: #8b949e; line-height: 1.7; }
+        .article-body { font-size: 15px; line-height: 1.9; color: #c9d1d9; }
+        .article-body h2 { font-size: 20px; color: #e6edf3; margin: 40px 0 16px; padding-left: 12px; border-left: 3px solid #58a6ff; }
+        .article-body h3 { font-size: 16px; color: #e6edf3; margin: 28px 0 12px; }
+        .article-body p { margin-bottom: 16px; }
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body strong { color: #e6edf3; }
+        .article-body a { color: #58a6ff; text-decoration: none; }
+        .article-body a:hover { text-decoration: underline; }
+        .article-body blockquote { border-left: 3px solid #30363d; padding: 4px 0 4px 16px; margin: 16px 0; color: #8b949e; font-size: 14px; line-height: 1.8; }
+        .article-body table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .article-body th { background: #161b22; color: #8b949e; font-weight: bold; padding: 10px 14px; text-align: left; border: 1px solid #21262d; font-size: 12px; }
+        .article-body td { padding: 10px 14px; border: 1px solid #21262d; vertical-align: top; }
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+        .article-body pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; overflow-x: auto; font-size: 13px; line-height: 1.7; }
+        .article-body code { font-family: 'Consolas', 'Courier New', monospace; color: #e6edf3; }
+        .article-body pre code { color: #c9d1d9; }
+        .formula-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+        .formula-block .formula-title { font-size: 12px; color: #58a6ff; font-weight: bold; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .formula-block .formula-main { font-size: 16px; color: #e6edf3; margin-bottom: 16px; line-height: 1.8; text-align: center; }
+        .formula-block .formula-note { font-size: 13px; color: #8b949e; line-height: 1.8; }
+        .formula-block .formula-note span { color: #ffa657; font-weight: bold; }
+        .insight-block { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .insight-block p { margin-bottom: 0; }
+        .warn-block { background: rgba(255,123,92,0.06); border: 1px solid rgba(255,123,92,0.25); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .warn-block p { margin-bottom: 0; }
+        .warn-block strong { color: #ffa657; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #58a6ff; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: opacity 0.2s; }
+        .back-link:hover { opacity: 0.75; }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; }
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; max-width: 680px; width: 95%; text-align: center; }
+        .share-modal h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; font-weight: normal; }
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+        .share-modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+        .share-modal-actions button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid #30363d; }
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+        footer { text-align: center; padding: 20px; color: #484f58; font-size: 12px; border-top: 1px solid #21262d; }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+    <ul class="nav-links">
+        <li><a href="../../index.html">首页</a></li>
+        <li><a href="../../resume/">关于我</a></li>
+        <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+    </ul>
+</nav>
+
+<div class="article-wrap">
+    <a href="../../index.html" class="back-link">← 返回首页</a>
+    <div class="article-header">
+        <div class="article-meta">
+            <span class="post-category cat-quant">量化交易</span>
+            <span class="article-date">2026-07</span>
+        </div>
+        <h1 class="article-title">不想在 SQL 里手写独热编码？用分步回归做市值行业中性化</h1>
+        <p class="article-subtitle">在纯 SQL 里手搓最小二乘、拼一堆行业哑变量，代码又长又易错。换个思路：先按行业去均值，再对市值做一元回归取残差——三行窗口函数搞定。本文用矩阵代数证明这套「分步回归」与教科书的「独热编码 + 多元最小二乘」逐元素恒等，再用一个 5 只股票的手算样例落地验证。</p>
+        <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+    </div>
+    <div class="article-body">
+        <h2>一、起因：我不想在 SQL 里手写最小二乘</h2>
+        <p>做多因子，几乎每个因子都要先做一次<strong>市值行业中性化</strong>——把因子里那部分由「市值大小」和「属于哪个行业」带来的系统性高低剥掉，剩下的才是干净的 alpha 信号。标准做法是一次横截面回归：用市值和行业哑变量去拟合因子，取回归残差。</p>
+        <p>问题是，我的数据都在 Parquet + DuckDB 里，习惯用纯 SQL 处理。而「独热编码 + 多元最小二乘」这套东西，用 SQL 写出来极其难受：</p>
+        <ul>
+            <li><strong>独热编码</strong>：31 个申万一级行业，得手动摊成 31 列 0/1 哑变量，一大坨 <code>CASE WHEN industry = '银行' THEN 1 ELSE 0 END</code>；</li>
+            <li><strong>最小二乘</strong>：SQL 没有原生的矩阵求逆。想解 <code>β = (XᵀX)⁻¹Xᵀy</code>，要么自己在 SQL 里拼矩阵乘法和高斯消元（32×32 的矩阵，写到崩溃），要么导出到 Python 跑 <code>statsmodels</code> 再导回来——数据来回搬运，流程割裂。</li>
+        </ul>
+        <p>那天我盯着屏幕上那坨 <code>CASE WHEN</code> 发呆，心想：<strong>能不能绕开独热编码和矩阵求逆，只用 SQL 最擅长的 <code>AVG / SUM OVER (PARTITION BY ...)</code> 窗口函数，把中性化做出来？</strong></p>
+
+        <h2>二、换个思路：分步回归</h2>
+        <p>顺着这个念头，我想到一个「分步」的做法，全程只用窗口聚合：</p>
+        <div class="formula-block">
+            <div class="formula-title">分步回归三步走</div>
+            <div class="formula-note" style="text-align:left">
+                <strong style="color:#58a6ff">第 1 步｜行业内去均值</strong>：把因子 <code>f</code> 和对数市值 <code>x</code>，各自减去它所在<strong>行业</strong>的组内均值，得到 <code>f_dm</code>、<code>x_dm</code>。<br>
+                → 对应 <code>AVG(...) OVER (PARTITION BY date, industry)</code><br><br>
+                <strong style="color:#58a6ff">第 2 步｜截面一元回归</strong>：把去均值后的 <code>f_dm</code> 对 <code>x_dm</code> 做一个<strong>过原点的一元回归</strong>，斜率 <code>β = Σ(f_dm·x_dm) / Σ(x_dm²)</code>。<br>
+                → 对应 <code>SUM(...) OVER (PARTITION BY date)</code><br><br>
+                <strong style="color:#58a6ff">第 3 步｜取残差</strong>：<code>中性化因子 = f_dm − β · x_dm</code>。
+            </div>
+        </div>
+        <p>三步全是窗口函数，没有哑变量、没有矩阵求逆，SQL 写起来清清爽爽。可问题也来了——<strong>这套「先按行业去均值、再对市值回归」的分步做法，跟教科书那套「31 个哑变量 + 市值，一次性丢进多元最小二乘」，结果真的一样吗？</strong></p>
+        <p>凭直觉觉得应该一样，但直觉不能当证据。于是我做了两件事：先用矩阵代数证明它俩<strong>逐元素恒等</strong>，再用一个小到能手算的例子验证。这篇文章就是这套推导的完整记录。</p>
+        <div class="insight-block">
+            <p>结论先摆这儿：<strong>分步回归（行业内去均值 + 市值一元回归取残差）与独热编码多元最小二乘，残差逐元素完全相等，不是近似。</strong>背后的原理是计量经济学里的 <strong>Frisch–Waugh–Lovell 定理（FWL）</strong>。下面先证明，再举例。</p>
+        </div>
+
+        <h2>三、代数推导：为什么两者恒等</h2>
+        <p>只用两个矩阵运算：<strong>矩阵乘法</strong>和<strong>转置</strong>。每个符号在第一次出现时解释。</p>
+
+        <h3>3.1 记号约定</h3>
+        <p>固定某一个交易日（截面）。设这天参与回归的股票有 <code>n</code> 只、行业有 <code>K</code> 个。</p>
+        <div class="formula-block">
+            <div class="formula-title">向量与矩阵</div>
+            <div class="formula-note" style="text-align:left">
+                $y$：因子列向量，尺寸 $n\times 1$（本文因子取 <code>close</code>）。<br>
+                $z$：对数市值列向量，$n\times 1$。<br>
+                $D$：<strong>行业哑变量矩阵</strong>，$n\times K$。第 $i$ 行第 $k$ 列 = "股票 $i$ 是否属于行业 $k$"，取 0 或 1。因为每只股票只属于一个行业，<strong>$D$ 的每一行恰好只有一个 1</strong>。<br>
+                $\gamma$：$K$ 个行业的系数，$K\times 1$。$\beta$：市值的系数，是一个标量（单个数）。
+            </div>
+        </div>
+        <p>「独热编码 + 多元最小二乘」要拟合的模型就是（$\varepsilon$ 是残差向量）：</p>
+        <div class="formula-block">
+            <div class="formula-title">多元回归模型</div>
+            <div class="formula-main">
+                $$y = D\gamma + z\beta + \varepsilon$$
+            </div>
+            <div class="formula-note">
+                $D\gamma$（$n\times K$ 乘 $K\times 1$）的第 $i$ 个分量，恰好是"股票 $i$ 所属那个行业的 $\gamma$ 值"。中性化的目标就是求出残差 $\varepsilon = y - D\gamma - z\beta$。
+            </div>
+        </div>
+
+        <h3>3.2 最优条件：残差与每个解释变量正交</h3>
+        <p>最小二乘的唯一要求（也是我们全程只需要的性质）是：<strong>拟合到最好时，残差里不能再残留任何一个解释变量能解释的成分</strong>。用数学讲，就是残差与每一个解释变量列的<strong>点积为 0</strong>。</p>
+        <p>这里插一句<strong>转置</strong>的定义：$A^\top$ 把矩阵沿对角线翻转，行列互换。一个关键特例——两个列向量 $a,b$（都 $n\times 1$）的点积（对应位置相乘再相加）可以写成矩阵乘法 $a^\top b$（$1\times n$ 乘 $n\times 1$，得到一个数）。</p>
+        <p>于是「残差与所有解释变量正交」写成矩阵形式就是：</p>
+        <div class="formula-block">
+            <div class="formula-title">最优条件（正交方程）</div>
+            <div class="formula-main">
+                $$D^\top\varepsilon = 0 \quad(K\times 1，\text{每个行业一条}),\qquad z^\top\varepsilon = 0\quad(\text{一个数})$$
+            </div>
+            <div class="formula-note">
+                $D^\top\varepsilon$ 的第 $k$ 个分量 = $D$ 的第 $k$ 列与 $\varepsilon$ 的点积 = <span>行业 $k$ 内部所有残差之和</span>。要求它为 0，意思就是"每个行业内的残差加起来等于零"。
+            </div>
+        </div>
+        <p>把 $\varepsilon = y - D\gamma - z\beta$ 代进这两条，整理出<strong>正规方程</strong>（把含 $\gamma$、$\beta$ 的项移到左边）：</p>
+        <div class="formula-block">
+            <div class="formula-title">正规方程</div>
+            <div class="formula-main">
+                $$D^\top D\,\gamma + D^\top z\,\beta = D^\top y \qquad\text{(I)}$$
+                $$z^\top D\,\gamma + z^\top z\,\beta = z^\top y \qquad\text{(II)}$$
+            </div>
+        </div>
+
+        <h3>3.3 关键一步：$D^\top D$ 是对角矩阵</h3>
+        <p>矩阵 $D^\top D$（尺寸 $K\times K$）的第 $(k,l)$ 个元素 = $D$ 第 $k$ 列与第 $l$ 列的点积。由于每只股票只属于一个行业：</p>
+        <ul>
+            <li>$k \ne l$（两个不同行业）：不存在哪只股票同时属于两个行业，两列对应位置乘积恒为 0，<strong>点积 = 0</strong>；</li>
+            <li>$k = l$（同一行业）：该列里 1 的个数就是行业 $k$ 的股票数 $n_k$，<strong>点积 = $n_k$</strong>。</li>
+        </ul>
+        <div class="formula-block">
+            <div class="formula-title">D 转置乘 D 是对角阵</div>
+            <div class="formula-main">
+                $$D^\top D = \mathrm{diag}(n_1, n_2, \dots, n_K)$$
+            </div>
+            <div class="formula-note">
+                对角线上是各行业的股票数，其余全是 0。<strong>逆矩阵</strong> $A^{-1}$ 指满足 $A^{-1}A=I$ 的矩阵（$I$ 是单位矩阵：对角线全 1、乘任何矩阵不变）。对角阵求逆特别简单，每个对角元取倒数即可：$(D^\top D)^{-1} = \mathrm{diag}(1/n_1, \dots, 1/n_K)$。
+            </div>
+        </div>
+
+        <h3>3.4 从 (I) 解出 $\gamma$，并发现「哑变量回归 = 取行业均值」</h3>
+        <p>把方程 (I) 两边左乘 $(D^\top D)^{-1}$，解出 $\gamma$：</p>
+        <div class="formula-block">
+            <div class="formula-title">行业系数</div>
+            <div class="formula-main">
+                $$\gamma = (D^\top D)^{-1} D^\top (y - z\beta) \qquad\text{(III)}$$
+            </div>
+        </div>
+        <p>这里出现了一个反复登场的组合 $D(D^\top D)^{-1}D^\top$。给它起个名字，定义算子 $P$：对任意向量 $a$，$Pa := D(D^\top D)^{-1}D^\top a$。跟着尺寸走一遍，就能看清 $P$ 到底干了什么：</p>
+        <div class="formula-block">
+            <div class="formula-title">P 就是「取行业组均值」</div>
+            <div class="formula-note" style="text-align:left">
+                ① $D^\top a$（$K\times 1$）：第 $k$ 个分量 = 行业 $k$ 内 $a$ 的<strong>求和</strong>；<br>
+                ② 再左乘 $(D^\top D)^{-1}$：第 $k$ 个分量 ÷ $n_k$ = 行业 $k$ 的<strong>均值</strong>；<br>
+                ③ 再左乘 $D$：把每个行业的均值，<strong>派发回</strong>该行业的每一只股票。<br><br>
+                合起来：<span>$Pa$ 就是把 $a$ 的每个元素，替换成它所在行业的组内均值。</span>
+            </div>
+        </div>
+        <p>这解释了一件重要的事：如果只用行业哑变量去回归 $y$（暂时不管市值），那么每只股票的<strong>预测值就是它所在行业的因子均值</strong>。所以「用一堆行业哑变量做回归」= 「按行业取均值」。这正是我们能用一句 <code>AVG(...) OVER (PARTITION BY date, industry)</code> 替代整个独热编码的根本原因。</p>
+
+        <h3>3.5 定义「去均值」算子，残差自然浮现</h3>
+        <p>既然 $Pa$ 是「取行业均值」，那 $a - Pa$ 就是「减掉行业均值」，也就是<strong>行业内去均值</strong>——正是分步回归的第 1 步。给它定义算子 $M$：</p>
+        <div class="formula-block">
+            <div class="formula-title">M = 行业内去均值</div>
+            <div class="formula-main">
+                $$Ma := a - Pa \quad\Longrightarrow\quad My = f_{dm},\quad Mz = x_{dm}$$
+            </div>
+            <div class="formula-note">
+                $My$ 就是因子减去行业均值（SQL 里的 <code>f_dm</code>），$Mz$ 就是市值减去行业均值（<code>x_dm</code>）。
+            </div>
+        </div>
+        <p>现在把 (III) 代回残差 $\varepsilon = y - D\gamma - z\beta$。注意 $D\gamma = D(D^\top D)^{-1}D^\top(y-z\beta) = P(y-z\beta)$：</p>
+        <div class="formula-block">
+            <div class="formula-title">残差的分步形式</div>
+            <div class="formula-main">
+                $$\varepsilon = y - P(y-z\beta) - z\beta = (y - Py) - (z - Pz)\beta = My - (Mz)\beta$$
+                $$\boxed{\;\varepsilon = f_{dm} - \beta\, x_{dm}\;}\qquad\text{(IV)}$$
+            </div>
+            <div class="formula-note">
+                看，多元回归的残差已经<strong>自动写成了分步回归第 3 步的样子</strong>：去均值后的因子，减去 $\beta$ 乘去均值后的市值。现在只差确认这个 $\beta$ 跟一元回归的斜率是不是同一个。
+            </div>
+        </div>
+
+        <h3>3.6 求出 $\beta$，正是一元回归斜率</h3>
+        <p>把 $\gamma$（式 III）代入方程 (II)。其中 $z^\top D\gamma = z^\top P(y - z\beta)$，代入整理得：</p>
+        <div class="formula-block">
+            <div class="formula-title">求解 β</div>
+            <div class="formula-main">
+                $$z^\top(z - Pz)\,\beta = z^\top(y - Py) \;\Longrightarrow\; z^\top(Mz)\,\beta = z^\top(My)\qquad\text{(V)}$$
+            </div>
+        </div>
+        <p>要把 (V) 化成 SQL 里那个漂亮的求和式，需要用到 $M$ 的两条性质，都能一行证出来：</p>
+        <div class="formula-block">
+            <div class="formula-title">M 的两条性质</div>
+            <div class="formula-note" style="text-align:left">
+                <strong>① 对称：$M^\top = M$。</strong> 因为 $P^\top = \big(D(D^\top D)^{-1}D^\top\big)^\top = D\big((D^\top D)^{-1}\big)^\top D^\top = P$（对角阵的逆仍是对角阵，转置不变），所以 $M^\top = (I-P)^\top = M$。<br><br>
+                <strong>② 幂等：$MM = M$。</strong> 先看 $PP = D(D^\top D)^{-1}\underbrace{D^\top D(D^\top D)^{-1}}_{=\,I}D^\top = P$，于是 $MM = (I-P)(I-P) = I - 2P + PP = I - P = M$。<br>
+                <span>直觉：一个数减掉组均值之后，组均值已经是 0，再减一次不变，所以「去均值」做两次等于做一次。</span>
+            </div>
+        </div>
+        <p>用这两条性质，把 (V) 两边的 $z^\top M$ 拆成 $z^\top M^\top M = (Mz)^\top M$（先用对称把一个 $M$ 变 $M^\top$，再用幂等补一个 $M$）：</p>
+        <div class="formula-block">
+            <div class="formula-title">分子分母化成求和式</div>
+            <div class="formula-main">
+                $$z^\top My = (Mz)^\top(My) = x_{dm}^\top f_{dm} = \sum_i f_{dm,i}\,x_{dm,i}$$
+                $$z^\top Mz = (Mz)^\top(Mz) = x_{dm}^\top x_{dm} = \sum_i x_{dm,i}^2$$
+            </div>
+        </div>
+        <p>代回 (V)，斜率 $\beta$ 就出来了：</p>
+        <div class="formula-block">
+            <div class="formula-title">β = 一元回归斜率</div>
+            <div class="formula-main">
+                $$\beta = \frac{\sum_i f_{dm,i}\,x_{dm,i}}{\sum_i x_{dm,i}^2}$$
+            </div>
+            <div class="formula-note">
+                这<strong>逐字</strong>就是分步回归第 2 步、也是 SQL 里的 <code>SUM(f_dm*x_dm) / SUM(x_dm*x_dm) OVER (PARTITION BY date)</code>。
+            </div>
+        </div>
+        <div class="insight-block">
+            <p><strong>证毕。</strong>式 (IV) 给出残差 $\varepsilon = f_{dm} - \beta\, x_{dm}$，式子里的 $\beta$ 恰好是一元回归斜率。这两件事合起来说明：<strong>「独热编码 + 多元最小二乘」的残差，与「行业内去均值 + 市值一元回归取残差」逐元素完全相同</strong>，对任意股票数 $n$、任意行业数 $K$ 都成立。这就是 FWL 定理在中性化场景下的具体形态。</p>
+        </div>
+
+        <h2>四、矩阵运算样例：一个能手算的验证</h2>
+        <p>代数证明说「对任意 $n,K$ 成立」，但抽象。这一节把 $n=5$、$K=2$ 代进去，用具体数字把上面每个矩阵运算都算一遍，眼见为实。</p>
+        <p>5 只股票，2 个行业。行业 A 装股票 1、2、3，行业 B 装股票 4、5。数字是特意挑的，都能整除，方便你拿笔跟着核对。</p>
+        <table>
+            <thead><tr><th>股票</th><th>行业</th><th>因子 $y$（close）</th><th>对数市值 $z$</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>A</td><td>10</td><td>2</td></tr>
+                <tr><td>2</td><td>A</td><td>12</td><td>4</td></tr>
+                <tr><td>3</td><td>A</td><td>20</td><td>6</td></tr>
+                <tr><td>4</td><td>B</td><td>5</td><td>1</td></tr>
+                <tr><td>5</td><td>B</td><td>9</td><td>3</td></tr>
+            </tbody>
+        </table>
+        <p>写成向量和矩阵（对照 3.1 的记号）：</p>
+        <div class="formula-block">
+            <div class="formula-title">代入具体数值</div>
+            <div class="formula-main">
+                $$y=\begin{bmatrix}10\\12\\20\\5\\9\end{bmatrix},\quad z=\begin{bmatrix}2\\4\\6\\1\\3\end{bmatrix},\quad D=\begin{bmatrix}1&0\\1&0\\1&0\\0&1\\0&1\end{bmatrix}$$
+            </div>
+            <div class="formula-note">$D$ 第 1 列 = 是否属于 A，第 2 列 = 是否属于 B。前三只股票在 A，后两只在 B。</div>
+        </div>
+
+        <h3>4.1 验证 $D^\top D$ 是对角阵（3.3）</h3>
+        <p>$D^\top D$ 第 $(k,l)$ 元 = $D$ 第 $k$ 列点乘第 $l$ 列：</p>
+        <div class="formula-block">
+            <div class="formula-main">
+                $$D^\top D = \begin{bmatrix} [1,1,1,0,0]\cdot[1,1,1,0,0] & [1,1,1,0,0]\cdot[0,0,0,1,1] \\ [0,0,0,1,1]\cdot[1,1,1,0,0] & [0,0,0,1,1]\cdot[0,0,0,1,1] \end{bmatrix} = \begin{bmatrix}3&0\\0&2\end{bmatrix}$$
+            </div>
+            <div class="formula-note">
+                对角线 = 各行业股票数（A 有 3 只、B 有 2 只），非对角 = 0。取倒数得逆：$(D^\top D)^{-1}=\begin{bmatrix}1/3&0\\0&1/2\end{bmatrix}$。
+            </div>
+        </div>
+
+        <h3>4.2 第 1 步：行业内去均值（对应算子 $M$）</h3>
+        <p>先算各行业均值。因子：A 组 $(10+12+20)/3 = 14$，B 组 $(5+9)/2 = 7$。市值：A 组 $(2+4+6)/3 = 4$，B 组 $(1+3)/2 = 2$。</p>
+        <div class="formula-block">
+            <div class="formula-title">去均值后的向量</div>
+            <div class="formula-main">
+                $$f_{dm}=My=\begin{bmatrix}10-14\\12-14\\20-14\\5-7\\9-7\end{bmatrix}=\begin{bmatrix}-4\\-2\\6\\-2\\2\end{bmatrix},\qquad x_{dm}=Mz=\begin{bmatrix}2-4\\4-4\\6-4\\1-2\\3-2\end{bmatrix}=\begin{bmatrix}-2\\0\\2\\-1\\1\end{bmatrix}$$
+            </div>
+            <div class="formula-note">对应 SQL：<code>raw_factor - AVG(raw_factor) OVER (PARTITION BY date, industry)</code>。</div>
+        </div>
+
+        <h3>4.3 第 2 步：一元回归斜率 $\beta$</h3>
+        <div class="formula-block">
+            <div class="formula-title">分子分母（点积）</div>
+            <div class="formula-note" style="text-align:left">
+                分子 $\sum f_{dm}\cdot x_{dm} = (-4)(-2)+(-2)(0)+(6)(2)+(-2)(-1)+(2)(1) = 8+0+12+2+2 = 24$<br>
+                分母 $\sum x_{dm}^2 = (-2)^2+0^2+2^2+(-1)^2+1^2 = 4+0+4+1+1 = 10$
+            </div>
+            <div class="formula-main" style="margin-top:16px">
+                $$\beta = 24 / 10 = 2.4$$
+            </div>
+        </div>
+
+        <h3>4.4 第 3 步：残差 = 中性化因子</h3>
+        <div class="formula-block">
+            <div class="formula-title">分步回归的答案</div>
+            <div class="formula-note" style="text-align:left">
+                $\varepsilon = f_{dm} - 2.4\, x_{dm}$：<br>
+                股1: $-4 - 2.4\times(-2) = -4 + 4.8 = 0.8$<br>
+                股2: $-2 - 2.4\times 0 = -2.0$<br>
+                股3: $6 - 2.4\times 2 = 6 - 4.8 = 1.2$<br>
+                股4: $-2 - 2.4\times(-1) = -2 + 2.4 = 0.4$<br>
+                股5: $2 - 2.4\times 1 = 2 - 2.4 = -0.4$
+            </div>
+            <div class="formula-main" style="margin-top:16px">
+                $$\varepsilon_{\text{分步}} = [\,0.8,\ -2.0,\ 1.2,\ 0.4,\ -0.4\,]$$
+            </div>
+        </div>
+
+        <h3>4.5 对照：教科书的独热编码多元回归</h3>
+        <p>现在按老办法，一次性用「是否A、是否B、市值」三样解释变量拟合 $y$，解正规方程 (I)(II)。用 3.2 的正交条件，需要这些点积：</p>
+        <div class="formula-block">
+            <div class="formula-note" style="text-align:left">
+                $D_A\!\cdot\! D_A=3,\quad D_A\!\cdot\! z=2{+}4{+}6=12,\quad D_A\!\cdot\! y=10{+}12{+}20=42$<br>
+                $D_B\!\cdot\! D_B=2,\quad D_B\!\cdot\! z=1{+}3=4,\quad D_B\!\cdot\! y=5{+}9=14$<br>
+                $z\!\cdot\! z=4{+}16{+}36{+}1{+}9=66,\quad z\!\cdot\! y=20{+}48{+}120{+}5{+}27=220$
+            </div>
+        </div>
+        <p>正交方程 $D_A\!\cdot\!\varepsilon=0,\ D_B\!\cdot\!\varepsilon=0,\ z\!\cdot\!\varepsilon=0$ 展开成三元一次方程组（$\gamma_A,\gamma_B,\beta$）：</p>
+        <div class="formula-block">
+            <div class="formula-main">
+                $$3\gamma_A + 12\beta = 42,\qquad 2\gamma_B + 4\beta = 14,\qquad 12\gamma_A + 4\gamma_B + 66\beta = 220$$
+            </div>
+            <div class="formula-note" style="text-align:left">
+                前两式解出 $\gamma_A = 14 - 4\beta$、$\gamma_B = 7 - 2\beta$，代入第三式：<br>
+                $12(14-4\beta) + 4(7-2\beta) + 66\beta = 220 \;\Rightarrow\; 196 + 10\beta = 220 \;\Rightarrow\; \beta = 2.4$
+            </div>
+        </div>
+        <p><strong>$\beta = 2.4$，和分步回归一模一样。</strong>回代得 $\gamma_A = 4.4$、$\gamma_B = 2.2$，算残差 $\varepsilon = y - \gamma_A D_A - \gamma_B D_B - \beta z$：</p>
+        <div class="formula-block">
+            <div class="formula-note" style="text-align:left">
+                股1: $10 - 4.4 - 2.4\times 2 = 0.8$<br>
+                股2: $12 - 4.4 - 2.4\times 4 = -2.0$<br>
+                股3: $20 - 4.4 - 2.4\times 6 = 1.2$<br>
+                股4: $5 - 2.2 - 2.4\times 1 = 0.4$<br>
+                股5: $9 - 2.2 - 2.4\times 3 = -0.4$
+            </div>
+            <div class="formula-main" style="margin-top:16px">
+                $$\varepsilon_{\text{独热}} = [\,0.8,\ -2.0,\ 1.2,\ 0.4,\ -0.4\,]$$
+            </div>
+        </div>
+
+        <h3>4.6 结果对比</h3>
+        <table>
+            <thead><tr><th>股票</th><th>分步回归（3行SQL）</th><th>独热编码多元回归</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>0.8</td><td>0.8</td></tr>
+                <tr><td>2</td><td>-2.0</td><td>-2.0</td></tr>
+                <tr><td>3</td><td>1.2</td><td>1.2</td></tr>
+                <tr><td>4</td><td>0.4</td><td>0.4</td></tr>
+                <tr><td>5</td><td>-0.4</td><td>-0.4</td></tr>
+            </tbody>
+        </table>
+        <p><strong>一个数都不差。</strong>第三节的代数证明保证了这不是这组数字的巧合，而是对任意截面都恒成立。</p>
+
+        <h2>五、写在最后</h2>
+        <p>回到最初那个问题：分步回归和独热编码多元最小二乘，到底一不一样？现在有了确定的答案——<strong>逐元素完全相等，不是近似</strong>。第三节的矩阵代数给出了对任意股票数、任意行业数都成立的证明，第四节用一个能手算的例子把每一步落到了实处。</p>
+        <p>这次推导最大的收获，不只是「可以少写一段独热编码」。更重要的是意识到：<strong>很多在工程上难写的操作，换一个等价的数学形式，就会变得异常简单。</strong>独热编码 + 矩阵求逆，和行业去均值 + 一元回归，其实是同一件事的两副面孔——前者贴合线性代数教科书的写法，后者贴合分组聚合的能力。</p>
+        <p>FWL 定理本身是计量里的老结论，它说的是「控制变量可以先分步剔除、再回归」。但只有当我真的被独热编码折磨够了，才体会到它的实用价值：它把一个「多元回归」问题，降维成了「分组求均值 + 一元回归」两个更好写的动作。</p>
+        <div class="insight-block">
+            <p>写对代码只是及格线。真正省力的功夫，往往在于<strong>先想清楚你要算的东西在数学上还有没有别的等价写法</strong>——有时候换一副面孔，繁琐的工程难题就自己化解了。</p>
+        </div>
+
+        <div class="warn-block">
+            <p><strong>一句适用边界：</strong>这套「去均值 + 一元回归」的等价，只在「任意个哑变量（行业）+ 至多一个连续控制变量（市值）」时成立。若要同时控制两个及以上连续变量（比如再加对数换手率），第二步的一元回归就升级成多元回归，等价关系不再是单个比值那么简单，得回到完整的多元最小二乘。</p>
+        </div>
+    </div><!-- /article-body -->
+</div><!-- /article-wrap -->
+
+<footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+</footer>
+
+<div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+    <div class="share-modal">
+        <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+        <canvas id="shareCanvas"></canvas>
+        <div class="share-modal-actions">
+            <button class="btn-download" onclick="downloadCard()">下载图片</button>
+            <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const CARD = {
+        w: 640, h: 360,
+        bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+        textPrimary: '#e6edf3', textSecondary: '#8b949e',
+        tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+        title: '不想在 SQL 里手写独热编码？用分步回归做市值行业中性化',
+        excerpt: '在纯 SQL 里手搓最小二乘、拼行业哑变量又长又易错。换个思路：先按行业去均值、再对市值一元回归取残差，三行窗口函数搞定，且与独热编码多元回归逐元素恒等。',
+        author: 'XiaoYinXu', tag: '量化交易',
+        font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const lines = text.split('\n');
+        let curY = y;
+        lines.forEach(line => {
+            const chars = line.split('');
+            let row = '';
+            for (let i = 0; i < chars.length; i++) {
+                const test = row + chars[i];
+                if (ctx.measureText(test).width > maxWidth && row) {
+                    ctx.fillText(row, x, curY); row = chars[i]; curY += lineHeight;
+                } else { row = test; }
+            }
+            if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+        });
+        return curY;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+        ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r);
+        ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h);
+        ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r);
+        ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+    }
+
+    function drawCard(canvas, qrImg) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CARD.w*dpr; canvas.height = CARD.h*dpr;
+        canvas.style.width = CARD.w+'px'; canvas.style.height = CARD.h+'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const pad = 40, qrSize = 80;
+        const textMaxW = CARD.w - pad*2 - qrSize - 16;
+        ctx.fillStyle = CARD.bg; ctx.fillRect(0,0,CARD.w,CARD.h);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.strokeRect(0.5,0.5,CARD.w-1,CARD.h-1);
+        ctx.fillStyle = CARD.accent; ctx.fillRect(0,0,CARD.w,3);
+        ctx.font = 'bold 13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        ctx.fillText(CARD.author, pad, 44);
+        const tagX = pad + ctx.measureText(CARD.author).width + 14;
+        const tagW = ctx.measureText(CARD.tag).width + 16;
+        ctx.fillStyle = CARD.tagBg; roundRect(ctx,tagX,30,tagW,20,4); ctx.fill();
+        ctx.font = 'bold 11px '+CARD.font; ctx.fillStyle = CARD.tagColor;
+        ctx.fillText(CARD.tag, tagX+8, 44);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(CARD.w-pad,62); ctx.stroke();
+        ctx.font = 'bold 22px '+CARD.font; ctx.fillStyle = CARD.textPrimary;
+        const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+        ctx.font = '13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        wrapText(ctx, CARD.excerpt, pad, titleBottom+16, textMaxW, 22);
+        ctx.font = '12px '+CARD.font; ctx.fillStyle = CARD.accent;
+        ctx.fillText('↗  '+window.location.href, pad, CARD.h-24);
+        if (qrImg) {
+            const qrX = CARD.w-pad-qrSize, qrY = Math.round((CARD.h-qrSize)/2);
+            ctx.fillStyle = '#fff'; roundRect(ctx,qrX-4,qrY-4,qrSize+8,qrSize+8,6); ctx.fill();
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>document.body.removeChild(t),500); }, 2000);
+    }
+
+    function openShareModal() {
+        const url = window.location.href;
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            if (navigator.share) { navigator.share({title:document.title,url}).catch(()=>{}); }
+            else {
+                const ta = document.createElement('textarea');
+                ta.value = url; ta.style.cssText='position:fixed;top:-9999px;left:-9999px';
+                document.body.appendChild(ta); ta.focus(); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                showToast('链接已复制');
+            }
+            return;
+        }
+        navigator.clipboard.writeText(url).catch(()=>{});
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, {text:url,width:160,height:160,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(() => {
+            const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+            if (el) {
+                const img = new Image();
+                img.onload = () => { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),img); document.getElementById('shareOverlay').classList.add('active'); };
+                img.src = el.tagName==='CANVAS' ? el.toDataURL() : el.src;
+            } else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),null); document.getElementById('shareOverlay').classList.add('active'); }
+        }, 50);
+    }
+
+    function closeShareModal(e) {
+        if (!e || e.target===document.getElementById('shareOverlay'))
+            document.getElementById('shareOverlay').classList.remove('active');
+    }
+
+    function downloadCard() {
+        const a = document.createElement('a');
+        a.download = 'factor-neutralize-card.png';
+        a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+        a.click();
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+    renderMathInElement(document.body, {
+        delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false }
+        ]
+    });
+</script>
+
+</body>
+</html>
