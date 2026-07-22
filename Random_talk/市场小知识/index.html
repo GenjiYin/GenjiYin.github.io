@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国家队是如何救市的 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-talk { background: rgba(255,123,156,0.12); color: #ff7b9c; border: 1px solid rgba(255,123,156,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #ff7b9c;
+        }
+
+        .article-body p { margin-bottom: 16px; }
+
+        .article-body strong { color: #e6edf3; }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 32px;
+        }
+
+        .share-btn:hover { border-color: #ff7b9c; color: #ff7b9c; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download {
+            background: #238636;
+            color: #fff;
+            border-color: #2ea043 !important;
+        }
+
+        .btn-download:hover { background: #2ea043; }
+
+        .btn-cancel {
+            background: transparent;
+            color: #8b949e;
+        }
+
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-talk">杂谈</span>
+                <span class="article-date">2026-07</span>
+            </div>
+            <h1 class="article-title">国家队是如何救市的</h1>
+            <p class="article-subtitle">"两万亿清仓守口如瓶,五百亿托底天下皆知。"用最通俗的语言,聊聊国家队救市背后的基金、套利与流动性,以及那句段子真正想说的东西。</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <p>"两万亿清仓守口如瓶,五百亿托底天下皆知。"这是我在网上看到的一个调侃的段子,这两句话都体现了国家队救市的动作。那我们今天简单聊聊国家队是怎么救市的。</p>
+
+            <h2>一、先搞懂基金是什么</h2>
+
+            <p>在聊这个大话题之前先聊聊基金是什么。基金就是一篮子股票,概念很简单,相信大家其实听过很多次这句话,那基金存在的意义是啥?</p>
+
+            <p>其实最开始有一套理论叫<strong>有效市场假说</strong>,这套理论认为市场是很难被战胜的,人们很难通过选股来超越市场。那如果真的很难超越市场,我们就跟着市场走不就行了?但是又衍生出一个问题:市场每天都有上千只票,我要跟上市场,就意味着要把市场所有的票全部买一遍……这样持仓的走势才能拟合指数走势。很显然这对投资者而言不切实际。但是不用悲观,有人干了这件事——基金发行公司。</p>
+
+            <p>基金其实就是个容器,他们拿着这个容器装着你们的钱去买很多股票,这就是基金的本质。如果要买下指数成分股,需要一大笔资金,这笔资金就是广大投资者购买基金这个容器的钱。<strong>这是基金在一级市场的形成机制。</strong></p>
+
+            <h2>二、基金也有自己的价格</h2>
+
+            <p>基金是可以买卖的,这是从二级市场的角度来看的。我们可以理解为——我们可以买入全市场的票,也可以卖出全市场的票,但那不现实,所以方便起见,我们可以对指数基金进行买卖。所以基金本身也会有一套价格机制!</p>
+
+            <p>真正的难点就在这里!我们可以交易商品,商品的价格由供给和需求决定,大家都抢着要,价格就会上升,反之下降。基金也是这样的。但是我们从一级市场的角度来看,基金应该和它的成分股是等价的,因为基金的出现本来就是为了让投资者买到"全市场股票"。这里面就会有差价!<strong>基金本身的市场价格,和成分股组成的投资组合(基金净值)之间,会有差别。</strong></p>
+
+            <h2>三、套利:差价从哪儿薅</h2>
+
+            <p>好,这里就引出了一个概念——套利。你在两个地方发现苹果价格不一样,就会从价格低的市场买入苹果,然后反手卖给价格高的市场,这就是套利。</p>
+
+            <p>国家队救市同时涉及到了这两个概念。国家队大量买入基金,会抬高基金的市场价格,这个时候基金市场价格是大于基金净值的。这样一来,大量投资者就会去买基金的成分股,然后拿着手上这些成分股去申购基金的份额。你可以理解为——拿成分股去换基金,换到的基金卖出去,就可以薅到国家队的钱了。</p>
+
+            <h2>四、国家队真正要的是什么</h2>
+
+            <p>其实在这个过程中可以发现,国家队的目的就不是冲着盈利去的,他的真正作用是要盘活市场流动性。因为套利者为了拿成分股去换基金,会大量买入成分股,股价被抬上去,股票市场的交易量也就跟着上来了。</p>
+
+            <p>而这里最妙的地方在于——它是<strong>自动收敛</strong>的。套利者换到份额、卖出基金,会把基金的市场价格一点点压回净值附近,溢价慢慢消失;但他们买成分股的钱是实实在在砸进股市的。也就是说,国家队只要在基金这一端点一把火,市场上无数逐利的套利者就会自发地、源源不断地把资金搬运到成分股上,替国家队完成"把钱送进股市"这件事。国家队花的是买基金的钱,撬动的却是整个市场的买盘,这就是"四两拨千斤"。</p>
+
+            <p>所以回头再看开头那句段子——"两万亿清仓守口如瓶,五百亿托底天下皆知"。真正的救市从来不只是砸钱,更是砸<strong>信心</strong>。清仓要瞒着,是怕动摇预期;托底要嚷嚷,是要让所有人都看见"有人在场"。资金能拉起一时的成交,而预期才决定大家愿不愿意把钱留在场内。国家队买的是基金,稳的是股价,但真正想守住的,是市场里那点不能散的人心。</p>
+
+            <blockquote>救市的第一层是钱,第二层是流动性,而最深的一层,是信心。</blockquote>
+
+        </div>
+    </div>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117',
+            border: '#30363d',
+            accent: '#ff7b9c',
+            textPrimary: '#e6edf3',
+            textSecondary: '#8b949e',
+            tagBg: 'rgba(255,123,156,0.12)',
+            tagColor: '#ff7b9c',
+            title: '国家队是如何救市的',
+            excerpt: '用最通俗的语言,从基金、套利讲到流动性,\n看懂国家队"四两拨千斤"背后的门道。',
+            author: 'XiaoYinXu',
+            tag: '杂谈',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const words = line.split('');
+                let row = '';
+                for (let i = 0; i < words.length; i++) {
+                    const test = row + words[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = words[i];
+                        curY += lineHeight;
+                    } else {
+                        row = test;
+                    }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r);
+            ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r);
+            ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr;
+            canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px';
+            canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = CARD.bg;
+            ctx.fillRect(0, 0, CARD.w, CARD.h);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+
+            ctx.fillStyle = CARD.accent;
+            ctx.fillRect(0, 0, CARD.w, 3);
+
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg;
+            roundRect(ctx, tagX, 30, tagW, 20, 4);
+            ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font;
+            ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad, 62);
+            ctx.lineTo(CARD.w - pad, 62);
+            ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font;
+            ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            const site = window.location.href;
+            ctx.font = '12px ' + CARD.font;
+            ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + site, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            // desktop: auto copy link
+            navigator.clipboard.writeText(url).catch(() => {});
+
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            const qr = new QRCode(tmp, {
+                text: url,
+                width: 160,
+                height: 160,
+                colorDark: '#000',
+                colorLight: '#fff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            const qrImg = tmp.querySelector('img') || tmp.querySelector('canvas');
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+
+            if (qrImg && qrImg.tagName === 'CANVAS') {
+                finish(qrImg.toDataURL());
+            } else if (qrImg && qrImg.src) {
+                finish(qrImg.src);
+            } else {
+                setTimeout(() => {
+                    const el = tmp.querySelector('img') || tmp.querySelector('canvas');
+                    if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                    else {
+                        document.body.removeChild(tmp);
+                        drawCard(document.getElementById('shareCanvas'), null);
+                        document.getElementById('shareOverlay').classList.add('active');
+                    }
+                }, 100);
+            }
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay')) {
+                document.getElementById('shareOverlay').classList.remove('active');
+            }
+        }
+
+        function downloadCard() {
+            const canvas = document.getElementById('shareCanvas');
+            const a = document.createElement('a');
+            a.download = 'guojiadui-jiushi-card.png';
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
