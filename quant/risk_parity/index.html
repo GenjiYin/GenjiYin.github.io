@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风险平价到底在平什么：从一个齐次函数推到反波动率加权 — XiaoYinXu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        .nav-logo { font-size: 18px; font-weight: bold; color: #58a6ff; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #8b949e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #c9d1d9; }
+        .article-wrap { max-width: 760px; margin: 60px auto 80px; padding: 0 40px; }
+        .article-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #21262d; }
+        .article-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .post-category { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+        .article-date { font-size: 12px; color: #484f58; }
+        .article-title { font-size: 28px; color: #e6edf3; font-weight: bold; line-height: 1.4; margin-bottom: 14px; }
+        .article-subtitle { font-size: 15px; color: #8b949e; line-height: 1.7; }
+        .article-body { font-size: 15px; line-height: 1.9; color: #c9d1d9; }
+        .article-body h2 { font-size: 20px; color: #e6edf3; margin: 40px 0 16px; padding-left: 12px; border-left: 3px solid #58a6ff; }
+        .article-body h3 { font-size: 16px; color: #e6edf3; margin: 28px 0 12px; }
+        .article-body p { margin-bottom: 16px; }
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body strong { color: #e6edf3; }
+        .article-body a { color: #58a6ff; text-decoration: none; }
+        .article-body a:hover { text-decoration: underline; }
+        .article-body blockquote { border-left: 3px solid #30363d; padding: 4px 0 4px 16px; margin: 16px 0; color: #8b949e; font-size: 14px; line-height: 1.8; }
+        .article-body table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .article-body th { background: #161b22; color: #8b949e; font-weight: bold; padding: 10px 14px; text-align: left; border: 1px solid #21262d; font-size: 12px; }
+        .article-body td { padding: 10px 14px; border: 1px solid #21262d; vertical-align: top; }
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+        .article-body pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; overflow-x: auto; font-size: 13px; line-height: 1.7; }
+        .article-body code { font-family: 'Consolas', 'Courier New', monospace; color: #e6edf3; }
+        .article-body pre code { color: #c9d1d9; }
+        .formula-block { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+        .formula-block .formula-title { font-size: 12px; color: #58a6ff; font-weight: bold; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .formula-block .formula-main { font-size: 16px; color: #e6edf3; margin-bottom: 16px; line-height: 1.8; text-align: center; }
+        .formula-block .formula-note { font-size: 13px; color: #8b949e; line-height: 1.8; }
+        .formula-block .formula-note span { color: #ffa657; font-weight: bold; }
+        .insight-block { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .insight-block p { margin-bottom: 0; }
+        .warn-block { background: rgba(255,123,92,0.06); border: 1px solid rgba(255,123,92,0.25); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .warn-block p { margin-bottom: 0; }
+        .warn-block strong { color: #ffa657; }
+        .article-img { width: 100%; border-radius: 8px; border: 1px solid #30363d; margin: 8px 0 4px; display: block; }
+        .img-caption { font-size: 12px; color: #484f58; text-align: center; margin-bottom: 24px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #58a6ff; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: opacity 0.2s; }
+        .back-link:hover { opacity: 0.75; }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; }
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; max-width: 680px; width: 95%; text-align: center; }
+        .share-modal h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; font-weight: normal; }
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+        .share-modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+        .share-modal-actions button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid #30363d; }
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+        footer { text-align: center; padding: 20px; color: #484f58; font-size: 12px; border-top: 1px solid #21262d; }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+    <ul class="nav-links">
+        <li><a href="../../index.html">首页</a></li>
+        <li><a href="../../resume/">关于我</a></li>
+        <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+    </ul>
+</nav>
+
+<div class="article-wrap">
+    <a href="../../index.html" class="back-link">← 返回首页</a>
+    <div class="article-header">
+        <div class="article-meta">
+            <span class="post-category cat-quant">量化交易</span>
+            <span class="article-date">2026-07</span>
+        </div>
+        <h1 class="article-title">风险平价到底在平什么：从一个齐次函数推到反波动率加权</h1>
+        <p class="article-subtitle">风险平价常被简化理解成"反波动率加权"，但这只是它在特殊假设下的解。这篇文章从组合风险的齐次性出发，完整推导边际风险贡献、等风险贡献方程组、凸优化解法，再用两个解析特例验证结论——顺带讲清楚为什么两资产组合的风险平价权重和相关系数完全无关。</p>
+        <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+    </div>
+    <div class="article-body">
+        <h2>一、等权、均值方差之外的第三条路</h2>
+        <p>做资产配置，最朴素的做法是<strong>等权（1/N）</strong>：几个资产平均分配资金。但这里有个容易被忽略的陷阱——资金等分不等于风险等分。经典例子是股债 60/40 组合：表面上股票占 60% 的钱，看起来股票没有"压倒性"地多，但股票的波动率通常是债券的 3~4 倍，算下来<strong>组合几乎全部的风险波动都来自股票</strong>，债券的存在感在风险层面几乎为零。你以为自己做了分散配置，实际上还是在赌一个资产。</p>
+        <p>另一条路是<strong>均值-方差最优（Markowitz）</strong>：给定风险约束下最大化预期收益。问题是它极度依赖收益预测，而收益预测恰恰是金融里最不可靠的输入——预测误差会被优化器放大成极端权重，这是教科书级的痛点。</p>
+        <p><strong>风险平价（Risk Parity）</strong>提供了第三条路：不猜收益，只看风险，让每个资产对组合总风险的<strong>贡献相等</strong>。它不能保证最优，但换来了一个很朴素的优点——不需要一个你大概率会猜错的收益预测。</p>
+        <img src="../../figure/风险平价.png" alt="风险平价配置示意" class="article-img">
+        <p class="img-caption">图：风险平价下，各资产的风险贡献被拉平，配置权重会向低波动资产倾斜</p>
+
+        <h2>二、地基：组合风险是一个一次齐次函数</h2>
+        <p>设权重向量 <code>w = (w₁,...,w_N)ᵀ</code>，资产协方差矩阵 <code>Σ</code>，组合方差与波动率：</p>
+        <div class="formula-block">
+            <div class="formula-title">组合风险</div>
+            <div class="formula-main">
+                $$\sigma_p^2 = w^T\Sigma w, \qquad \sigma_p(w) = \sqrt{w^T\Sigma w}$$
+            </div>
+        </div>
+        <p>风险平价能立住的第一块地基，是一个容易被忽视的性质：<code>σ_p(w)</code> 是 <code>w</code> 的<strong>一次齐次函数</strong>。把权重整体放大 <code>λ</code> 倍，风险恰好也放大 <code>λ</code> 倍：</p>
+        <div class="formula-block">
+            <div class="formula-title">一次齐次性</div>
+            <div class="formula-main">
+                $$\sigma_p(\lambda w) = \sqrt{(\lambda w)^T\Sigma(\lambda w)} = \sqrt{\lambda^2 w^T\Sigma w} = \lambda\,\sigma_p(w), \quad \lambda>0$$
+            </div>
+        </div>
+        <p>由欧拉齐次函数定理，一个 <code>k</code> 次齐次函数满足 <code>xᵀ∇f(x) = k·f(x)</code>。这里 <code>k=1</code>，代入得到：</p>
+        <div class="formula-block">
+            <div class="formula-title">欧拉定理的推论</div>
+            <div class="formula-main">
+                $$\sum_i w_i \cdot \frac{\partial \sigma_p}{\partial w_i} = \sigma_p(w)$$
+            </div>
+            <div class="formula-note">
+                这一步是风险平价能成立的<span>数学地基</span>：它保证组合总风险可以被<strong>精确分解</strong>成 N 项之和，不多不少，没有交叉项漏在外面。
+            </div>
+        </div>
+
+        <h2>三、边际风险贡献与风险贡献</h2>
+        <p><strong>边际风险贡献（Marginal Risk Contribution）</strong>：资产 <code>i</code> 权重每变化一单位，组合风险变化多少。对 <code>σ_p = (wᵀΣw)^{1/2}</code> 求偏导：</p>
+        <div class="formula-block">
+            <div class="formula-title">边际风险贡献</div>
+            <div class="formula-main">
+                $$\frac{\partial \sigma_p}{\partial w_i} = \frac{1}{2}(w^T\Sigma w)^{-1/2}\cdot\frac{\partial(w^T\Sigma w)}{\partial w_i} = \frac{(\Sigma w)_i}{\sigma_p}$$
+            </div>
+            <div class="formula-note">
+                利用了 <span>Σ 对称</span>，所以 <code>∂(wᵀΣw)/∂wᵢ = 2(Σw)ᵢ</code>。
+            </div>
+        </div>
+        <p><strong>风险贡献（Risk Contribution）</strong>：权重乘以边际贡献，代表资产 <code>i</code> 实际占用了多少组合风险：</p>
+        <div class="formula-block">
+            <div class="formula-title">风险贡献</div>
+            <div class="formula-main">
+                $$RC_i = w_i \cdot \frac{\partial \sigma_p}{\partial w_i} = \frac{w_i(\Sigma w)_i}{\sigma_p}$$
+            </div>
+        </div>
+        <p>把上一节欧拉定理的推论代进来验证一下，风险贡献确实能精确加总回总风险，没有遗漏也没有多余：</p>
+        <div class="formula-block">
+            <div class="formula-title">加总验证</div>
+            <div class="formula-main">
+                $$\sum_i RC_i = \sum_i \frac{w_i(\Sigma w)_i}{\sigma_p} = \frac{w^T\Sigma w}{\sigma_p} = \frac{\sigma_p^2}{\sigma_p} = \sigma_p \;\checkmark$$
+            </div>
+        </div>
+        <div class="insight-block">
+            <p>这一步的意义在于，组合总风险被完美拆成了 N 份，每一份都有清晰的经济含义：<strong>资产 i 的权重 × 它对组合的边际风险贡献</strong>。有了这个干净的分解，"风险平价"才能被精确定义成一个数学目标，而不是一句模糊的口号。</p>
+        </div>
+
+        <h2>四、风险平价的目标：等风险贡献</h2>
+        <p>风险平价要求所有资产的风险贡献相等：</p>
+        <div class="formula-block">
+            <div class="formula-title">等风险贡献条件</div>
+            <div class="formula-main">
+                $$RC_1 = RC_2 = \cdots = RC_N = \frac{\sigma_p}{N}$$
+            </div>
+        </div>
+        <p>展开即 <code>wᵢ(Σw)ᵢ = σ_p²/N</code>，对所有 <code>i</code> 都成立。这是一个<strong>非线性方程组</strong>——注意 <code>σ_p</code> 本身也是 <code>w</code> 的函数，方程组自己嵌套自己。一般没有解析解，只能数值求解，而且直接迭代求解这个方程组数值上并不稳定。</p>
+
+        <h2>五、转成凸优化：为什么要引入对数障碍项</h2>
+        <p>Maillard, Roncalli &amp; Teiletche（2010）给出的标准做法，是把上面的非线性方程组转化成一个<strong>严格凸</strong>的优化问题：</p>
+        <div class="formula-block">
+            <div class="formula-title">风险平价的凸优化形式</div>
+            <div class="formula-main">
+                $$\min_w \; \frac{1}{2}w^T\Sigma w - \frac{1}{N}\sum_i \ln(w_i), \qquad \text{s.t. } w_i > 0$$
+            </div>
+        </div>
+        <p>对目标函数求一阶条件，看它是否真的对应等风险贡献：</p>
+        <div class="formula-block">
+            <div class="formula-title">一阶条件</div>
+            <div class="formula-main">
+                $$\frac{\partial}{\partial w_i}\Big[\frac{1}{2}w^T\Sigma w - \frac{1}{N}\sum_i\ln w_i\Big] = (\Sigma w)_i - \frac{1}{N w_i} = 0$$
+            </div>
+            <div class="formula-main">
+                $$\Rightarrow\; w_i(\Sigma w)_i = \frac{1}{N} \quad(\text{对所有 } i \text{ 都是同一常数})$$
+            </div>
+        </div>
+        <div class="insight-block">
+            <p>这正是"风险贡献相等"的条件（差一个 <code>σ_p²</code> 的归一化常数，不影响最终权重解）。<strong>对数惩罚项的作用就是把一个多元非线性方程组，转成了有唯一解、能用牛顿法或凸优化库（<code>cvxpy</code>、<code>scipy.optimize</code>）稳定求出来的问题</strong>——目标函数是二次项加凹的对数障碍项，整体严格凸，保证解存在且唯一。</p>
+        </div>
+
+        <h2>六、两个有教学意义的解析特例</h2>
+        <p>抛开数值求解，有两种简单情形可以手推出解析解，能帮你建立直觉，也常被拿来当近似简化用。</p>
+
+        <h3>特例一：资产两两不相关</h3>
+        <p>此时协方差矩阵 <code>Σ</code> 是对角矩阵，<code>Σᵢᵢ = σᵢ²</code>。等风险贡献条件 <code>wᵢσᵢ² ∝ 1</code> 直接给出：</p>
+        <div class="formula-block">
+            <div class="formula-title">反波动率加权</div>
+            <div class="formula-main">
+                $$w_i \propto \frac{1}{\sigma_i} \quad\Rightarrow\quad w_i = \frac{1/\sigma_i}{\sum_j 1/\sigma_j}$$
+            </div>
+        </div>
+        <p>这就是实践中经常见到的<strong>反波动率加权（inverse volatility weighting）</strong>。它常被当作风险平价的简化版直接拿来用——但要清楚，这只是风险平价在"资产互不相关"这个特殊假设下的解析解，一旦相关性不能忽略，它就只是个近似。</p>
+
+        <h3>特例二：只有两个资产（不要求不相关）</h3>
+        <p>这个特例更有意思，因为它<strong>不要求资产不相关</strong>，却依然能推出干净的解析解。设两资产 <code>w₁+w₂=1</code>，令 <code>RC₁=RC₂</code>：</p>
+        <div class="formula-block">
+            <div class="formula-title">两资产等风险贡献</div>
+            <div class="formula-main">
+                $$w_1(w_1\sigma_1^2+w_2\sigma_1\sigma_2\rho) = w_2(w_2\sigma_2^2+w_1\sigma_1\sigma_2\rho)$$
+            </div>
+        </div>
+        <p>两边各自展开后，会发现相关系数带来的交叉项 <code>w₁w₂σ₁σ₂ρ</code> 在等式两边完全相同，直接约掉：</p>
+        <div class="formula-block">
+            <div class="formula-title">约掉相关项后</div>
+            <div class="formula-main">
+                $$w_1^2\sigma_1^2 = w_2^2\sigma_2^2 \;\Rightarrow\; w_1\sigma_1 = w_2\sigma_2 \;\Rightarrow\; \frac{w_1}{w_2}=\frac{\sigma_2}{\sigma_1}$$
+            </div>
+        </div>
+        <div class="warn-block">
+            <p><strong>反直觉但很干净的结论：</strong>两资产情形下，风险平价权重恒为 <code>wᵢ∝1/σᵢ</code>，<strong>与相关系数 ρ 完全无关</strong>——不管两个资产相关性多高多低，解都长这个样子。这是 N=2 独有的特例，从 N=3 开始，相关系数会真正进入权重解，不能再这样简化。</p>
+        </div>
+
+        <h2>七、和其他配置方法横向对比</h2>
+        <table>
+            <thead><tr><th>方法</th><th>优化目标</th><th>特点</th></tr></thead>
+            <tbody>
+                <tr><td>等权（1/N）</td><td>资金等分</td><td>简单，但隐含风险集中在高波动资产</td></tr>
+                <tr><td>均值-方差最优</td><td>给定风险下收益最大化</td><td>依赖收益预测，对预测误差极度敏感</td></tr>
+                <tr><td>最小方差</td><td><code>min wᵀΣw</code></td><td>容易集中于低波动/低相关的少数资产，权重常出现极端解</td></tr>
+                <tr><td><strong>风险平价</strong></td><td>各资产风险贡献相等</td><td>不需要收益预测，天然分散风险贡献；隐含"各资产夏普比率相同"的假设</td></tr>
+            </tbody>
+        </table>
+
+        <h2>八、风险平价的局限性</h2>
+        <ul>
+            <li><strong>不利用收益预测信息</strong>：风险平价能"仅用风险就求解"，前提是隐含假设所有资产的<strong>夏普比率相同</strong>。如果资产间夏普比率差异很大，风险平价组合就是次优的——它只在"不知道谁更好"时才是一个合理的默认选择。</li>
+            <li><strong>常需要杠杆</strong>：低波动资产（比如债券）会被加权很重，若要让组合达到目标收益/风险水平，往往要对低波动部分加杠杆放大——这正是桥水"全天候"策略的实践做法。</li>
+            <li><strong>协方差矩阵的估计误差</strong>：和所有依赖 <code>Σ</code> 的方法一样，样本协方差矩阵的不稳定性会直接传导到权重上，维度越高越严重。</li>
+            <li><strong>极端行情下相关性趋同</strong>：牛市普涨或危机踩踏时，资产相关性会集体飙升，风险平价预设的"分散风险贡献"恰恰在最需要它的时刻失效。</li>
+        </ul>
+
+        <h2>九、写在最后</h2>
+        <p>风险平价常被一句话带过——"按波动率倒数加权"，这句话在资产不相关或只有两个资产时是对的，但它是<strong>结论，不是定义</strong>。定义永远是"等风险贡献"，而反波动率加权只是这个定义在特殊结构下的解。把地基（齐次性）、分解（边际贡献→风险贡献）、目标（等风险贡献方程组）、解法（凸优化）这四步理清楚，才不会在资产数变多、相关性变复杂之后，还死守着一个只在特例下成立的公式。</p>
+        <div class="insight-block">
+            <p>这套骨架不止用在资产层面。把权重 <code>w</code> 换成因子暴露、把协方差矩阵 <code>Σ</code> 换成因子协方差矩阵，同样的推导可以搬到多因子风险模型里做<strong>因子空间的风险预算</strong>——数学完全一致，只是"风险贡献"的对象从一只只资产变成了一个个风格因子。这是后面会展开的另一个话题。</p>
+        </div>
+    </div><!-- /article-body -->
+</div><!-- /article-wrap -->
+
+<footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+</footer>
+
+<div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+    <div class="share-modal">
+        <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+        <canvas id="shareCanvas"></canvas>
+        <div class="share-modal-actions">
+            <button class="btn-download" onclick="downloadCard()">下载图片</button>
+            <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const CARD = {
+        w: 640, h: 360,
+        bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+        textPrimary: '#e6edf3', textSecondary: '#8b949e',
+        tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+        title: '风险平价到底在平什么：从一个齐次函数推到反波动率加权',
+        excerpt: '风险平价常被简化成反波动率加权，但这只是特殊假设下的解。从组合风险的齐次性推导边际风险贡献、等风险贡献方程组和凸优化解法，再用两个解析特例验证。',
+        author: 'XiaoYinXu', tag: '量化交易',
+        font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const lines = text.split('\n');
+        let curY = y;
+        lines.forEach(line => {
+            const chars = line.split('');
+            let row = '';
+            for (let i = 0; i < chars.length; i++) {
+                const test = row + chars[i];
+                if (ctx.measureText(test).width > maxWidth && row) {
+                    ctx.fillText(row, x, curY); row = chars[i]; curY += lineHeight;
+                } else { row = test; }
+            }
+            if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+        });
+        return curY;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+        ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r);
+        ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h);
+        ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r);
+        ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+    }
+
+    function drawCard(canvas, qrImg) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CARD.w*dpr; canvas.height = CARD.h*dpr;
+        canvas.style.width = CARD.w+'px'; canvas.style.height = CARD.h+'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const pad = 40, qrSize = 80;
+        const textMaxW = CARD.w - pad*2 - qrSize - 16;
+        ctx.fillStyle = CARD.bg; ctx.fillRect(0,0,CARD.w,CARD.h);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.strokeRect(0.5,0.5,CARD.w-1,CARD.h-1);
+        ctx.fillStyle = CARD.accent; ctx.fillRect(0,0,CARD.w,3);
+        ctx.font = 'bold 13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        ctx.fillText(CARD.author, pad, 44);
+        const tagX = pad + ctx.measureText(CARD.author).width + 14;
+        const tagW = ctx.measureText(CARD.tag).width + 16;
+        ctx.fillStyle = CARD.tagBg; roundRect(ctx,tagX,30,tagW,20,4); ctx.fill();
+        ctx.font = 'bold 11px '+CARD.font; ctx.fillStyle = CARD.tagColor;
+        ctx.fillText(CARD.tag, tagX+8, 44);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(CARD.w-pad,62); ctx.stroke();
+        ctx.font = 'bold 22px '+CARD.font; ctx.fillStyle = CARD.textPrimary;
+        const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+        ctx.font = '13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        wrapText(ctx, CARD.excerpt, pad, titleBottom+16, textMaxW, 22);
+        ctx.font = '12px '+CARD.font; ctx.fillStyle = CARD.accent;
+        ctx.fillText('↗  '+window.location.href, pad, CARD.h-24);
+        if (qrImg) {
+            const qrX = CARD.w-pad-qrSize, qrY = Math.round((CARD.h-qrSize)/2);
+            ctx.fillStyle = '#fff'; roundRect(ctx,qrX-4,qrY-4,qrSize+8,qrSize+8,6); ctx.fill();
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>document.body.removeChild(t),500); }, 2000);
+    }
+
+    function openShareModal() {
+        const url = window.location.href;
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            if (navigator.share) { navigator.share({title:document.title,url}).catch(()=>{}); }
+            else {
+                const ta = document.createElement('textarea');
+                ta.value = url; ta.style.cssText='position:fixed;top:-9999px;left:-9999px';
+                document.body.appendChild(ta); ta.focus(); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                showToast('链接已复制');
+            }
+            return;
+        }
+        navigator.clipboard.writeText(url).catch(()=>{});
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, {text:url,width:160,height:160,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(() => {
+            const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+            if (el) {
+                const img = new Image();
+                img.onload = () => { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),img); document.getElementById('shareOverlay').classList.add('active'); };
+                img.src = el.tagName==='CANVAS' ? el.toDataURL() : el.src;
+            } else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),null); document.getElementById('shareOverlay').classList.add('active'); }
+        }, 50);
+    }
+
+    function closeShareModal(e) {
+        if (!e || e.target===document.getElementById('shareOverlay'))
+            document.getElementById('shareOverlay').classList.remove('active');
+    }
+
+    function downloadCard() {
+        const a = document.createElement('a');
+        a.download = 'risk-parity-card.png';
+        a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+        a.click();
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+    renderMathInElement(document.body, {
+        delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '$', right: '$', display: false },
+            { left: '\\(', right: '\\)', display: false }
+        ]
+    });
+</script>
+
+</body>
+</html>
