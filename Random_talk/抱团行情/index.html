@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每次抱团行情崩盘前，都有人说"这次不一样" — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-talk { background: rgba(255,123,156,0.12); color: #ff7b9c; border: 1px solid rgba(255,123,156,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #ff7b9c;
+        }
+
+        .article-body p { margin-bottom: 16px; }
+
+        .article-body strong { color: #e6edf3; }
+
+        .article-body ul, .article-body ol {
+            margin: 0 0 16px 22px;
+        }
+
+        .article-body li { margin-bottom: 8px; }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            margin: 8px 0 4px;
+            display: block;
+        }
+
+        .img-caption {
+            font-size: 12px;
+            color: #484f58;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 32px;
+        }
+
+        .share-btn:hover { border-color: #ff7b9c; color: #ff7b9c; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download {
+            background: #238636;
+            color: #fff;
+            border-color: #2ea043 !important;
+        }
+
+        .btn-download:hover { background: #2ea043; }
+
+        .btn-cancel {
+            background: transparent;
+            color: #8b949e;
+        }
+
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-talk">杂谈</span>
+                <span class="article-date">2026-07</span>
+            </div>
+            <h1 class="article-title">每次抱团行情崩盘前，都有人说"这次不一样"</h1>
+            <p class="article-subtitle">茅指数、宁组合、这轮科技抱团——不靠印象和网上的成分股名单，用本地历史数据把三轮抱团的估值、资金集中度、崩盘节奏摆出来，看"这次不一样"这句话到底站不站得住。</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <p>A股这些年经历过好几轮"抱团行情"：2019到2021年是"茅指数"，一堆各行业龙头股票被资金一起买上天；2021到2022年换成了"宁组合"，新能源、光伏、锂电池的股票轮番创新高；最近这半年多，轮到了AI算力和半导体。每一轮抱团后期，市场里总会有人讲同一句话——"这次不一样，逻辑变了，估值贵是有道理的"。然后呢？前两轮都崩了，跌幅超过三成，耗时最长接近两年才磨到底部。</p>
+
+            <p>我这次没打算靠印象或者网上搜的成分股名单来聊这个事，而是直接用本地的历史行情、估值、财务数据，把三轮抱团的走势、估值、资金集中度全部用数字摆出来，看看这几轮到底有没有共同的规律，"这次不一样"这句话经不经得起数据检验。</p>
+
+            <h2>一、别信我的记忆，让数据自己去找"龙头"</h2>
+
+            <p>"茅指数""宁组合"这两个名字，压根不是交易所的官方指数，是市场自己起的外号，各家机构统计的成分股名单都不太一样。如果我凑着记忆写一份名单，很容易带入"事后已经知道谁是赢家"的偏差——比如我肯定会把宁德时代放进宁组合，但如果倒回2020年年初，谁能百分百确定它会成为核心资产？</p>
+
+            <p>所以我换了个更硬的办法：不认名单，认<strong>市值排名</strong>。在申万行业分类里，圈定几个跟"茅指数""宁组合""科技抱团"沾边的行业池子（比如食品饮料、家电、医药对应茅指数；电池、光伏、锂电池对应宁组合；半导体、计算机、通信对应这轮科技抱团），然后每个月按总市值重新排一次名，取池子里市值前10的股票，作为当月的"龙头篮子"。名单每月滚动更新，不是一份从头到尾不变的静态清单。</p>
+
+            <p>这套方法算出来的名单，跟大家平时聊的"抱团股"几乎一模一样。2021年年中的茅指数篮子里，排前面的是贵州茅台、中国平安、五粮液、中国人寿、迈瑞医疗；2021年年底的宁组合篮子是宁德时代、比亚迪、隆基股份、亿纬锂能、阳光电源、赣锋锂业；现在这轮科技抱团篮子，排在前面的是中芯国际、寒武纪、海光信息、北方华创、兆易创新。这几个名字大家应该都不陌生——说明"用市值动态排名找龙头"这个思路是靠得住的，不需要靠人脑去凑名单。</p>
+
+            <h2>二、三轮抱团，见顶那一刻业绩都还挺好</h2>
+
+            <p>我按月给每个篮子算了三件事：龙头篮子相对全市场的净值强度（抱团程度的直接结果）、龙头篮子的市值加权PE-TTM（贵不贵）、龙头篮子成交额占全A股的比重（资金有多集中）。</p>
+
+            <p>最扎眼的一个发现是：<strong>三轮行情净值相对强度触顶的那个月，公司的业绩增速都还在历史高位</strong>，没有一次是"业绩先变差、股价才跌下来"。真正压垮抱团的，从来不是基本面突然崩了，而是<strong>估值涨到扛不住了</strong>。</p>
+
+            <p>具体数字摆出来看：</p>
+
+            <ul>
+                <li>茅指数见顶那月（2021年1月），龙头篮子PE-TTM是57倍，是当时全A股中位数PE的<strong>2.08倍</strong></li>
+                <li>宁组合见顶那月（2021年10月），龙头篮子PE-TTM冲到130倍，溢价率一度到过<strong>4.81倍</strong></li>
+                <li>这轮科技抱团（截至2026年6月末），龙头篮子PE-TTM已经到了167倍，溢价率<strong>6.53倍</strong>——三轮里最夸张的一次</li>
+            </ul>
+
+            <img src="../../figure/三轮抱团_估值溢价率对比.png" alt="三轮抱团见顶时的估值溢价率对比" class="article-img">
+            <p class="img-caption">图1：三轮抱团在见顶前18个月内的估值溢价率走势——这轮科技抱团的溢价率明显比前两轮更极端</p>
+
+            <p>估值涨这么快，靠的是什么支撑？我查了一下这轮科技抱团篮子的净利润增速中位数，账面上看是同比+89.7%，看起来很猛，但拆开一看，这个数字基本是被寒武纪、华虹宏力、兆易创新几只极端个股拉起来的（同比涨幅几百个百分点），篮子里还有中国移动同比是<strong>负</strong>的。用几只股票的爆发式增长撑起整个板块的估值叙事——这跟宁组合后期的情况几乎一个模子刻出来的。</p>
+
+            <h2>三、崩不是一次崩完，是"急跌+磨底"分两段走</h2>
+
+            <p>把三轮行情对齐到"距离各自净值相对强度峰值的月数"，画在同一张图上看：</p>
+
+            <img src="../../figure/三轮抱团_相对强度对比.png" alt="三轮抱团相对强度走势对比" class="article-img">
+            <p class="img-caption">图2：三轮抱团龙头篮子相对全A股的净值强度走势，T=0为各自的相对强度峰值月</p>
+
+            <p>两条已经走完全程的曲线（茅指数、宁组合）有个共同的形态：见顶之后先是一波急跌，跌个大几个月，把最泡沫化的估值先挤掉一截；然后进入一段横盘或者反复拉锯的"磨底"期，很多人这时候会觉得"跌够了、该抄底了"；结果磨了大半年到一年多之后，又跟着基本面真正走弱（宁组合对应的是2023年锂电池、光伏产能过剩、组件价格战），补上第二轮更深的下跌。</p>
+
+            <p>拿具体数字说：</p>
+
+            <ul>
+                <li>茅指数见顶后6个月内，相对强度回撤了38.5%</li>
+                <li>宁组合见顶后2个月先快速跌了20%，之后横盘了将近一年，直到2023年上半年才补跌到-51.6%，全程走了19个月</li>
+            </ul>
+
+            <p>也就是说，<strong>光看第一波急跌就判断"跌透了、可以抄底了"，历史上两次都判断早了</strong>。真正的底往往要等到基本面的故事被证伪之后才会出现。</p>
+
+            <h2>四、这一轮，可能已经在半路上了</h2>
+
+            <p>写这篇文章的时候是2026年7月底，"科技抱团"这轮从月度数据上看还在创新高（6月末相对强度还是历史高点）。但我用日线数据往后多看了一个月：拿6月末确定的龙头名单（不换仓），一直算到7月29日——<strong>这个篮子7月以来跌了19%，同期全A股中位数只跌了7.8%</strong>。半导体ETF（经过份额分拆复权处理后）从7月2日的高点到7月29日，跌幅达到62%，方向跟龙头篮子完全一致，只是波动更极端。</p>
+
+            <p>换句话说，用真实数据看，这轮科技抱团的顶大概率已经出现在2026年6月末到7月初，现在正处在历史上茅指数和宁组合都经历过的那个"急跌阶段"——而急跌阶段结束，往往还有磨底期在后面等着，不代表已经跌透了。</p>
+
+            <h2>写在最后</h2>
+
+            <p>"这次不一样"这句话，每一轮抱团行情的后期都会有人说，逻辑也永远听起来很扎实——白酒有消费升级，新能源有能源革命，AI有算力革命。故事都是真的，但故事讲得再好，也没法让估值一直涨上天而不回头。</p>
+
+            <p>回头看这三轮数据，判断抱团有没有到头，真没必要去猜"这次的故事是不是真的不一样"，倒是可以盯紧三个更硬的信号：估值溢价率是不是冲到了历史级的极端分位、资金集中度是不是见顶钝化、板块整体的业绩增速是不是开始靠少数几只股票的极端值撑场面而不是普遍性变好。这三个信号，茅指数和宁组合见顶前都同时亮过灯，现在这轮，三个灯好像也都亮着。</p>
+
+            <blockquote>故事从来不会不一样，会变的只是这次轮到了谁。</blockquote>
+
+        </div>
+    </div>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117',
+            border: '#30363d',
+            accent: '#ff7b9c',
+            textPrimary: '#e6edf3',
+            textSecondary: '#8b949e',
+            tagBg: 'rgba(255,123,156,0.12)',
+            tagColor: '#ff7b9c',
+            title: '每次抱团行情崩盘前，都有人说"这次不一样"',
+            excerpt: '茅指数、宁组合、这轮科技抱团——\n用本地数据把三轮抱团的估值、集中度、崩盘节奏摆出来。',
+            author: 'XiaoYinXu',
+            tag: '杂谈',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const words = line.split('');
+                let row = '';
+                for (let i = 0; i < words.length; i++) {
+                    const test = row + words[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = words[i];
+                        curY += lineHeight;
+                    } else {
+                        row = test;
+                    }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r);
+            ctx.lineTo(x + r, y);
+            ctx.arcTo(x, y, x + r, y, r);
+            ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr;
+            canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px';
+            canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = CARD.bg;
+            ctx.fillRect(0, 0, CARD.w, CARD.h);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+
+            ctx.fillStyle = CARD.accent;
+            ctx.fillRect(0, 0, CARD.w, 3);
+
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg;
+            roundRect(ctx, tagX, 30, tagW, 20, 4);
+            ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font;
+            ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad, 62);
+            ctx.lineTo(CARD.w - pad, 62);
+            ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font;
+            ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            const site = window.location.href;
+            ctx.font = '12px ' + CARD.font;
+            ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + site, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            navigator.clipboard.writeText(url).catch(() => {});
+
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            const qr = new QRCode(tmp, {
+                text: url,
+                width: 160,
+                height: 160,
+                colorDark: '#000',
+                colorLight: '#fff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            const qrImg = tmp.querySelector('img') || tmp.querySelector('canvas');
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+
+            if (qrImg && qrImg.tagName === 'CANVAS') {
+                finish(qrImg.toDataURL());
+            } else if (qrImg && qrImg.src) {
+                finish(qrImg.src);
+            } else {
+                setTimeout(() => {
+                    const el = tmp.querySelector('img') || tmp.querySelector('canvas');
+                    if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                    else {
+                        document.body.removeChild(tmp);
+                        drawCard(document.getElementById('shareCanvas'), null);
+                        document.getElementById('shareOverlay').classList.add('active');
+                    }
+                }, 100);
+            }
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay')) {
+                document.getElementById('shareOverlay').classList.remove('active');
+            }
+        }
+
+        function downloadCard() {
+            const canvas = document.getElementById('shareCanvas');
+            const a = document.createElement('a');
+            a.download = 'baotuan-xingqing-card.png';
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
