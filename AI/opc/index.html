@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我给自己开了家公司，员工全是 AI：一人公司（OPC）是怎么搭起来的 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-ai { background: rgba(255,165,0,0.12); color: #ffa657; border: 1px solid rgba(255,165,0,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 30px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p {
+            margin-bottom: 16px;
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li {
+            margin-bottom: 8px;
+        }
+
+        .article-body strong {
+            color: #e6edf3;
+        }
+
+        .if-hook {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: bold;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #21262d;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .article-body td {
+            padding: 10px 14px;
+            border: 1px solid #21262d;
+            vertical-align: top;
+        }
+
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+
+        .article-body pre {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .article-body code {
+            background: rgba(110, 118, 129, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #e6edf3;
+        }
+
+        .article-body pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .article-img {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            margin: 16px auto 4px;
+            display: block;
+        }
+
+        .img-caption {
+            text-align: center;
+            font-size: 12px;
+            color: #484f58;
+            margin-bottom: 16px;
+        }
+
+        .summary-block {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 32px 0;
+            text-align: center;
+            font-size: 18px;
+            color: #e6edf3;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">&#8592; 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-ai">AI 工程</span>
+                <span class="article-date">2026-08</span>
+            </div>
+            <h1 class="article-title">我给自己开了家公司，员工全是 AI：一人公司（OPC）是怎么搭起来的</h1>
+            <p class="article-subtitle">打开浏览器，界面长得像 QQ 群，群里除了我全是 AI 员工。这东西是怎么拼出来的？如果你刚好会用 Claude Code 的非交互模式，你就能把它变成随叫随到的"打工人"；如果你恰好还懂一点提示词工程，你就能给这个打工人注入性格；如果你碰巧再会一点多线程，你就能让六个员工真的同时干活；如果你正好认同"老板只做三件事"这条理念，你就会知道剩下的活都该让系统自动接住。</p>
+            <button class="share-btn" onclick="openShareModal()">&#8599; 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+            <p>上个月我给自己写了个东西，叫"一人公司"（OPC）。打开浏览器，界面长得像 QQ 群：左边是成员列表，中间是聊天窗，右边是群公告和群文件。区别是，群里除了我，剩下的全是 AI——我 @ 一句话，它们就去干活，干完把结果扔回群里。</p>
+            <p>这篇文章不想写成"如何部署"的说明书，那种文档我已经在 <code>docs/使用文档.md</code> 里写过了。我想换个方式讲：这东西的每一步，都是"如果我刚好会点什么，就多能往前走一步"拼出来的——有的是技术上会用某个工具，有的是设计上认同某个理念。挑几个关键的拼接点，讲给你听。</p>
+
+            <img src="../../figure/opc_群聊界面.png" alt="一人公司聊天窗界面" class="article-img">
+            <p class="img-caption">聊天窗：@ 派活，实时看思考 / 调工具 / 出结果</p>
+
+            <h2><span class="if-hook">一、如果你正好认同"老板只做三件事"，你就会想清楚</span>要做一个什么样的东西</h2>
+
+            <p>先说产品，不说技术。我给自己招了六个"员工"：期货研究员、股票基金研究员、私域流量文章优化、文件整理专家、知识星球规划专家、成长记录官。以前这些活要么我自己一个个做，要么开好几个 Claude Code 终端窗口来回切，谁干了什么、干到哪一步，全靠脑子记。</p>
+            <p><span class="if-hook">如果你正好认同"一个人的公司，老板该做的只有招人、派活、把关交付"这条理念，你自然会想到</span>：剩下的事——谁在忙、干完了没、产出存哪了——都不该占用你的脑子，得让系统自动接住。这条理念定了之后，界面该长什么样几乎是显然的：一个能同时看清所有人状态的地方，一句话能同时派给好几个人，产出自动归档不用手动去翻文件夹，刷新页面不会把进度弄丢。"一人公司"这个名字，就是这条理念直接翻译出来的。</p>
+
+            <h2><span class="if-hook">二、如果你恰好会用 Claude Code 的非交互模式，你就能把它变成</span>一个随叫随到的"打工人"</h2>
+
+            <p>整套系统的地基，其实不是我写的代码，是 Claude Code 本身。它除了大家熟悉的交互式终端，还有一种"非交互模式"：把提示词丢给它，加上 <code>--output-format stream-json</code>，它会把整个思考过程——思考、调用工具、最终结果——按 JSON Lines 一行一行吐给你，而不是等跑完才给一段话。</p>
+            <p><span class="if-hook">如果你恰好会用这个非交互模式，你就能实现</span>：用 <code>subprocess.Popen</code> 拉起一个 Claude Code 子进程，把任务通过 stdin 喂给它，再一行一行读它的输出，解析出"它在想什么""它调了什么工具""它最后说了什么"。这就是 <code>runtime.py</code> 里 <code>call_engine()</code> 函数的全部——大概八十行代码，剩下的智能全是 Claude Code 自己的：</p>
+            <pre><code>cmd = [CODER, "--output-format", "stream-json", "--verbose",
+       "--append-system-prompt-file", str(playbook_path),
+       "--allowedTools", *tools,
+       "--dangerously-skip-permissions"]
+proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, ...)
+proc.stdin.write(prompt)
+for raw in proc.stdout:
+    ev = json.loads(raw)   # 逐行解析事件流：thinking / tool_use / text / result</code></pre>
+            <p>顺带一句踩坑记录：提示词得从 <code>stdin</code> 传进去，不能用 <code>-p</code> 参数——多行文本走 <code>-p</code> 会让 Claude Code 退回纯文本模式，事件流直接解析不出来。</p>
+
+            <h2><span class="if-hook">三、如果你恰好还懂一点提示词工程，你就能想到</span>用一份说明书给"打工人"注入性格</h2>
+
+            <p>光会调 CLI，你只有一个千篇一律的助手，怎么问都是同一个语气回答你。想让它变成"期货研究员"而不是"股票基金研究员"，靠的是上面命令里那个 <code>--append-system-prompt-file</code> 参数：每个员工在磁盘上有一份自己的 <code>playbook.md</code>，写着角色定位、专家技能（我塞进去的专业知识）、能力范围、工作守则，作为系统提示词的追加内容注入进去。</p>
+            <p><span class="if-hook">如果你恰好懂点<a href="../prompt_engineering/">提示词工程</a>，你就能想到</span>：员工好不好用，从来不取决于模型多强，取决于你把多少专业判断力提前写进了这份说明书。playbook 允许员工自己迭代（我在工作守则里给了这个权限），也允许我随时手动补充——招人时填一次，之后当"活文档"长期养护，是我在这套系统里投入心思最多的地方，而不是代码本身。</p>
+
+            <h2><span class="if-hook">四、如果你碰巧还会一点多线程，你就能让</span>六个员工真的同时干活，而不是排队</h2>
+
+            <p>Claude Code 的 CLI 进程是阻塞的——一个任务没跑完，你不能在同一个进程里塞下一个任务。<span class="if-hook">如果你碰巧会用标准库里的 <code>threading</code>，你就能实现</span>：给每个要开工的员工起一个线程，各自拉起自己的 Claude Code 子进程，互不阻塞，真正意义上的同时开工。</p>
+            <p>但真并行会带来一个新麻烦，恰好也是另一件"懂了就能避坑"的事：<span class="if-hook">如果你碰巧知道"共享状态并发写会互相覆盖"这条常识，你就能想到</span>——这几个线程会同时读写同一批文件（任务面板 <code>board.md</code>、群文件索引 <code>_index.json</code>、聊天记录 <code>chat.jsonl</code>），"读出来、改一改、写回去"这种操作，两个线程同时改，后写的会把先写的覆盖掉，轻则丢一行记录，重则把整张表格写坏。解法很朴素：全局一把可重入锁（<code>threading.RLock()</code>），谁要动这几份共享文件，先拿锁再动手，不需要引入消息队列或者数据库这么重的东西。</p>
+            <p>前端这边也要配合：<span class="if-hook">如果你碰巧还知道浏览器对同一站点有并发连接数上限，你就不会让六个员工各开一条 HTTP 请求，而是想到</span>用一条 SSE（Server-Sent Events）长连接，把六个线程的事件都塞进同一个队列，由主线程按到达顺序统一往前端推。所以界面上几个员工的"思考中""调用工具"气泡会交替蹦出来——那不是排队的假象，是真的在同时跑。</p>
+
+            <h2><span class="if-hook">五、如果你正好懂"状态要落盘"这条工程常识，</span>刷新页面就不会把进度弄丢</h2>
+
+            <p>SSE 连接一断（比如你刷新了页面），内存里那些"正在发生的事件"就没了。<span class="if-hook">如果你正好懂分布式系统里"事件溯源"（event sourcing）这条思路——状态不靠内存记，靠一份可回放的事件流记——你就能想到</span>一个很轻的实现：员工每完成一步（一次思考、一次调工具、一句话），顺手往一个 <code>_live.jsonl</code> 文件里追加一行。前端重新连上时，先把这个文件从头读一遍"倒放"给你看，再继续订阅后面实时发生的。文件是唯一真相源，内存状态随时可以丢，重启后从文件里长回来。</p>
+            <p><span class="if-hook">如果你正好也认同"系统要有单一真相源"这条设计理念，你还能顺手多解决一个问题</span>——团队协作怎么留痕。任务面板 <code>board.md</code> 就是这条理念面向"人"的版本：一张纯 Markdown 表格（时间 / 员工名 / 任务名 / 完成情况），谁做完了一件事，系统自动往表格末尾加一行，完成情况那一列直接是产出文件的链接。员工之间要接力，A 把产出写进面板，我 @B 说"去读面板里 A 的产出"，B 自己去表格里找那一行、点开链接看。没有消息总线，没有数据库表，一张 Markdown 表格就把"任务追踪"和"团队协作"这两件事一起解决了。</p>
+
+            <img src="../../figure/opc_群文件界面.png" alt="一人公司群文件界面" class="article-img">
+            <p class="img-caption">群文件：员工产出自动归档，按人分组，可预览可删除</p>
+
+            <h2><span class="if-hook">六、如果你恰好愿意接受一些朴素的取舍，你就能把</span>这套系统做成零依赖</h2>
+
+            <p>把上面几件事拼起来——<code>subprocess</code> 拿流式事件、<code>--append-system-prompt-file</code> 注入人设、<code>threading</code> 实现真并行、写锁保并发安全、<code>.jsonl</code> 落盘保证不丢进度、一张 Markdown 表格当协作黑板——就是这套系统的全部技术骨架。前端是一个不到两千行的单文件 <code>index.html</code>，没有框架；后端 <code>app.py</code> 只用了 Python 的 <code>http.server</code>。</p>
+            <p><span class="if-hook">如果你恰好愿意接受"用文件当数据库、用轮询代替推送"这类朴素取舍，你就能想到</span>：整个项目除了 Claude Code 本身，可以做到<strong>零第三方依赖</strong>。这是我刻意验证的一件事——"多智能体协作系统"听起来是个很重的概念，但只要肯接受这些取舍，标准库就够了。</p>
+
+            <h3>几个值得记一下的取舍</h3>
+            <table>
+                <thead>
+                    <tr><th>决策</th><th>选择</th><th>为什么</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>执行引擎</td><td>本地 CLI subprocess</td><td>复用 Claude Code 现成的工具调用能力，不用自己撸一套 agent loop</td></tr>
+                    <tr><td>并行模型</td><td>每员工一线程 + 写锁</td><td>够用就好，没必要为了这个量级引入消息队列</td></tr>
+                    <tr><td>数据存储</td><td>纯文件（JSONL / Markdown）</td><td>零依赖、人可读、天然 Git 友好，出问题直接打开文件看</td></tr>
+                    <tr><td>前后端通信</td><td>REST + SSE</td><td>不需要 WebSocket 的双向能力，单向推送够用</td></tr>
+                    <tr><td>状态恢复</td><td>活日志 <code>_live.jsonl</code></td><td>刷新页面后从文件回放，而不是依赖内存里的连接状态</td></tr>
+                </tbody>
+            </table>
+
+            <h2><span class="if-hook">七、如果你正好认同"人对结果负责"，</span>你就知道该在哪里收住技术的手</h2>
+
+            <p>技术上能做的事，和"应该让 AI 做的事"，是两条不同的线。<span class="if-hook">如果你恰好认同"最小权限"这条安全理念，你就能想到</span>给员工的工具默认只开 <code>Read / Write / Edit / WebSearch / WebFetch</code>，不给 <code>Bash</code>——要跑脚本、要动系统，得我手动开权限，而不是一上来就给满权限图省事。</p>
+            <p><span class="if-hook">如果你碰巧认同"每一步产出都该留痕，方便出错时倒查"，你就能想到</span>让员工之间的协作只走"面板接力"，而不是互相直接私下对话——A 写进面板，B 去面板里找，谁的结论用了谁的东西，一目了然。</p>
+            <p><span class="if-hook">如果你刚好也认同"研究不等于实盘，AI 的产出不等于我的背书"，你就能想到</span>给整套系统钉死一条规则：所有员工产出的都是草稿，<strong>最终对外发布这一步，永远是我自己审完再发</strong>。这条规则一行代码都不需要写，靠的是我自己守住它。</p>
+            <p>拼到这里，"一人公司"想验证的事也就清楚了：AI 员工负责把专业知识变成产出的效率，人负责把关方向、承担责任。技术上的每一步进展，都是"如果我恰好会点什么"拼出来的；但产品上的每一条边界，都是"如果我正好认同点什么"划出来的。前者决定它能不能跑起来，后者决定它该不该这样跑。</p>
+
+            <div class="summary-block">
+                一个人 + N 个 AI 员工 = 一家公司。<br>
+                <span style="font-size:15px; font-weight:normal; color:#8b949e; margin-top:8px; display:block;">会的技术拼出了它怎么跑，认的理念划出了它该怎么跑。</span>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+            textPrimary: '#e6edf3', textSecondary: '#8b949e',
+            tagBg: 'rgba(255,165,0,0.12)', tagColor: '#ffa657',
+            title: '我给自己开了家公司，员工全是 AI：\n一人公司（OPC）是怎么搭起来的',
+            excerpt: '打开浏览器，界面像 QQ 群，群里除了我全是 AI 员工。\n讲讲这个念头怎么落地：产品想解决什么问题，技术怎么一层层叠上去。',
+            author: 'XiaoYinXu', tag: 'AI 工程',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const chars = line.split('');
+                let row = '';
+                for (let i = 0; i < chars.length; i++) {
+                    const test = row + chars[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = chars[i];
+                        curY += lineHeight;
+                    } else { row = test; }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+            ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+            ctx.fillText('&#8599;  ' + window.location.href, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            navigator.clipboard.writeText(url).catch(() => {});
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            new QRCode(tmp, { text: url, width: 160, height: 160, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+            setTimeout(() => {
+                const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+                if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'), null); document.getElementById('shareOverlay').classList.add('active'); }
+            }, 50);
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay'))
+                document.getElementById('shareOverlay').classList.remove('active');
+        }
+
+        function downloadCard() {
+            const a = document.createElement('a');
+            a.download = 'opc-guide-card.png';
+            a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
