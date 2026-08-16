@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一人公司实战项目：8 天、80+ 任务，我怎么用一群 AI 员工把投研跑成了团队作业 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 760px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-ai { background: rgba(255,165,0,0.12); color: #ffa657; border: 1px solid rgba(255,165,0,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 30px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .article-body h3 {
+            font-size: 16px;
+            color: #e6edf3;
+            margin: 28px 0 12px;
+        }
+
+        .article-body p {
+            margin-bottom: 16px;
+        }
+
+        .article-body ul, .article-body ol {
+            margin: 12px 0 16px 24px;
+        }
+
+        .article-body li {
+            margin-bottom: 8px;
+        }
+
+        .article-body strong {
+            color: #e6edf3;
+        }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .article-body th {
+            background: #161b22;
+            color: #8b949e;
+            font-weight: bold;
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid #21262d;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .article-body td {
+            padding: 10px 14px;
+            border: 1px solid #21262d;
+            vertical-align: top;
+        }
+
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+
+        .article-body pre {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .article-body code {
+            background: rgba(110, 118, 129, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #e6edf3;
+        }
+
+        .article-body pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .article-img {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            margin: 16px auto 4px;
+            display: block;
+        }
+
+        .img-caption {
+            text-align: center;
+            font-size: 12px;
+            color: #484f58;
+            margin-bottom: 16px;
+        }
+
+        .summary-block {
+            background: rgba(88,166,255,0.06);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 32px 0;
+            text-align: center;
+            font-size: 18px;
+            color: #e6edf3;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 16px;
+        }
+
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">&#8592; 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-ai">AI 工程</span>
+                <span class="article-date">2026-08</span>
+            </div>
+            <h1 class="article-title">一人公司实战项目：8 天、80+ 任务，我怎么用一群 AI 员工把投研跑成了团队作业</h1>
+            <p class="article-subtitle">上一篇偏"构造"——讲这套系统怎么搭、架构长啥样。这一篇不重复那些，专讲一件事：我是怎么真用起来的。不讲怎么造工具，讲工具造好之后，我拿它干了什么、踩了哪些坑、以及在这个过程中我自己怎么变强。投研的具体参数、代码、收益数字一律脱敏，重点全在协作流程和方法论上。</p>
+            <button class="share-btn" onclick="openShareModal()">&#8599; 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+            <p>先说清这篇和上篇的区别。之前那版偏"构造"——讲这套系统怎么搭、架构长啥样、引擎怎么跑。这篇<strong>不重复那些</strong>，专讲一件事：<strong>我是怎么真用起来的</strong>。不讲怎么造工具，讲工具造好之后，我拿它干了什么、踩了哪些坑、以及在这个过程中我自己怎么变强。投研的具体参数、代码、收益数字一律脱敏（那是我自己的研究资产），重点全在协作流程和方法论上。</p>
+
+            <h2>零、先上证据：这不是 demo，是这 8 天真干出来的</h2>
+
+            <p>写任何"我搞了套系统"之前，先放一组从我自己的任务面板里扒出来的真实数据。免得有人觉得这是"想象中的产品"：</p>
+
+            <ul>
+                <li><strong>时间跨度</strong>：2026-08-09 到 2026-08-16，满打满算 <strong>8 天</strong>；</li>
+                <li><strong>面板里留下的已完成任务记录</strong>：<strong>80+ 条</strong>（每条都带时间戳、执行人、产出文件链接）；</li>
+                <li><strong>常驻角色</strong>：近 <strong>10 个</strong>（下文只列可公开的部分）；</li>
+                <li><strong>单兵产出</strong>：期货研究员一个人在这 8 天里，产出了十几份带图、带回测代码、带结论的研究报告；</li>
+                <li><strong>自动化在跑</strong>：创新研究员"每日情报播报"从 8/12 起连续 5 天早上 8 点自动开工，没断过。</li>
+            </ul>
+
+            <p>换句话说，这不是"搭好拍张照就完了"的玩具，是这 8 天我每天真在里头派活、纠偏、收货的东西。下面这张就是我现在每天打开它看到的样子：</p>
+
+            <img src="../../figure/opc_overview.png" alt="一人公司工作台总览：左侧成员列表、中间聊天窗（带思考/工具/回复 实时流）、右侧任务面板" class="article-img">
+            <p class="img-caption">图 1：工作台总览。左是群成员，中是聊天派活区，右是任务面板。所有截图均为真实运行界面，未做任何摆拍。</p>
+
+            <h2>一、这套系统到底怎么用</h2>
+
+            <h3>1. 核心形态：像群聊一样管理一支 AI 团队</h3>
+
+            <p>打开就是一个"群聊"界面。我在聊天框里打 <code>@员工名 需求</code>，对方就立刻开工，界面上能实时看到他 💭思考 → 🔧调工具 → 💬回复的全过程。<code>@甲 @乙</code> 或 <code>@所有人</code> 可以让好几个人<strong>同时</strong>干活，不是排队，总耗时约等于最慢的那一个。</p>
+
+            <p>还有个细节很实用：<strong>运行中的任务在群里会冒一个带「⏹」的实时气泡</strong>，我随时能点掉终止。后面案例里你会看到，这个"终止 + 接着干"的能力不是摆设，是真的救过命。</p>
+
+            <h3>2. 最值钱的两个机制：任务面板接力 + 群文件归档</h3>
+
+            <p>这套系统里我觉得最值钱的不是"能聊天"，而是下面两件事：</p>
+
+            <ul>
+                <li><strong>任务面板（共享看板）</strong>：一张表格，记着"谁、什么时候、干了什么、产出在哪"。每行任务完成后会自动打 ✅ 并挂上 📎 群文件链接。员工之间没有记忆，每次开工都是全新会话，靠这张表<strong>互相接力</strong>——A 的产出写进面板，我告诉 B "去看面板里 A 的东西，接着做"，B 就能读到上下文继续干。我还会把<strong>真正感兴趣的任务收藏置顶</strong>，方便随时回看。</li>
+                <li><strong>群文件归档</strong>：每个员工的产出自动存档，图片直接嵌入报告里看，不用到处找文件。</li>
+            </ul>
+
+            <p>任务面板长这样（注意顶部的 🔖 收藏分组是置顶的，下面按日期分组，当天展开、历史收起）：</p>
+
+            <img src="../../figure/opc_board.png" alt="任务面板：按日期分组、收藏置顶、每行带时间戳和产出链接" class="article-img">
+            <p class="img-caption">图 2：任务面板。这是我反复提到"接力"和"收藏"的地方——所有协作的上下文都落在这张表里。</p>
+
+            <p>群文件那边更夸张，按员工自动归类，光期货研究员一人就沉淀了 18 份产出，整个团队 8 天攒了 <strong>66 份带链接的文档</strong>：</p>
+
+            <img src="../../figure/opc_files.png" alt="群文件：按员工分组列出全部产出，期货研究员 18 份、股票基金 11 份、创新研究员 10 份" class="article-img">
+            <p class="img-caption">图 3：群文件归档。66 份产出不是数字游戏——每一份都对应面板里一条带时间戳的任务，可回溯、可复核。</p>
+
+            <h2>二、一条真实的协作链：从"理解错"到"框架化"</h2>
+
+            <p>我挑一条最完整的协作链条来说明这套系统实际怎么用——<strong>一个期货择时策略从想法到可复用框架的全过程</strong>。具体的参数、代码、收益数字我不会展开，但协作过程本身非常有代表性，而且每一步在面板里都有时间戳和产出可查。</p>
+
+            <p><strong>第一步（8/10）：提想法，不是提代码。</strong> 我跟期货研究员说了一个多周期嵌套的思路（大周期定方向、小周期找时机），没给任何实现细节，让他自己去设计和回测。他交了第一版。</p>
+
+            <p><strong>第二步（8/12）：第一版理解偏了，纠偏。</strong> 我看了他的产出，发现他把信号触发逻辑理解错了。我直接用大白话重述了规则——"你可能理解错了，我的意思是日频定上下限后，五分钟突破上限就平空开多、突破下限就平多开空"。他按我的原话重做，出了《日频定界5分钟穿越回测结论》。<strong>这一步的教训是：跟 AI 员工提策略思路，越是'意会'的部分越容易被理解偏，宁可啰嗦也要把边界条件讲死。</strong></p>
+
+            <p><strong>第三步（8/13）：独立复核。</strong> 光一个人做不放心，我拉 CTA 研究员单独复核这套逻辑和回测代码是否可靠，产出《日频定界回测复核报告》。复核结论是核心逻辑没问题，但挑出几处小瑕疵。<strong>这一步是我觉得最值钱的机制：同一个结论，换一个"人"（另一个 AI 会话）用独立视角挑毛病，比自己审自己靠谱。</strong></p>
+
+            <p><strong>第四步（8/13）：深挖"为什么有效"和"弱点在哪"。</strong> 光知道赚钱不够，我追问了背后的收益来源和潜在弱点。这一轮中间真实发生过两次中断——一次他跑挂了，我回一句"报错了 继续"，他接着跑；一次我看了文字结论说"没有 K 线图我没法看啊"，他补了图。最后交出了《正期望来源与弱点分析》和带图的《策略弱点交易员视角复盘》。<strong>这种"中断—继续—补图"的来回，是真实干活才会有的节奏，不是一次性生成的漂亮报告。</strong></p>
+
+            <p>下面这张就是当时打开的一份真实报告——注意它有标题、日期、标签、状态，还有专门写"数据与方法"的章节，交代了用了什么数据、怎么处理的：</p>
+
+            <img src="../../figure/opc_report.png" alt="打开一份真实报告：标题/日期/标签/状态齐全，还有数据与方法章节说明用了什么、怎么做的" class="article-img">
+            <p class="img-caption">图 4：真实交付物长这样。它不是聊天里一段文字，而是带方法说明、可复核的结构化报告——这也是我能放心"把关交付"的底气。</p>
+
+            <p><strong>第五步（8/15）：喊出最关键的一句话。</strong> 聊到资金管理时，我明确说："说实话资金分配非常重要，优化入场出场信号的重要程度没有资金分配更加重要。"于是有了《资金分配路线与 sizing 实现》。<strong>这条是我在这轮协作里主动拍板的方向：策略信号只是研究的一半，资金管理和工程实现同样重要，甚至更重要。</strong></p>
+
+            <p><strong>第六步（8/15–8/16）：把经验沉淀成"可复用框架"。</strong> 我没让他每次都从零读项目文件，而是要求他设计一套快速回测框架、写好 README、更新自己的 playbook，目标是"以后写新策略，看 README 就能动手"。他交了《快速期货回测框架方案》、框架 README，以及后续多频率、多品种的回测验证。</p>
+
+            <p>这条链前后经过了<strong>单点验证 → 纠偏重做 → 交叉复核 → 原创假设深挖 → 独立验证 → 工程框架化</strong>六个阶段，每一步的产出都留在任务面板里，可以随时回看"谁在什么时间点说了什么、纠正了什么"。这就是"接力"机制真正值钱的地方。</p>
+
+            <h2>三、另一个例子：我让"错误结论"也留着</h2>
+
+            <p>光说顺的没意思，说一个有点反直觉的做法。</p>
+
+            <p>股票基金研究员做过一轮 ETF 策略研究，中途我发现他早期版本的理解和我最初的想法对不上——我要求的三个要素是"去指数化 / 波动率过滤 / 分散化约束"，他第一次交上来是乱的。我把他纠回正轨后，让他做了三因子消融实验（《三因子消融实验复核》）。</p>
+
+            <p>然后我让<strong>文件整理专家</strong>把这些最新结论沉淀进知识库，但特意交代：<strong>不要删除以前的内容，正确和错误的结论都要留着</strong>。文件整理专家照做了，产出了带"正确版本 + 旧版说明"的知识库文件。</p>
+
+            <p>为什么这么做？因为对我而言，知识库不是"只放标准答案"的展览馆，而是<strong>我自己的思考纠错史</strong>。保留"我当时错在哪、被谁纠正了"，下次才不会重蹈覆辙。这套系统让我能把"踩过的坑"也结构化管理起来——这是单靠我自己记备忘录根本做不到的。</p>
+
+            <h2>四、我在这个过程里的方法论成长（这才是这篇真正想讲的）</h2>
+
+            <p>比起策略本身，我更想记录下来的是<strong>我在用这套系统的过程中，自己"怎么想问题"发生了哪些变化</strong>：</p>
+
+            <ol>
+                <li><strong>从"单点测试"到"主动设计结构"。</strong> 早期我提需求是"帮我测一下这个信号行不行"，现在我会先想清楚一个多层级的结构（比如大周期定方向、小周期找时机），再让员工去实现和验证。提问方式变了，说明我对问题的理解深了一层。</li>
+                <li><strong>不因为数字好看就照单全收。</strong> 有一次我直接质疑股票基金研究员某份策略优化的数据真实性，要求他"保存所有研究代码、说明这些代码在证明什么"，而不是只给结论。哪怕新版本数据没那么亮眼，我也坚持用"我能不能真的这么做"去校正。<strong>结论好不好看，永远要用真实约束去过滤。</strong></li>
+                <li><strong>"为什么有效"比"是否有效"更重要。</strong> 一个策略跑出正收益只是第一步，我会继续追问收益从哪来、什么条件下会失效（参见上面《正期望来源与弱点分析》那一轮）。这个习惯让我对策略的信任建立在"我理解它的机制"上，而不是"数字好看"。</li>
+                <li><strong>独立复核不是形式主义，是真的能挑出东西。</strong> 一开始让 CTA 研究员复核别人的结论，我以为只是走个流程，结果真挑出了细节问题。这让我对"多角度校验"的态度从"可做可不做"变成"关键结论必须过一遍"。</li>
+                <li><strong>任务粒度要先小规模验证，再决定升量。</strong> 我踩过一次坑：某个方向一次性铺开到全品种、高频度的组合测试，直接超时中断（面板里那条"刚搞中断了，继续测"就是这么来的）。后来才明白，高频数据 + 大品种池组合任务很容易超出单次处理的承受范围，应该先小规模验证可行性，再扩量。</li>
+                <li><strong>用真实约束反向校正研究方向，比追求理论最优更重要。</strong> 贯穿好几个方向——"只做多头"这种仓位约束、"资金分配比信号更重要"这种工程偏好、小资金下的组合回测——本质上都是同一件事：<strong>拿真实世界的约束条件去过滤纯学术上更优的方案。</strong></li>
+            </ol>
+
+            <h2>五、这套系统好用在哪，代价是什么</h2>
+
+            <p><strong>好用的地方：</strong></p>
+            <ul>
+                <li>一次提问能同时触发多条并行的深挖，不用自己一个个盯着；</li>
+                <li>任务面板让"接力"变得可行，不用自己复述上下文；</li>
+                <li><strong>自动化在真跑</strong>：创新研究员的"每日情报播报"我设成每天早上自动开工，连续 5 天没断，相当于雇了个不用睡觉的情报员；</li>
+                <li><strong>私聊模式</strong>让我能把一些不方便在群里说、或者需要单独交代背景的需求，一对一地跟某个员工聊，不污染群聊；</li>
+                <li>独立复核角色的存在，让我不用自己审自己，减少了盲点；</li>
+                <li>所有产出落盘可查，复盘时能完整回溯"我当时是怎么一步步想清楚这个问题的"，这篇文章本身就是这套回溯能力的产物。</li>
+            </ul>
+
+            <p><strong>代价和注意事项（老实说）：</strong></p>
+            <ul>
+                <li>员工没有记忆，每次开工都是新会话，提需求必须把上下文讲清楚，不然容易被理解偏（我自己就踩过这个坑，见第二节第二步）；</li>
+                <li>多人同时干活会更吃资源、额度消耗更集中，需要自己控制并行数量；</li>
+                <li>终止 + 重跑虽好用，但"理解偏了"这种事只能靠我在关键节点亲自把关，系统不会替我发现；</li>
+                <li>最终对外交付的东西，一定是我自己审过再发——这套系统给的是草稿和研究支持，不是免检的成品。</li>
+            </ul>
+
+            <h2>六、我的"北极星"：老板的安排</h2>
+
+            <p>最后说一个我自己很看重的设定。系统里有一块叫「老板的安排」——这是我写给所有员工看的"北极星"，写清楚我做这件事的最终目的，让他们干活时不跑偏。</p>
+
+            <img src="../../figure/opc_owner.png" alt="老板的安排：写给我所有 AI 员工的战略方向，含三条北极星目标" class="article-img">
+            <p class="img-caption">图 5：老板的安排。这块内容不对外公开细节，但我想说明的是——我给团队定的不是"任务清单"，而是"为什么做"的方向。员工理解了目的，才会在我没想到的地方主动补位。</p>
+
+            <p>这块内容涉及我自己的战略规划，具体文字不便公开，但它的存在本身很重要：<strong>一个人带团队，最怕的是下面的人很卖力但方向散。把"为什么做"写清楚，比天天追着派活管用得多。</strong></p>
+
+            <div class="summary-block">
+                8 天、80+ 条任务、一条从"理解错"走到"框架化"的真实链路。<br>
+                <span style="font-size:15px; font-weight:normal; color:#8b949e; margin-top:8px; display:block;">招人、派活、把关交付——每一次纠偏、复核、追问"为什么"，其实都是我自己在变强。</span>
+            </div>
+
+            <p>这套系统不是要把 AI 当成"更快的自己"，而是当成<strong>能从不同角度挑战我的多个协作者</strong>。如果你也在一个人死磕一件很吃精力的事，也许值得想想：哪些活，其实可以交给"一群不会累的同事"去并行？</p>
+
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+            textPrimary: '#e6edf3', textSecondary: '#8b949e',
+            tagBg: 'rgba(255,165,0,0.12)', tagColor: '#ffa657',
+            title: '一人公司实战项目：8 天、80+ 任务，\n我怎么用一群 AI 员工把投研跑成团队作业',
+            excerpt: '一个人带一群 AI 员工干了 8 天、80+ 条任务：\n怎么派活、怎么接力、怎么纠偏复核，以及我在这个过程中怎么变强。',
+            author: 'XiaoYinXu', tag: 'AI 工程',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const chars = line.split('');
+                let row = '';
+                for (let i = 0; i < chars.length; i++) {
+                    const test = row + chars[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = chars[i];
+                        curY += lineHeight;
+                    } else { row = test; }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr; canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px'; canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.fillStyle = CARD.bg; ctx.fillRect(0, 0, CARD.w, CARD.h);
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+            ctx.fillStyle = CARD.accent; ctx.fillRect(0, 0, CARD.w, 3);
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg; roundRect(ctx, tagX, 30, tagW, 20, 4); ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font; ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(pad, 62); ctx.lineTo(CARD.w - pad, 62); ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font; ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font; ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            ctx.font = '12px ' + CARD.font; ctx.fillStyle = CARD.accent;
+            ctx.fillText('&#8599;  ' + window.location.href, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            navigator.clipboard.writeText(url).catch(() => {});
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            new QRCode(tmp, { text: url, width: 160, height: 160, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+            setTimeout(() => {
+                const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+                if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'), null); document.getElementById('shareOverlay').classList.add('active'); }
+            }, 50);
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay'))
+                document.getElementById('shareOverlay').classList.remove('active');
+        }
+
+        function downloadCard() {
+            const a = document.createElement('a');
+            a.download = 'opc-practice-card.png';
+            a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
