@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>两类风格迥异的低频策略，在极端行情下犯了同一种"病" — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        .nav-logo { font-size: 18px; font-weight: bold; color: #58a6ff; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #8b949e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #c9d1d9; }
+        .article-wrap { max-width: 760px; margin: 60px auto 80px; padding: 0 40px; }
+        .article-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #21262d; }
+        .article-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .post-category { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+        .article-date { font-size: 12px; color: #484f58; }
+        .article-title { font-size: 28px; color: #e6edf3; font-weight: bold; line-height: 1.4; margin-bottom: 14px; }
+        .article-subtitle { font-size: 15px; color: #8b949e; line-height: 1.7; }
+        .article-body { font-size: 15px; line-height: 1.9; color: #c9d1d9; }
+        .article-body h2 { font-size: 20px; color: #e6edf3; margin: 40px 0 16px; padding-left: 12px; border-left: 3px solid #58a6ff; }
+        .article-body h3 { font-size: 16px; color: #e6edf3; margin: 28px 0 12px; }
+        .article-body p { margin-bottom: 16px; }
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body strong { color: #e6edf3; }
+        .article-body a { color: #58a6ff; text-decoration: none; }
+        .article-body a:hover { text-decoration: underline; }
+        .article-body blockquote { border-left: 3px solid #30363d; padding: 4px 0 4px 16px; margin: 16px 0; color: #8b949e; font-size: 14px; line-height: 1.8; }
+        .article-img { width: 100%; border-radius: 8px; border: 1px solid #30363d; margin: 8px 0 4px; display: block; }
+        .img-caption { font-size: 12px; color: #484f58; text-align: center; margin-bottom: 24px; }
+        .insight-block { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .insight-block p { margin-bottom: 0; }
+        .warn-block { background: rgba(255,123,92,0.06); border: 1px solid rgba(255,123,92,0.25); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .warn-block p { margin-bottom: 0; }
+        .warn-block strong { color: #ffa657; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #58a6ff; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: opacity 0.2s; }
+        .back-link:hover { opacity: 0.75; }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; }
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; max-width: 680px; width: 95%; text-align: center; }
+        .share-modal h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; font-weight: normal; }
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+        .share-modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+        .share-modal-actions button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid #30363d; }
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+        footer { text-align: center; padding: 20px; color: #484f58; font-size: 12px; border-top: 1px solid #21262d; }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+    <ul class="nav-links">
+        <li><a href="../../index.html">首页</a></li>
+        <li><a href="../../resume/">关于我</a></li>
+        <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+    </ul>
+</nav>
+
+<div class="article-wrap">
+    <a href="../../index.html" class="back-link">← 返回首页</a>
+    <div class="article-header">
+        <div class="article-meta">
+            <span class="post-category cat-quant">量化交易</span>
+            <span class="article-date">2026-08</span>
+        </div>
+        <h1 class="article-title">两类风格迥异的低频策略，在极端行情下犯了同一种"病"</h1>
+        <p class="article-subtitle">一次压力测试复盘：两个选股逻辑、持仓结构完全不同的低频策略，本以为极端行情下的表现也会大相径庭，结果发现它们生的是同一种病，只是病情轻重不同。这篇不讲具体策略代号、不贴具体数字，只讲现象和背后的方法论。</p>
+        <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+    </div>
+    <div class="article-body">
+        <h2>一次压力测试复盘</h2>
+        <p>最近我用同一套压力测试框架，对比检验了两类风格完全不同的低频量化方法：</p>
+        <ul>
+            <li><strong>A类</strong>：偏"低波动 + 行业分散持仓"</li>
+            <li><strong>B类</strong>：偏"高股息 + 相对集中持仓"</li>
+        </ul>
+        <p>这两类策略在选股逻辑、持仓结构上几乎没有相似之处，我原本以为它们在极端行情下的表现也会大相径庭。结果发现：<strong>它们生的是同一种病，只是病情轻重不同</strong>。</p>
+        <p>这篇复盘不讲具体策略代号、不贴具体数字，只讲我发现的现象和背后的方法论——这也是我自己认为比"某个策略好不好"更值得记录的东西。</p>
+
+        <h2>我是怎么测的</h2>
+        <p>压力测试框架分四步走：</p>
+        <ol>
+            <li><strong>收益分布形态</strong>：看整体收益曲线是偏"温和震荡"还是"小赚多次、偶尔大跌"</li>
+            <li><strong>压力日敏感度</strong>：单独挑出大盘单日暴跌的交易日，看策略在这些日子里对大盘的敏感度会不会异常放大</li>
+            <li><strong>历史极端事件复盘</strong>：拿几次公开的市场极端事件（如流动性危机、系统性熔断）做逐一对照</li>
+            <li><strong>持仓结构归因</strong>：如果某次事件里策略跌得特别深，回头看是不是持仓结构本身埋了雷</li>
+        </ol>
+        <blockquote><strong>一个踩坑记录（纯工程教训，和策略无关）</strong>：做时间序列对齐时，如果某个历史事件的日期早于其中一个账户的数据起点，用最近邻映射（<code>method='nearest'</code>）取值会静默地把两个不同的事件映射到同一个交易日，产生"两件事同一天发生"的假象。正确做法是发现缺失区间后直接剔除该事件，不要用近似值顶替。这是纯粹的时间序列处理陷阱，跟具体策略逻辑没关系，但很容易踩。</blockquote>
+
+        <h2>发现了什么</h2>
+        <h3>1. 收益分布：两者都是"卖保险"型结构，但程度不同</h3>
+        <p>两类方法的收益分布都呈现"小赚多次、偶尔大跌"的负偏、厚尾特征——这是靠承担尾部风险换取日常稳定收益的策略共性。其中偏分散持仓的那类，分布形态明显更温和；偏集中持仓的那类，左尾更极端。</p>
+        <img src="../../figure/压力测试_收益分布对比.png" alt="两类策略收益分布对比示意" class="article-img">
+        <p class="img-caption">示意图：用合成数据表达"两者都负偏厚尾、B类左尾更极端"这一相对关系，不还原任何真实统计数值</p>
+
+        <h3>2. 压力日表现：敏感度都会放大，但放大幅度差很大</h3>
+        <p>两类方法在大盘单日暴跌超过一定阈值时，对大盘的敏感度都会明显放大——这是共性；但集中持仓那类放大得更剧烈，说明它对系统性恐慌更脆弱。</p>
+        <img src="../../figure/压力测试_压力日敏感度对比.png" alt="正常时期与压力日敏感度对比示意" class="article-img">
+        <p class="img-caption">示意图：柱高为相对刻度，不是真实Beta值，只体现"都放大、B类放大更多"这一结构性事实</p>
+
+        <h3>3. 一次历史流动性危机复盘：分散持仓的修复更快</h3>
+        <p>以一次典型的流动性危机为例，两类方法都出现了明显下跌，但走出低谷的时间点不一样：偏分散的那类跟随大盘企稳后很快修复；偏集中的那类多跌了一段时间，也晚了几天才见底。</p>
+        <img src="../../figure/压力测试_危机窗口曲线对比.png" alt="危机窗口累计收益曲线对比示意" class="article-img">
+        <p class="img-caption">示意图：横轴为危机窗口内的交易日序号而非真实日期，纵轴为示意刻度而非真实累计收益，仅保留"A类率先见底、B类跌更深且晚几天见底"这一相对形态</p>
+
+        <h3>4. 根因：不是流动性机制，是行业暴露浓度</h3>
+        <p>深挖之后发现，那次踩踏中集中持仓策略回撤更深，根因不是流动性机制本身，而是它的选股逻辑被动堆积了某个强周期行业的暴露。市场情绪一转向"衰退预期"，这个行业的股票就被集中砸盘；而分散持仓策略因为行业跨度更广，没有被单一叙事精准命中。</p>
+        <div class="insight-block">
+            <p>这也印证了我之前复盘另一策略时得到的教训：<strong>选股条件如果不对行业分布做约束，很容易在不知不觉中把整个组合押注到一两个强周期行业上</strong>，平时看不出问题，一旦遇到叙事切换（比如"衰退预期"这种宏观叙事），这些行业会被集中抛售，伤害远超预期。</p>
+        </div>
+
+        <h3>5. 最大回撤：分散持仓明显更浅</h3>
+        <p>极端行情下，分散持仓的方法最大回撤明显浅一些，且更早开始修复。</p>
+
+        <h2>我的结论</h2>
+        <ol>
+            <li><strong>两个基因完全不同的策略，在极端行情下犯的是同一种"病"</strong>：压力时期对大盘的敏感度会突然放大，只是程度不同。</li>
+            <li><strong>根因是行业暴露浓度，不是流动性机制</strong>：谁的持仓在无意中堆积了单一强周期行业，谁在"衰退叙事"里就跌得更狠。</li>
+            <li><strong>这提示我一件事</strong>：与其为每个策略单独设计"专属预警信号"，不如先建一个跨策略通用的"压力敏感度监控"——不管策略逻辑本身是什么，只要监控它在压力日的敏感度是否异常放大，可能是更省力也更普适的风控思路。</li>
+        </ol>
+
+        <h2>下一步想验证的</h2>
+        <ul>
+            <li>"压力日敏感度放大"能不能做成一个跟具体策略逻辑无关、可以套用在任何策略上的通用监控指标</li>
+            <li>分散持仓的策略是不是也存在自己没发现的"隐藏周期行业暴露"，需要单独扫描</li>
+        </ul>
+
+        <div class="warn-block">
+            <p>本文数据来自本人历史研究复盘，为保护策略细节，文中不涉及具体策略名称、具体持仓标的、精确数值和交易日期，配图均为合成示意数据，仅保留方法论和方向性结论，不还原任何真实回测/持仓数据。</p>
+        </div>
+    </div><!-- /article-body -->
+</div><!-- /article-wrap -->
+
+<footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+</footer>
+
+<div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+    <div class="share-modal">
+        <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+        <canvas id="shareCanvas"></canvas>
+        <div class="share-modal-actions">
+            <button class="btn-download" onclick="downloadCard()">下载图片</button>
+            <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const CARD = {
+        w: 640, h: 360,
+        bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+        textPrimary: '#e6edf3', textSecondary: '#8b949e',
+        tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+        title: '两类风格迥异的低频策略，在极端行情下犯了同一种"病"',
+        excerpt: '一次压力测试复盘：两个选股逻辑、持仓结构完全不同的低频策略，在极端行情下犯了同一种病——压力日敏感度都会放大，根因是行业暴露浓度，不是流动性机制。',
+        author: 'XiaoYinXu', tag: '量化交易',
+        font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const lines = text.split('\n');
+        let curY = y;
+        lines.forEach(line => {
+            const chars = line.split('');
+            let row = '';
+            for (let i = 0; i < chars.length; i++) {
+                const test = row + chars[i];
+                if (ctx.measureText(test).width > maxWidth && row) {
+                    ctx.fillText(row, x, curY); row = chars[i]; curY += lineHeight;
+                } else { row = test; }
+            }
+            if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+        });
+        return curY;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+        ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r);
+        ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h);
+        ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r);
+        ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+    }
+
+    function drawCard(canvas, qrImg) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CARD.w*dpr; canvas.height = CARD.h*dpr;
+        canvas.style.width = CARD.w+'px'; canvas.style.height = CARD.h+'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const pad = 40, qrSize = 80;
+        const textMaxW = CARD.w - pad*2 - qrSize - 16;
+        ctx.fillStyle = CARD.bg; ctx.fillRect(0,0,CARD.w,CARD.h);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.strokeRect(0.5,0.5,CARD.w-1,CARD.h-1);
+        ctx.fillStyle = CARD.accent; ctx.fillRect(0,0,CARD.w,3);
+        ctx.font = 'bold 13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        ctx.fillText(CARD.author, pad, 44);
+        const tagX = pad + ctx.measureText(CARD.author).width + 14;
+        const tagW = ctx.measureText(CARD.tag).width + 16;
+        ctx.fillStyle = CARD.tagBg; roundRect(ctx,tagX,30,tagW,20,4); ctx.fill();
+        ctx.font = 'bold 11px '+CARD.font; ctx.fillStyle = CARD.tagColor;
+        ctx.fillText(CARD.tag, tagX+8, 44);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(CARD.w-pad,62); ctx.stroke();
+        ctx.font = 'bold 22px '+CARD.font; ctx.fillStyle = CARD.textPrimary;
+        const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+        ctx.font = '13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        wrapText(ctx, CARD.excerpt, pad, titleBottom+16, textMaxW, 22);
+        ctx.font = '12px '+CARD.font; ctx.fillStyle = CARD.accent;
+        ctx.fillText('↗  '+window.location.href, pad, CARD.h-24);
+        if (qrImg) {
+            const qrX = CARD.w-pad-qrSize, qrY = Math.round((CARD.h-qrSize)/2);
+            ctx.fillStyle = '#fff'; roundRect(ctx,qrX-4,qrY-4,qrSize+8,qrSize+8,6); ctx.fill();
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>document.body.removeChild(t),500); }, 2000);
+    }
+
+    function openShareModal() {
+        const url = window.location.href;
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            if (navigator.share) { navigator.share({title:document.title,url}).catch(()=>{}); }
+            else {
+                const ta = document.createElement('textarea');
+                ta.value = url; ta.style.cssText='position:fixed;top:-9999px;left:-9999px';
+                document.body.appendChild(ta); ta.focus(); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                showToast('链接已复制');
+            }
+            return;
+        }
+        navigator.clipboard.writeText(url).catch(()=>{});
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, {text:url,width:160,height:160,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(() => {
+            const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+            if (el) {
+                const img = new Image();
+                img.onload = () => { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),img); document.getElementById('shareOverlay').classList.add('active'); };
+                img.src = el.tagName==='CANVAS' ? el.toDataURL() : el.src;
+            } else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),null); document.getElementById('shareOverlay').classList.add('active'); }
+        }, 50);
+    }
+
+    function closeShareModal(e) {
+        if (!e || e.target===document.getElementById('shareOverlay'))
+            document.getElementById('shareOverlay').classList.remove('active');
+    }
+
+    function downloadCard() {
+        const a = document.createElement('a');
+        a.download = 'stress-test-card.png';
+        a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+        a.click();
+    }
+</script>
+
+</body>
+</html>
