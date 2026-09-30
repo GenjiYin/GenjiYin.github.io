@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>因子组合方法论：单因子为什么做不出alpha，组合又难在哪里 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        .nav-logo { font-size: 18px; font-weight: bold; color: #58a6ff; text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links a { color: #8b949e; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-links a:hover { color: #c9d1d9; }
+        .article-wrap { max-width: 860px; margin: 60px auto 80px; padding: 0 40px; }
+        .article-header { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid #21262d; }
+        .article-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .post-category { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .cat-quant { background: rgba(52,152,219,0.15); color: #58a6ff; border: 1px solid rgba(52,152,219,0.3); }
+        .article-date { font-size: 12px; color: #484f58; }
+        .article-title { font-size: 28px; color: #e6edf3; font-weight: bold; line-height: 1.4; margin-bottom: 14px; }
+        .article-subtitle { font-size: 15px; color: #8b949e; line-height: 1.7; }
+        .article-body { font-size: 15px; line-height: 1.9; color: #c9d1d9; }
+        .article-body h2 { font-size: 20px; color: #e6edf3; margin: 40px 0 16px; padding-left: 12px; border-left: 3px solid #58a6ff; }
+        .article-body h3 { font-size: 16px; color: #e6edf3; margin: 28px 0 12px; }
+        .article-body h4 { font-size: 14px; color: #e6edf3; margin: 20px 0 10px; }
+        .article-body p { margin-bottom: 16px; }
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+        .article-body strong { color: #e6edf3; }
+        .article-body a { color: #58a6ff; text-decoration: none; }
+        .article-body a:hover { text-decoration: underline; }
+        .article-body blockquote { border-left: 3px solid #30363d; padding: 4px 0 4px 16px; margin: 16px 0; color: #8b949e; font-size: 14px; line-height: 1.8; }
+        .article-body table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+        .article-body th { background: #161b22; color: #8b949e; font-weight: bold; padding: 10px 12px; text-align: center; border: 1px solid #21262d; font-size: 12px; }
+        .article-body td { padding: 10px 12px; border: 1px solid #21262d; vertical-align: top; text-align: center; }
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+        .article-body pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px 24px; margin: 20px 0; overflow-x: auto; font-size: 13px; line-height: 1.7; }
+        .article-body code { font-family: 'Consolas', 'Courier New', monospace; color: #e6edf3; }
+        .article-body pre code { color: #c9d1d9; }
+        .insight-block { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .insight-block p { margin-bottom: 0; }
+        .warn-block { background: rgba(255,123,92,0.06); border: 1px solid rgba(255,123,92,0.25); border-radius: 8px; padding: 20px 24px; margin: 24px 0; }
+        .warn-block p { margin-bottom: 0; }
+        .warn-block strong { color: #ffa657; }
+        .article-img { width: 100%; border-radius: 8px; border: 1px solid #30363d; margin: 8px 0 4px; display: block; }
+        .img-caption { font-size: 12px; color: #484f58; text-align: center; margin-bottom: 24px; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: #58a6ff; text-decoration: none; font-size: 14px; margin-bottom: 32px; transition: opacity 0.2s; }
+        .back-link:hover { opacity: 0.75; }
+        .share-btn { display: inline-flex; align-items: center; gap: 6px; background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; transition: border-color 0.2s, color 0.2s; margin-top: 16px; }
+        .share-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 24px; max-width: 680px; width: 95%; text-align: center; }
+        .share-modal h3 { font-size: 14px; color: #8b949e; margin-bottom: 16px; font-weight: normal; }
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+        .share-modal-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
+        .share-modal-actions button { padding: 8px 20px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid #30363d; }
+        .btn-download { background: #238636; color: #fff; border-color: #2ea043 !important; }
+        .btn-download:hover { background: #2ea043; }
+        .btn-cancel { background: transparent; color: #8b949e; }
+        .btn-cancel:hover { color: #c9d1d9; }
+        footer { text-align: center; padding: 20px; color: #484f58; font-size: 12px; border-top: 1px solid #21262d; }
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+            .article-body table { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+    <ul class="nav-links">
+        <li><a href="../../index.html">首页</a></li>
+        <li><a href="../../resume/">关于我</a></li>
+        <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+    </ul>
+</nav>
+
+<div class="article-wrap">
+    <a href="../../index.html" class="back-link">← 返回首页</a>
+    <div class="article-header">
+        <div class="article-meta">
+            <span class="post-category cat-quant">量化交易</span>
+            <span class="article-date">2026-09</span>
+        </div>
+        <h1 class="article-title">因子组合方法论：单因子为什么做不出alpha，组合又难在哪里</h1>
+        <p class="article-subtitle">单因子选股要先填上一个-5.56pp的成本坑，还常常一头栽进尾部陷阱；因子组合看似有"化学反应"，本质却是互相裁剪极端值，不是信号叠加。这篇文章用本地真实数据一步步拆开这两件事，最后给出一套从起跑线到留白测试的可操作流程。</p>
+        <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+    </div>
+    <div class="article-body">
+        <h2>0. 前言</h2>
+        <p>这篇文章主要围绕着一个问题——为啥单因子很难做出超额alpha，因子组合又难在哪里。</p>
+        <p>说实话这个问题有点大，所以我们进一步拆分成四个子问题，一个压着一个解答：</p>
+        <table>
+            <thead><tr><th>子问题</th><th>介绍章节</th></tr></thead>
+            <tbody>
+                <tr><td>单因子为什么难做alpha</td><td>第1、2章</td></tr>
+                <tr><td>因子组合为什么会有奇效？组合产生了什么化学反应？</td><td>第3章</td></tr>
+                <tr><td>组合数量爆炸，到底爆炸到什么程度</td><td>第4章</td></tr>
+                <tr><td>在这么大的搜索空间里，怎样才不被运气欺骗</td><td>第5章</td></tr>
+            </tbody>
+        </table>
+        <p>注：所有结论都是用我本地真实数据做的统计，各位可自行复现。</p>
+
+        <h2>1. 起跑线不在0，在-5.56pp</h2>
+        <p>在讨论任何因子之前，有一个所有人都容易忽略的成本。</p>
+
+        <h3>1.1 一个对照试验：完全随机选股</h3>
+        <p>我造了60个<strong>纯噪声因子</strong>，造法是：给每只票一个固定的随机倾向值，再每天加一点随机扰动（加扰动是为了让它像真因子一样有一定的时间连续性，否则换手率会爆表，不可比）。这些因子里不包含任何信息。</p>
+        <p>然后用完全相同的规则回测：每天按照这个假因子排序，买前10名，每日最多换1只，等权持有。</p>
+        <table>
+            <thead><tr><th>指标</th><th>60个随机因子</th><th>全市场等权基准</th></tr></thead>
+            <tbody>
+                <tr><td>年化收益(中位数)</td><td>+2.45%</td><td>+8.02%</td></tr>
+                <tr><td>年化收益(最好的那个)</td><td>+13.01%</td><td>--</td></tr>
+                <tr><td>Sharpe(中位数)</td><td>0.23</td><td>0.443</td></tr>
+                <tr><td>Sharpe(最好的那个)</td><td>0.574</td><td>--</td></tr>
+                <tr><td>超额为正的个数</td><td>4 / 60 = 6.7%</td><td>--</td></tr>
+            </tbody>
+        </table>
+        <p>看到没，随机选10只票，年化还能跑输市场5个多点。</p>
+
+        <h3>1.2 为什么随机选10只会跑输全市场</h3>
+        <h4>原因一：手续费 (≈4.03pp/年)</h4>
+        <p>交易规则是每天最多换1只，持仓10只，每天换手是10%。手续费买入是0.03%、卖出时0.13%，一次换仓的成本就是0.16%。但这0.16%只作用在10%的仓位上，所以每天成本是：</p>
+        <pre><code>10% * 0.16% = 0.016% (每天)
+0.016% * 252 天 = 4.03% (每年)</code></pre>
+        <p>一年下来你要交掉4个点的费用。所以这个市场并不是个零和博弈市场。我可以明确告诉你，这个值还算乐观的，因为中小散户还要面临最低5元费用和印花费用。</p>
+        <h4>原因二：波动损耗 (≈1.5pp/年)</h4>
+        <p>这个概念不太直观，给你举个极端的例子：</p>
+        <table>
+            <thead><tr><th></th><th>第一年</th><th>第二年</th><th>两年后净值</th><th>实际结果</th></tr></thead>
+            <tbody>
+                <tr><td>组合A (低波动)</td><td>+10%</td><td>-10%</td><td>1.10 × 0.9 = 0.99</td><td>亏1%</td></tr>
+                <tr><td>组合B (高波动)</td><td>+50%</td><td>-50%</td><td>1.50 × 0.5 = 0.75</td><td>亏25%</td></tr>
+            </tbody>
+        </table>
+        <p>平均涨幅一样，但是波动大的那个组合亏的多，这就是复利在起作用。</p>
+        <p><strong>10只票的组合，波动远大于4000只票的等权组合。</strong>即便是两者平均收益相同，复利之后的结果也会差一大截。这一截就是波动损耗。</p>
+        <p>这也是为什么仓位管理总是会被人拿出来说的原因。</p>
+        <p>至此，5个多点的缺口就是这样来的：</p>
+        <pre><code>5.55pp ≈ 4.03pp + 1.5pp</code></pre>
+
+        <h3>1.3 这件事彻底改变了问题的性质</h3>
+        <p>理想很丰满，现实很骨感。一般人想的是——<strong>我要找到一个因子，看它能不能带来超额收益。</strong></p>
+        <p>实际情况是——<strong>你要找到一个能打赢市场的因子，它必须先赚回5.56%，才能追上"什么都不做"，超额还是另外的价钱……</strong></p>
+        <p>这也是为什么<strong>单因子做不出alpha</strong>——不是因子没用，是你的因子根本不够填上这5个点的坑位。</p>
+        <p>这个坑有两个原因是可以优化的：</p>
+        <ol>
+            <li>你和券商谈费用，从根源上降低成本；</li>
+            <li>换调仓手段，尽量别碰高频策略，少做T；</li>
+            <li>仓位管理，最简单的就是拿波动率倒数作为仓位权重，使得你持仓的每只票风险平权。</li>
+        </ol>
+
+        <h2>2. 单因子的第二个问题：取极值</h2>
+        <p>上一节说的是成本端，所有策略都会面临的问题。这一节是每个因子都会有的毛病。</p>
+
+        <h3>2.1 先看失败清单</h3>
+        <p>56 个常用因子去重成 46 个独立轴，每个轴按它的 IC（因子值和收益的相关系数）方向买前 10 只：</p>
+        <table>
+            <thead><tr><th>判定</th><th>个数</th></tr></thead>
+            <tbody>
+                <tr><td>跑赢基准（超额年化 &gt; 0）</td><td>6 / 46</td></tr>
+                <tr><td>稳定跑赢（9 年里至少 7 年跑赢）</td><td>1 / 46</td></tr>
+                <tr><td>Sharpe 高于基准的 0.44</td><td>5 / 46</td></tr>
+            </tbody>
+        </table>
+
+        <h3>2.2 尾部里面装的是"魔丸"，不是"金丹"</h3>
+        <p>按一个因子排序买前 10 名，你买到的是这个因子最极端的 10 个值。问题在于：极端值往往是数据异常或制度产物，不是「这个因子的纯净信号」。我们来看看买最低的10只票买了什么玩意：</p>
+        <table>
+            <thead><tr><th>因子(买最低)</th><th>一字板占比</th><th>成交额中位数</th><th>成交额&lt;1000万占比</th></tr></thead>
+            <tbody>
+                <tr><td>amplitude（振幅）</td><td>49.08%</td><td>4886 万</td><td>15.02%</td></tr>
+                <tr><td>volatility_5（5 日波动）</td><td>7.36%</td><td>5205 万</td><td>13.81%</td></tr>
+                <tr><td>momentum_5（5 日动量）</td><td>4.96%</td><td>25083 万</td><td>3.18%</td></tr>
+                <tr><td>amount（成交额）</td><td>4.56%</td><td>337 万</td><td>88.72%</td></tr>
+                <tr><td>turn（换手率）</td><td>3.26%</td><td>5562 万</td><td>30.31%</td></tr>
+            </tbody>
+        </table>
+        <p>你们看看振幅和成交额这两个"妖孽"。</p>
+        <ul>
+            <li>你如果买振幅最低的10只票，你有一半的概率选到一字板，这一字板我还没统计涨停跌停各多少。</li>
+            <li>如果买成交额最低的10只票，你买的票流动性很低很低，你的策略滑点会非常大，因为后续你会发现手上一堆票卖不出去。</li>
+        </ul>
+        <p>我们将买入位置挪到100名后：</p>
+        <table>
+            <thead><tr><th>因子</th><th>一字板占比（#1~10）</th><th>一字板占比（#101~110）</th></tr></thead>
+            <tbody>
+                <tr><td>amplitude</td><td>49.08%</td><td>0.05%</td></tr>
+                <tr><td>volatility_5</td><td>7.36%</td><td>0.05%</td></tr>
+                <tr><td>momentum_5</td><td>4.96%</td><td>0.16%</td></tr>
+                <tr><td>turn</td><td>3.26%</td><td>0.36%</td></tr>
+            </tbody>
+        </table>
+
+        <h3>2.3 决定性检验：把买入位置往后挪</h3>
+        <p>如果尾部是问题所在，那么不买最极端的，改买靠后一点的，业绩应该改善。</p>
+        <p>做法：不买第 1~10 名，改买第 11~20 名、第 21~30 名、第 51~60 名……一直到第 501~510 名。其他完全不变。46 个独立轴挨个测太多，下面挑 6 个有代表性的——4 个前面已经证明有尾部问题（momentum_5、amplitude、volatility_5、atr_6_norm），2 个前面说"无异常"当反例对照（turn、amount）。</p>
+        <img src="../../figure/exp1_尾部实验.png" alt="因子分箱回测：年化收益随买入排名后移的变化" class="article-img">
+        <p class="img-caption">图：6 个代表性因子，买入排名从 #1 挪到 #501 后的年化收益变化</p>
+        <table>
+            <thead><tr><th>因子</th><th>#1</th><th>#11</th><th>#21</th><th>#51</th><th>#101</th><th>#201</th><th>#501</th><th>改善幅度</th></tr></thead>
+            <tbody>
+                <tr><td><strong>momentum_5</strong></td><td>−36.67</td><td>−13.90</td><td>−10.49</td><td>−1.46</td><td>+1.65</td><td>+8.23</td><td>+9.31</td><td>+46.0pp</td></tr>
+                <tr><td>amplitude</td><td>−8.38</td><td>−1.45</td><td>−4.73</td><td>+2.35</td><td>+3.00</td><td><strong>+7.02</strong></td><td>+1.98</td><td>+15.4pp</td></tr>
+                <tr><td>volatility_5</td><td>−8.25</td><td>+2.14</td><td>−6.66</td><td>+0.04</td><td>+1.40</td><td>+4.94</td><td><strong>+5.08</strong></td><td>+13.3pp</td></tr>
+                <tr><td>atr_6_norm</td><td>−0.96</td><td>+0.08</td><td>+2.36</td><td>+0.28</td><td>+2.96</td><td>+3.85</td><td><strong>+5.42</strong></td><td>+6.4pp</td></tr>
+                <tr><td>turn</td><td>+6.36</td><td>+7.53</td><td>+3.39</td><td>+6.79</td><td>+3.43</td><td>+3.86</td><td>+4.02</td><td>无趋势</td></tr>
+                <tr><td>amount</td><td>+25.05</td><td>+25.59</td><td><strong>+33.07</strong></td><td>+30.30</td><td>+20.13</td><td>+29.47</td><td>+20.36</td><td>无趋势</td></tr>
+            </tbody>
+        </table>
+        <p>四个因子的形态非常一致：越往后挪越好。其中 momentum_5 最夸张——买 5 日动量最高的 10 只，年化 −36.67%；买第 501~510 名，年化 +9.31%。同一个因子、同一个方向，只是不买最极端的，结果差了 46 个百分点。</p>
+        <p>同时也可以发现换手率、成交额似乎是例外。</p>
+        <ul>
+            <li>换手率的尾部相对干净，但是换手率尾部的票流动性较差，这些票回测里面能买，实盘滑点会很大；</li>
+            <li>让人意外的是成交额在所有分段都稳定有效：1. 它和市值相关性较大(+0.663)，本质就是小市值的低流动性溢价；2. 收益集中在23年、25年这种小盘行情年；3. 实盘容量有上限，这是小市值策略的通病。<strong>这是一个已知、有条件、容量受限的风险溢价。</strong></li>
+        </ul>
+
+        <h2>3. 因子组合化学反应的真相</h2>
+        <p>给各位看一个我新做的策略：</p>
+        <img src="../../figure/非热门股.png" alt="非热门股策略净值曲线，对比沪深300基准" class="article-img">
+        <p class="img-caption">图：红色线是策略绝对净值，蓝线是沪深300基准，区间2023年至今。最大回撤7.99%，年化21.23%，走势比基准平滑不少。</p>
+        <p>我可以明确告诉各位，这个策略是我用80%的量价数据+20%的财务因子做出来的，给大家看其中的量价单因子的回测：</p>
+        <table>
+            <thead><tr><th>方案</th><th>年化</th><th>Sharp</th></tr></thead>
+            <tbody>
+                <tr><td>只用波动因子</td><td>-0.44%</td><td>0.035</td></tr>
+                <tr><td>只用反转因子</td><td>-40.49%</td><td>-0.969</td></tr>
+                <tr><td>合起来</td><td>21.23%</td><td>1.42</td></tr>
+            </tbody>
+        </table>
+        <p>三个单独都不赚钱甚至大亏的因子，合起来年化 +21%。这就是「垃圾组合有化学反应」。</p>
+        <p>具体数据不便公开，但是可以明确的是，量价数据单拎出来确实很菜，其实那些财务数据本身的回测结果也很一般，但是这里所起的反应是因为财务数据将量价数据进行了裁剪，从而避开了量价数据的尾部，这便是因子组合的本质。</p>
+        <p>那什么情况下组合真的有用？</p>
+        <p>我不想把话说绝对。组合在两种情况下确实应该有额外价值，只是本轮没测出来：</p>
+        <ul>
+            <li>因子方向真正不同时。如果换成方向真正无关的因子（比如低波动 + 高股息 + 低负债），叠加才可能有意义。</li>
+            <li>因子各自都有正向信号时。组合是加权平均，如果每个成分的期望都是负的，平均之后还是负的。指望「三个负的相加变成正的」在数学上就没道理——除非机制是「避开尾部」，而那本来就不是叠加。</li>
+        </ul>
+
+        <h2>4. 组合爆炸有多可怕</h2>
+        <h3>4.1 先算一下因子组合数给大家一点小震撼</h3>
+        <p>以我的因子库为例，只有56个因子，从中挑选k个因子进行组合，可能的组合数是 <code>C(56, k)</code>：</p>
+        <table>
+            <thead><tr><th>挑几个</th><th>组合数</th></tr></thead>
+            <tbody>
+                <tr><td>2 个</td><td>1,540</td></tr>
+                <tr><td>3 个</td><td>27,720</td></tr>
+                <tr><td>5 个</td><td>3,819,816</td></tr>
+                <tr><td>8 个</td><td>1,420,494,075</td></tr>
+                <tr><td>任意个（所有子集）</td><td>2⁵⁶ ≈ 7.2 × 10¹⁶</td></tr>
+            </tbody>
+        </table>
+        <p>这还只算了"选哪几个"，还没算怎么组合（哪些因子做筛选，哪些因子赋权重），你要把这些算上，那将会是不可列且无限多的连续空间。</p>
+
+        <h3>4.2 但因子重复度高</h3>
+        <p>真实情况是这 56 个因子里有大量重复。看相关性热图：</p>
+        <img src="../../figure/因子相关性.png" alt="56个因子截面秩相关热图" class="article-img">
+        <p class="img-caption">图：因子两两截面秩相关热图，深色方块代表高度相关</p>
+        <p>深色方块就是「同一个东西的不同写法」。给大家看个例子——市值和对数市值，这两应该完全相同，还有成交额和小单买入额，这两相关性在小票上高达85%。</p>
+
+        <h3>4.3 去重能降600倍</h3>
+        <p>把「秩相关 ≥ 阈值」的因子合并成一个轴，只留一个代表：</p>
+        <table>
+            <thead><tr><th>合并阈值</th><th>独立轴个数</th><th>C(轴, 3)</th><th>C(轴, 5)</th><th>相比 C(56,5) 降低</th></tr></thead>
+            <tbody>
+                <tr><td>0.95</td><td>50</td><td>19,600</td><td>2,118,760</td><td>1.8 倍</td></tr>
+                <tr><td>0.90</td><td>46</td><td>15,180</td><td>1,370,754</td><td>2.8 倍</td></tr>
+                <tr><td>0.80</td><td>35</td><td>6,545</td><td>324,632</td><td>12 倍</td></tr>
+                <tr><td>0.70</td><td>30</td><td>4,060</td><td>142,506</td><td>27 倍</td></tr>
+                <tr><td>0.60</td><td>24</td><td>2,024</td><td>42,504</td><td>90 倍</td></tr>
+                <tr><td>0.50</td><td>21</td><td>1,330</td><td>20,349</td><td>188 倍</td></tr>
+                <tr><td><strong>0.40</strong></td><td><strong>17</strong></td><td><strong>680</strong></td><td><strong>6,188</strong></td><td><strong>617 倍</strong></td></tr>
+                <tr><td>（不去重）</td><td>56</td><td>27,720</td><td>3,819,816</td><td>—</td></tr>
+            </tbody>
+        </table>
+        <p>这里你应该给相关系数磕一个，它帮你从382万的样本空间容量降到了6188，降了617倍。</p>
+        <p>但是别高兴太早，6188次搜索对一台计算机来说简直不要太简单，回测一次10秒，你跑个17个小时就能拿到结果，但是引出了一个大问题：搜索次数越多，纯靠运气冒出漂亮结果的概率越大。</p>
+        <p>而且合并阈值本身是个主观选择。用 0.40 合并会把相关 0.45 的两个因子当成同一个，可能丢掉真实的差异；用 0.95 合并等于没去重。这个阈值本身就是一个研究者自由度。</p>
+
+        <h2>5. 什么门槛拦得住运气</h2>
+        <p>搜索的代价是<strong>假发现</strong>，拿机器学习的术语来讲叫过拟合。试得越多，纯靠运气冒出漂亮结果的概率越大。这一章用随机因子量化这个代价，并回答「用什么门槛才拦得住」。</p>
+
+        <h3>5.1 试N次取最好，能好到什么程度</h3>
+        <p>拿第 1 章那 60 个纯噪声因子，模拟「我试了 N 个，只报告最好的那个」：</p>
+        <img src="../../figure/exp4_试N次取最好.png" alt="随机因子试N次取最优Sharpe的分布曲线" class="article-img">
+        <p class="img-caption">图：纯噪声因子试 N 次只报告最好结果，最优 Sharpe 随 N 上升的曲线</p>
+        <p>看到没，我试了10次就要超过基准了，试到60多次这个最高夏普基本就要平了。但是<strong>这些因子里面没有一点信息！</strong></p>
+        <p>所以以后各位看量化相关的文章的时候，看到<strong>我找到了一个Sharp 0.57 的策略</strong>这句话的时候，如果不说明试了多少次，那这篇文章的含金量就要打一个大大的问号。</p>
+        <p>上面说的还只是「明摆着的试」——自己数得清试了多少次因子。更麻烦的是那些你根本没意识到自己在试的选择。</p>
+
+        <h3>5.2 研究者自由度：你已经试了多少次？</h3>
+        <p>除了明确的搜索，还有一类隐形的搜索，学术上叫研究者自由度（researcher degrees of freedom）：</p>
+        <table>
+            <thead><tr><th>你悄悄试过的选择</th><th>相当于多少次搜索</th></tr></thead>
+            <tbody>
+                <tr><td>回测区间从 2018 开始还是 2015 开始</td><td>×2</td></tr>
+                <tr><td>持仓 50 只还是 100 只</td><td>×2</td></tr>
+                <tr><td>每天换 1 只还是每 5 天换 1 只</td><td>×2</td></tr>
+                <tr><td>去重阈值 0.9 还是 0.7</td><td>×2</td></tr>
+                <tr><td>成交额门槛 1000 万还是 2000 万</td><td>×2</td></tr>
+                <tr><td>预测周期 5 / 10 / 20 天(针对机器学习策略)</td><td>×3</td></tr>
+                <tr><td><strong>合计</strong></td><td><strong>×96</strong></td></tr>
+            </tbody>
+        </table>
+        <p>每个看起来无害的「参数怎么选」，都在乘上你的搜索次数。上面这 6 个选择合起来就是 96 倍，配合上面那张表——光靠这些自由度就能轻松刷出高 Sharpe 策略。</p>
+        <p>唯一的解药是记账：把你试过的每一个配置都写下来，包括失败的。报告结果时同时报告「我一共试了 N 次」。</p>
+
+        <h2>6. 一套可操作的方法论</h2>
+
+        <h3>第0步 先测随机选股当起跑线</h3>
+        <p><strong>做法：</strong>造 30~60 个纯噪声因子，用你真正的交易规则回测，记下年化和 Sharpe 的中位数。</p>
+        <div class="insight-block">
+            <p><strong>为什么：</strong>这是你真正的对照组。拿因子成绩和 0 比、或者和沪深300 比，都会过于乐观。本项目实测起跑线是年化 +2.45%，Sharpe 0.23，而不是 0。</p>
+        </div>
+        <p>顺带的好处：这批随机因子的 Sharpe 分布就是你的「运气刻度尺」——以后任何结果，先问它在这个分布里排第几。</p>
+
+        <h3>第1步 把股票池的可交易性搞干净</h3>
+        <p><strong>做法：</strong>排除一字板、收盘涨停股，设定成交额下限。</p>
+        <div class="warn-block">
+            <p><strong>为什么：</strong>不做这一步，回测会「买到」买不进的涨停板。本项目第一版因此跑出 Sharpe 4.62。</p>
+        </div>
+
+        <h3>第2步 去重，数清自己有几个独立想法</h3>
+        <p><strong>做法：</strong>有一定交易经验的可以凭自己对数据的理解筛选出一批风格不相关的因子，若无经验，可通过算法来完成：算所有因子的截面秩相关（不是普通相关），按阈值贪心聚类，每个簇留一个代表。</p>
+        <div class="insight-block">
+            <p><strong>为什么：</strong>56 个因子名字不等于 56 个想法。实测 0.4 阈值下只剩 17 个独立轴。不去重的话，你的「组合」很可能是同一个因子加了三遍。</p>
+        </div>
+        <p>具体提醒：取对数、转百分位排名、改变量纲，在秩相关下完全等价，一定会被识别为同一个轴。</p>
+
+        <h3>第3步 分箱体检</h3>
+        <p><strong>做法：</strong>每个因子不只测「买前 10 名」，而是测第 1、11、51、101、201、501 名各买 10 只，画出「年化 vs 起始排名」的曲线。</p>
+        <div class="insight-block">
+            <p><strong>为什么：</strong>这条曲线告诉你因子在哪个区间有用。市值在最极端处是 -87%，剔除尾部个股是 +34%。但我们都知道小市值在市场中效果的显著性，只测尾部会把这个因子判为「垃圾」，而它其实只是被用错了地方。</p>
+        </div>
+
+        <h3>第4步 组合时先处理极端值，再谈加权</h3>
+        <p><strong>做法：</strong>先把每个因子裁剪到 1%~99% 分位（超出的按边界算），然后转成截面百分位排名，最后等权平均。</p>
+        <div class="insight-block">
+            <p><strong>为什么：</strong>第 3 章证明，组合的主要价值来自处理极端值，不是信号叠加。裁剪 + 等权是 0 个拟合参数的做法，不会过拟合。</p>
+        </div>
+        <ul>
+            <li>第 1 步：每个因子裁剪到 [1% 分位, 99% 分位]</li>
+            <li>第 2 步：转成当日截面百分位排名（0~1）</li>
+            <li>第 3 步：按 IC 方向统一符号（IC 为负的取相反数）</li>
+            <li>第 4 步：直接平均</li>
+        </ul>
+        <p>挑因子的原则：从独立轴里选 3~5 个方向真正不同的，按经济逻辑挑而不是按回测成绩挑。</p>
+
+        <h3>第5步 留一段真正没碰过的数据</h3>
+        <p><strong>做法：</strong>在动手之前就把最后 2~3 年封存，整个研究过程完全不看。所有配方定稿之后，只在这段上跑一次，跑完就认，不许回头改。</p>
+        <div class="warn-block">
+            <p><strong>为什么：</strong>前四步做得再干净，只要你在同一段数据上反复看结果，就已经在泄漏信息。「封存数据」是唯一不依赖自律的保护措施。</p>
+        </div>
+    </div><!-- /article-body -->
+</div><!-- /article-wrap -->
+
+<footer>
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+</footer>
+
+<div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+    <div class="share-modal">
+        <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+        <canvas id="shareCanvas"></canvas>
+        <div class="share-modal-actions">
+            <button class="btn-download" onclick="downloadCard()">下载图片</button>
+            <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const CARD = {
+        w: 640, h: 360,
+        bg: '#0d1117', border: '#30363d', accent: '#58a6ff',
+        textPrimary: '#e6edf3', textSecondary: '#8b949e',
+        tagBg: 'rgba(52,152,219,0.15)', tagColor: '#58a6ff',
+        title: '因子组合方法论：单因子为什么做不出alpha，组合又难在哪里',
+        excerpt: '单因子选股要先填上一个-5.56pp的成本坑，还常常一头栽进尾部陷阱；因子组合看似有化学反应，本质却是互相裁剪极端值，不是信号叠加。用本地真实数据拆开这两件事，给出一套可操作流程。',
+        author: 'XiaoYinXu', tag: '量化交易',
+        font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        const lines = text.split('\n');
+        let curY = y;
+        lines.forEach(line => {
+            const chars = line.split('');
+            let row = '';
+            for (let i = 0; i < chars.length; i++) {
+                const test = row + chars[i];
+                if (ctx.measureText(test).width > maxWidth && row) {
+                    ctx.fillText(row, x, curY); row = chars[i]; curY += lineHeight;
+                } else { row = test; }
+            }
+            if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+        });
+        return curY;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+        ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h-r);
+        ctx.arcTo(x+w,y+h,x+w-r,y+h,r); ctx.lineTo(x+r,y+h);
+        ctx.arcTo(x,y+h,x,y+h-r,r); ctx.lineTo(x,y+r);
+        ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+    }
+
+    function drawCard(canvas, qrImg) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CARD.w*dpr; canvas.height = CARD.h*dpr;
+        canvas.style.width = CARD.w+'px'; canvas.style.height = CARD.h+'px';
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const pad = 40, qrSize = 80;
+        const textMaxW = CARD.w - pad*2 - qrSize - 16;
+        ctx.fillStyle = CARD.bg; ctx.fillRect(0,0,CARD.w,CARD.h);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.strokeRect(0.5,0.5,CARD.w-1,CARD.h-1);
+        ctx.fillStyle = CARD.accent; ctx.fillRect(0,0,CARD.w,3);
+        ctx.font = 'bold 13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        ctx.fillText(CARD.author, pad, 44);
+        const tagX = pad + ctx.measureText(CARD.author).width + 14;
+        const tagW = ctx.measureText(CARD.tag).width + 16;
+        ctx.fillStyle = CARD.tagBg; roundRect(ctx,tagX,30,tagW,20,4); ctx.fill();
+        ctx.font = 'bold 11px '+CARD.font; ctx.fillStyle = CARD.tagColor;
+        ctx.fillText(CARD.tag, tagX+8, 44);
+        ctx.strokeStyle = CARD.border; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad,62); ctx.lineTo(CARD.w-pad,62); ctx.stroke();
+        ctx.font = 'bold 22px '+CARD.font; ctx.fillStyle = CARD.textPrimary;
+        const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+        ctx.font = '13px '+CARD.font; ctx.fillStyle = CARD.textSecondary;
+        wrapText(ctx, CARD.excerpt, pad, titleBottom+16, textMaxW, 22);
+        ctx.font = '12px '+CARD.font; ctx.fillStyle = CARD.accent;
+        ctx.fillText('↗  '+window.location.href, pad, CARD.h-24);
+        if (qrImg) {
+            const qrX = CARD.w-pad-qrSize, qrY = Math.round((CARD.h-qrSize)/2);
+            ctx.fillStyle = '#fff'; roundRect(ctx,qrX-4,qrY-4,qrSize+8,qrSize+8,6); ctx.fill();
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>document.body.removeChild(t),500); }, 2000);
+    }
+
+    function openShareModal() {
+        const url = window.location.href;
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        if (isMobile) {
+            if (navigator.share) { navigator.share({title:document.title,url}).catch(()=>{}); }
+            else {
+                const ta = document.createElement('textarea');
+                ta.value = url; ta.style.cssText='position:fixed;top:-9999px;left:-9999px';
+                document.body.appendChild(ta); ta.focus(); ta.select();
+                document.execCommand('copy'); document.body.removeChild(ta);
+                showToast('链接已复制');
+            }
+            return;
+        }
+        navigator.clipboard.writeText(url).catch(()=>{});
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, {text:url,width:160,height:160,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+        setTimeout(() => {
+            const el = tmp.querySelector('canvas') || tmp.querySelector('img');
+            if (el) {
+                const img = new Image();
+                img.onload = () => { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),img); document.getElementById('shareOverlay').classList.add('active'); };
+                img.src = el.tagName==='CANVAS' ? el.toDataURL() : el.src;
+            } else { document.body.removeChild(tmp); drawCard(document.getElementById('shareCanvas'),null); document.getElementById('shareOverlay').classList.add('active'); }
+        }, 50);
+    }
+
+    function closeShareModal(e) {
+        if (!e || e.target===document.getElementById('shareOverlay'))
+            document.getElementById('shareOverlay').classList.remove('active');
+    }
+
+    function downloadCard() {
+        const a = document.createElement('a');
+        a.download = 'factor-engineering-card.png';
+        a.href = document.getElementById('shareCanvas').toDataURL('image/png');
+        a.click();
+    }
+</script>
+
+</body>
+</html>
