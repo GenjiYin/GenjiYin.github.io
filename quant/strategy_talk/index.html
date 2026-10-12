@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>别人赚钱的策略，为什么你照搬会亏 — XiaoYinXu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #21262d;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #c9d1d9; }
+
+        .article-wrap {
+            max-width: 860px;
+            margin: 60px auto 80px;
+            padding: 0 40px;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .post-category {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .cat-talk { background: rgba(255,123,156,0.12); color: #ff7b9c; border: 1px solid rgba(255,123,156,0.25); }
+
+        .article-date {
+            font-size: 12px;
+            color: #484f58;
+        }
+
+        .article-title {
+            font-size: 28px;
+            color: #e6edf3;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 14px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #8b949e;
+            line-height: 1.7;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #c9d1d9;
+        }
+
+        .article-body h2 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin: 40px 0 16px;
+            padding-left: 12px;
+            border-left: 3px solid #ff7b9c;
+        }
+
+        .article-body p { margin-bottom: 16px; }
+
+        .article-body ul, .article-body ol { margin: 12px 0 16px 24px; }
+        .article-body li { margin-bottom: 8px; }
+
+        .article-body strong { color: #e6edf3; }
+
+        .article-body blockquote {
+            border-left: 3px solid #30363d;
+            padding: 12px 20px;
+            margin: 20px 0;
+            background: #161b22;
+            border-radius: 0 6px 6px 0;
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .article-body table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+        .article-body th { background: #161b22; color: #8b949e; font-weight: bold; padding: 10px 12px; text-align: center; border: 1px solid #21262d; font-size: 13px; }
+        .article-body td { padding: 10px 12px; border: 1px solid #21262d; vertical-align: top; text-align: center; }
+        .article-body tr:nth-child(even) td { background: #0d1117; }
+        .article-body tr:nth-child(odd) td { background: #161b22; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #58a6ff;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 32px;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { opacity: 0.75; }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #484f58;
+            font-size: 12px;
+            border-top: 1px solid #21262d;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-top: 32px;
+        }
+
+        .share-btn:hover { border-color: #ff7b9c; color: #ff7b9c; }
+
+        .share-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .share-modal-overlay.active { display: flex; }
+
+        .share-modal {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 680px;
+            width: 95%;
+            text-align: center;
+        }
+
+        .share-modal h3 {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .share-modal canvas { border-radius: 8px; max-width: 100%; }
+
+        .share-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+
+        .share-modal-actions button {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+        }
+
+        .btn-download {
+            background: #238636;
+            color: #fff;
+            border-color: #2ea043 !important;
+        }
+
+        .btn-download:hover { background: #2ea043; }
+
+        .btn-cancel {
+            background: transparent;
+            color: #8b949e;
+        }
+
+        .btn-cancel:hover { color: #c9d1d9; }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .article-wrap { padding: 0 20px; margin: 40px auto 60px; }
+            .article-title { font-size: 22px; }
+            .article-body table { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="../../index.html" class="nav-logo">XiaoYinXu</a>
+        <ul class="nav-links">
+            <li><a href="../../index.html">首页</a></li>
+            <li><a href="../../resume/">关于我</a></li>
+            <li><a href="https://github.com/GenjiYin" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="article-wrap">
+        <a href="../../index.html" class="back-link">← 返回首页</a>
+
+        <div class="article-header">
+            <div class="article-meta">
+                <span class="post-category cat-talk">杂谈</span>
+                <span class="article-date">2026-10</span>
+            </div>
+            <h1 class="article-title">别人赚钱的策略，为什么你照搬会亏</h1>
+            <p class="article-subtitle">从资金量、波动、成本到理解深度，聊聊为什么别人的策略不能直接照搬，以及借用之前该问自己的四句话。</p>
+            <button class="share-btn" onclick="openShareModal()">↗ 分享这篇文章</button>
+        </div>
+
+        <div class="article-body">
+
+            <p>别人赚钱的方法，直接拿来用行不行？常常不行。</p>
+
+            <p>同一套操作，别人赚、你亏，问题往往不在策略本身，而在策略和人不匹配。他的策略也许只适合某个资金量，你的钱不是那个数；他能扛住的起伏，你扛不住；他拿到的成交价，你拿不到。</p>
+
+            <p><strong>策略不是随便能借来穿的衣服，尺码未必合你的身。</strong></p>
+
+            <h2>第零关：你看到的，是全部吗</h2>
+
+            <p>在讨论合不合身之前，先要确认衣服本身是真的。</p>
+
+            <ul>
+                <li>你看到的是赚钱的人。亏钱的人不会发帖，也不会晒收益，这叫<strong>幸存者偏差</strong>。</li>
+                <li>你看到的多半是结果，不是完整做法。真正起作用的细节，往往没被说出来。</li>
+                <li>公开的策略，用的人一多就容易失灵。赚钱的机会是有限的，人挤人，就不赚钱了。</li>
+            </ul>
+
+            <p>这一关过了，再往下看合不合身。</p>
+
+            <h2>一、资金量：装不下，或者铺不开</h2>
+
+            <p>每个策略赚的，都是市场上某一类机会的钱，而机会是有限的。所以每个策略能装下的资金量也有上限。</p>
+
+            <p>钱多的人会遇到一个问题：你的买卖本身会改变价格。你想买，价格被你推上去；你想卖，价格被你砸下来。多花的这部分钱叫<strong>冲击成本</strong>，对方小资金的回测里看不到，却会实实在在吃掉你的利润。</p>
+
+            <p>钱少的人也有问题。有些策略要求把钱分散到很多标的上，每个只放一小份。对方资金量大，能铺满；你的钱不够，只能买其中几个，收益被稀释，风险反而更集中。</p>
+
+            <p>所以资金量的错位是双向的。小资金跑着赚钱的策略，换成大资金可能亏；要铺很多标的的策略，小资金又未必玩得转。不是策略变了，是钱变了。</p>
+
+            <h2>二、波动：起伏你扛不扛得住</h2>
+
+            <p>对方的策略最大回撤 40%，在他看来是正常波动，扛一扛就过去了。你亏 15% 就睡不着，亏到 25% 就想割肉，最后往往割在最低点。策略没有错，是它超出了你的心理承受范围。</p>
+
+            <p>有一点要特别留意：看回测曲线的时候，谁都觉得自己能扛 40%。真金白银亏起来，感受完全是另一回事。所以别用"我觉得我能扛"来判断，用"我真的亏过多少、当时做了什么"来判断。</p>
+
+            <p>好在波动是可以调的。把仓位减半，回撤大致也跟着减半，从 40% 降到 20% 上下。代价是收益也会跟着缩小。</p>
+
+            <p>也可以反着调。有些策略起伏很小，收益也慢，你嫌不够刺激就加杠杆。但调过头，你手里的就不再是原来那个策略了，风险已经变成另一种。</p>
+
+            <h2>三、成本和执行：同样的操作，你到手的更少</h2>
+
+            <p>买卖要花钱：佣金、印花税，还有一项容易被忽略的，叫<strong>滑点</strong>，也就是你想要的价格和实际成交价之间的差。</p>
+
+            <p>对方可能有更低的佣金，也可能用程序自动下单，信号一出现几乎立刻成交。你是手动操作，看到信号再下单，价格已经走了一截；还只能按市价追着买，成交价更差。</p>
+
+            <p>这一点对不同频率的策略影响差别很大：</p>
+
+            <ul>
+                <li>买卖越频繁，利润越薄，成本越致命。佣金从万分之一变成万分之三，可能直接从赚变亏。</li>
+                <li>买卖越少、持有越久，成本和延迟的影响就越小，这时候更要紧的是上一节的波动。</li>
+            </ul>
+
+            <p>还有一些策略本身依赖特定条件，比如要同时下很多单、要快速撤单。你没有这套环境，策略就跑不起来，或者跑出来是残缺版。</p>
+
+            <h2>四、理解深度：分得清"正常回撤"和"策略失效"吗</h2>
+
+            <p>最后一点最容易被忽略。</p>
+
+            <p>对方知道这个策略赚的是什么钱，什么时候会亏，为什么会亏。所以回撤的时候，他知道这是正常起伏，不用慌。你不懂，一亏就慌，一慌操作就变形，最后亏在心态上，而不是策略上。</p>
+
+            <p>反过来，市场环境变了，策略可能真的不灵了。懂的人能看出来，及时停手；不懂的人看不出来，还在照跑，直到亏得很厉害才反应过来。</p>
+
+            <p>"该扛"和"该停"，其实是同一个问题：<strong>这次亏，是正常的，还是出问题了？</strong></p>
+
+            <p>答案要在亏钱之前就想好，而不是亏的时候临时判断。比如事先写下来：这个策略历史上最深的回撤是多少？亏到什么程度、或者它赚钱的前提发生什么变化，就认定它不灵了？</p>
+
+            <h2>哪些能改，哪些改不了</h2>
+
+            <p>衣服是可以改的，但能改的地方有限。</p>
+
+            <table>
+                <thead>
+                    <tr><th>能调</th><th>不太好调</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>仓位和杠杆，决定了你的波动</td><td>资金量，决定了策略装不装得下你</td></tr>
+                    <tr><td>券商、下单方式，决定了成本和成交价</td><td>理解深度，只能靠时间和经验慢慢积累</td></tr>
+                </tbody>
+            </table>
+
+            <p>能改的，改完要确认这还是不是原来的策略。改不了的，只能选尺码合适的，不能硬穿。</p>
+
+            <h2>借别人的策略前，先问自己四句话</h2>
+
+            <ol>
+                <li>我看到的是完整的做法，还是只有一个结果？</li>
+                <li>我的资金量，和这个策略装得下的量对得上吗？</li>
+                <li>它最难受的时候有多深，我真的扛得住吗？不行的话，减仓后收益我还满意吗？</li>
+                <li>它赚的是什么钱？我准备好了，什么情况下算它失效吗？</li>
+            </ol>
+
+            <blockquote>别人的策略，可以参考思路，但不能直接照搬。袖子可以改短，肩宽改不了。</blockquote>
+
+        </div>
+    </div>
+
+    <!-- 分享弹窗 -->
+    <div class="share-modal-overlay" id="shareOverlay" onclick="closeShareModal(event)">
+        <div class="share-modal">
+            <h3>分享卡片预览（链接已复制到剪贴板）</h3>
+            <canvas id="shareCanvas"></canvas>
+            <div class="share-modal-actions">
+                <button class="btn-download" onclick="downloadCard()">下载图片</button>
+                <button class="btn-cancel" onclick="closeShareModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        本页访问量 <span id="busuanzi_value_page_pv"></span> 次
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        const CARD = {
+            w: 640, h: 360,
+            bg: '#0d1117',
+            border: '#30363d',
+            accent: '#ff7b9c',
+            textPrimary: '#e6edf3',
+            textSecondary: '#8b949e',
+            tagBg: 'rgba(255,123,156,0.12)',
+            tagColor: '#ff7b9c',
+            title: '别人赚钱的策略，为什么你照搬会亏',
+            excerpt: '同一套操作，别人赚、你亏，问题往往不在策略，而在尺码。从资金量、波动、成本执行、理解深度四个角度，聊聊别人的策略为什么不能直接照搬，以及借用之前该问自己的四句话。',
+            author: 'XiaoYinXu',
+            tag: '杂谈',
+            font: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif'
+        };
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const lines = text.split('\n');
+            let curY = y;
+            lines.forEach(line => {
+                const words = line.split('');
+                let row = '';
+                for (let i = 0; i < words.length; i++) {
+                    const test = row + words[i];
+                    if (ctx.measureText(test).width > maxWidth && row) {
+                        ctx.fillText(row, x, curY);
+                        row = words[i];
+                        curY += lineHeight;
+                    } else {
+                        row = test;
+                    }
+                }
+                if (row) { ctx.fillText(row, x, curY); curY += lineHeight; }
+            });
+            return curY;
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.arcTo(x + w, y, x + w, y + r, r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h);
+            ctx.arcTo(x, y + h, x, y + h - r, r);
+            ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r);
+            ctx.closePath();
+        }
+
+        function drawCard(canvas, qrImg) {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = CARD.w * dpr;
+            canvas.height = CARD.h * dpr;
+            canvas.style.width = CARD.w + 'px';
+            canvas.style.height = CARD.h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = CARD.bg;
+            ctx.fillRect(0, 0, CARD.w, CARD.h);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0.5, 0.5, CARD.w - 1, CARD.h - 1);
+
+            ctx.fillStyle = CARD.accent;
+            ctx.fillRect(0, 0, CARD.w, 3);
+
+            const pad = 40;
+            const qrSize = 80;
+            const textMaxW = CARD.w - pad * 2 - qrSize - 16;
+
+            ctx.font = 'bold 13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            ctx.fillText(CARD.author, pad, 44);
+
+            const tagX = pad + ctx.measureText(CARD.author).width + 14;
+            const tagW = ctx.measureText(CARD.tag).width + 16;
+            ctx.fillStyle = CARD.tagBg;
+            roundRect(ctx, tagX, 30, tagW, 20, 4);
+            ctx.fill();
+            ctx.font = 'bold 11px ' + CARD.font;
+            ctx.fillStyle = CARD.tagColor;
+            ctx.fillText(CARD.tag, tagX + 8, 44);
+
+            ctx.strokeStyle = CARD.border;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad, 62);
+            ctx.lineTo(CARD.w - pad, 62);
+            ctx.stroke();
+
+            ctx.font = 'bold 22px ' + CARD.font;
+            ctx.fillStyle = CARD.textPrimary;
+            const titleBottom = wrapText(ctx, CARD.title, pad, 96, textMaxW, 34);
+
+            ctx.font = '13px ' + CARD.font;
+            ctx.fillStyle = CARD.textSecondary;
+            wrapText(ctx, CARD.excerpt, pad, titleBottom + 16, textMaxW, 22);
+
+            const site = window.location.href;
+            ctx.font = '12px ' + CARD.font;
+            ctx.fillStyle = CARD.accent;
+            ctx.fillText('↗  ' + site, pad, CARD.h - 24);
+
+            if (qrImg) {
+                const qrX = CARD.w - pad - qrSize;
+                const qrY = Math.round((CARD.h - qrSize) / 2);
+                ctx.fillStyle = '#fff';
+                roundRect(ctx, qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 6);
+                ctx.fill();
+                ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.textContent = msg;
+            t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s';
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => document.body.removeChild(t), 500); }, 2000);
+        }
+
+        function openShareModal() {
+            const url = window.location.href;
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+            if (isMobile) {
+                if (navigator.share) {
+                    navigator.share({ title: document.title, url: url }).catch(() => {});
+                } else {
+                    const fallbackCopy = () => {
+                        const ta = document.createElement('textarea');
+                        ta.value = url;
+                        ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus(); ta.select();
+                        const ok = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        return ok;
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(url).then(() => showToast('链接已复制')).catch(() => {
+                            fallbackCopy(); showToast('链接已复制');
+                        });
+                    } else {
+                        fallbackCopy(); showToast('链接已复制');
+                    }
+                }
+                return;
+            }
+            // desktop: auto copy link
+            navigator.clipboard.writeText(url).catch(() => {});
+
+            const tmp = document.createElement('div');
+            tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tmp);
+            const qr = new QRCode(tmp, {
+                text: url,
+                width: 160,
+                height: 160,
+                colorDark: '#000',
+                colorLight: '#fff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            const qrImg = tmp.querySelector('img') || tmp.querySelector('canvas');
+            const finish = (src) => {
+                const img = new Image();
+                img.onload = () => {
+                    document.body.removeChild(tmp);
+                    drawCard(document.getElementById('shareCanvas'), img);
+                    document.getElementById('shareOverlay').classList.add('active');
+                };
+                img.src = src;
+            };
+
+            if (qrImg && qrImg.tagName === 'CANVAS') {
+                finish(qrImg.toDataURL());
+            } else if (qrImg && qrImg.src) {
+                finish(qrImg.src);
+            } else {
+                setTimeout(() => {
+                    const el = tmp.querySelector('img') || tmp.querySelector('canvas');
+                    if (el) finish(el.tagName === 'CANVAS' ? el.toDataURL() : el.src);
+                    else {
+                        document.body.removeChild(tmp);
+                        drawCard(document.getElementById('shareCanvas'), null);
+                        document.getElementById('shareOverlay').classList.add('active');
+                    }
+                }, 100);
+            }
+        }
+
+        function closeShareModal(e) {
+            if (!e || e.target === document.getElementById('shareOverlay')) {
+                document.getElementById('shareOverlay').classList.remove('active');
+            }
+        }
+
+        function downloadCard() {
+            const canvas = document.getElementById('shareCanvas');
+            const a = document.createElement('a');
+            a.download = 'strategy-talk-card.png';
+            a.href = canvas.toDataURL('image/png');
+            a.click();
+        }
+    </script>
+
+</body>
+</html>
